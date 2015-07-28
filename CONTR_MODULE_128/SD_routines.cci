@@ -1,0 +1,7 @@
+VERSION:3 SOURCE_TIMESTAMP:427D9011
+NODE:I LEVEL:0 LINE:4 "D:\Проекты от студии\mnsauV3 (07.07.15)\CONTR_MODULE_128\SPI_routines.h"
+NODE:I LEVEL:0 LINE:5 "D:\Проекты от студии\mnsauV3 (07.07.15)\CONTR_MODULE_128\SD_routines.h"
+NODE:F LEVEL:0 LINE:13 "SD_init(void)"
+NODE:F LEVEL:0 LINE:56 "SD_sendCommand(unsigned char cmd,unsigned long arg)"
+NODE:F LEVEL:0 LINE:90 "SD_readSingleBlock(unsigned long startBlock)"
+NODE:F LEVEL:0 LINE:123 "SD_writeSingleBlock(unsigned long startBlock)"

@@ -1,0 +1,4 @@
+VERSION:3 SOURCE_TIMESTAMP:427C6E8F
+NODE:I LEVEL:0 LINE:4 "D:\Проекты от студии\mnsauV3 (07.07.15)\CONTR_MODULE_128\SPI_routines.h"
+NODE:F LEVEL:0 LINE:6 "SPI_transmit(unsigned char data)"
+NODE:F LEVEL:0 LINE:18 "SPI_receive(void)"

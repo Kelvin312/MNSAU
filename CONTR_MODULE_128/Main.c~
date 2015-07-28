@@ -1,0 +1,1047 @@
+#include <mega128.h>
+#include <delay.h>
+#include <math.h>
+#include <spi.h>
+#include <string.h>
+#include "PCF8583.h"
+#include "Font16x16.c"
+#include "SSD1963.c"
+#include "TSC2046.c"
+#include "SPI_routines.c"
+#include "SD_routines.c"
+#include "FAT32.c"
+
+// I2C Bus functions
+#asm
+   .equ __i2c_port=0x12 ;PORTD
+   .equ __sda_bit=1
+   .equ __scl_bit=0
+#endasm
+#include <i2c.h>
+
+
+#ifndef RXB8
+#define RXB8 1
+#endif
+
+#ifndef TXB8
+#define TXB8 0
+#endif
+
+#ifndef UPE
+#define UPE 2
+#endif
+
+#ifndef DOR
+#define DOR 3
+#endif
+
+#ifndef FE
+#define FE 4
+#endif
+
+#ifndef UDRE
+#define UDRE 5
+#endif
+
+#ifndef RXC
+#define RXC 7
+#endif
+
+#define FRAMING_ERROR (1<<FE)
+#define PARITY_ERROR (1<<UPE)
+#define DATA_OVERRUN (1<<DOR)
+#define DATA_REGISTER_EMPTY (1<<UDRE)
+#define RX_COMPLETE (1<<RXC)
+
+
+// USART0 Receiver buffer
+#define RX_BUFFER_SIZE0 8
+char rx_buffer0[RX_BUFFER_SIZE0];
+
+#if RX_BUFFER_SIZE0 <= 256
+unsigned char rx_wr_index0=0,rx_rd_index0=0;
+#else
+unsigned int rx_wr_index0=0,rx_rd_index0=0;
+#endif
+
+#if RX_BUFFER_SIZE0 < 256
+unsigned char rx_counter0=0;
+#else
+unsigned int rx_counter0=0;
+#endif
+
+// This flag is set on USART0 Receiver buffer overflow
+bit rx_buffer_overflow0;
+
+// USART0 Receiver interrupt service routine
+interrupt [USART0_RXC] void usart0_rx_isr(void)
+{
+char status,data;
+status=UCSR0A;
+data=UDR0;
+if ((status & (FRAMING_ERROR | PARITY_ERROR | DATA_OVERRUN))==0)
+   {
+   rx_buffer0[rx_wr_index0++]=data;
+#if RX_BUFFER_SIZE0 == 256
+   // special case for receiver buffer size=256
+   if (++rx_counter0 == 0) rx_buffer_overflow0=1;
+#else
+   if (rx_wr_index0 == RX_BUFFER_SIZE0) rx_wr_index0=0;
+   if (++rx_counter0 == RX_BUFFER_SIZE0)
+      {
+      rx_counter0=0;
+      rx_buffer_overflow0=1;
+      }
+#endif
+   }
+}
+
+#ifndef _DEBUG_TERMINAL_IO_
+// Get a character from the USART0 Receiver buffer
+#define _ALTERNATE_GETCHAR_
+#pragma used+
+char getchar(void)
+{
+char data;
+while (rx_counter0==0);
+data=rx_buffer0[rx_rd_index0++];
+#if RX_BUFFER_SIZE0 != 256
+if (rx_rd_index0 == RX_BUFFER_SIZE0) rx_rd_index0=0;
+#endif
+#asm("cli")
+--rx_counter0;
+#asm("sei")
+return data;
+}
+#pragma used-
+#endif
+
+// USART0 Transmitter buffer
+#define TX_BUFFER_SIZE0 8
+char tx_buffer0[TX_BUFFER_SIZE0];
+
+#if TX_BUFFER_SIZE0 <= 256
+unsigned char tx_wr_index0=0,tx_rd_index0=0;
+#else
+unsigned int tx_wr_index0=0,tx_rd_index0=0;
+#endif
+
+#if TX_BUFFER_SIZE0 < 256
+unsigned char tx_counter0=0;
+#else
+unsigned int tx_counter0=0;
+#endif
+
+// USART0 Transmitter interrupt service routine
+interrupt [USART0_TXC] void usart0_tx_isr(void)
+{
+if (tx_counter0)
+   {
+   --tx_counter0;
+   UDR0=tx_buffer0[tx_rd_index0++];
+#if TX_BUFFER_SIZE0 != 256
+   if (tx_rd_index0 == TX_BUFFER_SIZE0) tx_rd_index0=0;
+#endif
+   }
+}
+
+#ifndef _DEBUG_TERMINAL_IO_
+// Write a character to the USART0 Transmitter buffer
+#define _ALTERNATE_PUTCHAR_
+#pragma used+
+void putchar(char c)
+{
+while (tx_counter0 == TX_BUFFER_SIZE0);
+#asm("cli")
+if (tx_counter0 || ((UCSR0A & DATA_REGISTER_EMPTY)==0))
+   {
+   tx_buffer0[tx_wr_index0++]=c;
+#if TX_BUFFER_SIZE0 != 256
+   if (tx_wr_index0 == TX_BUFFER_SIZE0) tx_wr_index0=0;
+#endif
+   ++tx_counter0;
+   }
+else
+   UDR0=c;
+#asm("sei")
+}
+#pragma used-
+#endif
+
+
+
+// USART1 Receiver buffer
+#define RX_BUFFER_SIZE1 8
+char rx_buffer1[RX_BUFFER_SIZE1];
+
+#if RX_BUFFER_SIZE1 <= 256
+unsigned char rx_wr_index1,rx_rd_index1,rx_counter1;
+#else
+unsigned int rx_wr_index1,rx_rd_index1,rx_counter1;
+#endif
+
+// This flag is set on USART1 Receiver buffer overflow
+bit rx_buffer_overflow1;
+
+// USART1 Receiver interrupt service routine
+interrupt [USART1_RXC] void usart1_rx_isr(void)
+{
+char status,data;
+status=UCSR1A;
+data=UDR1;
+if ((status & (FRAMING_ERROR | PARITY_ERROR | DATA_OVERRUN))==0)
+   {
+   rx_buffer1[rx_wr_index1++]=data;
+#if RX_BUFFER_SIZE1 == 256
+   // special case for receiver buffer size=256
+   if (++rx_counter1 == 0)
+      {
+#else
+   if (rx_wr_index1 == RX_BUFFER_SIZE1) rx_wr_index1=0;
+   if (++rx_counter1 == RX_BUFFER_SIZE1)
+      {
+      rx_counter1=0;
+#endif
+      rx_buffer_overflow1=1;
+      }
+   }
+}
+
+// Get a character from the USART1 Receiver buffer
+#pragma used+
+char getchar1(void)
+{
+char data;
+while (rx_counter1==0);
+data=rx_buffer1[rx_rd_index1++];
+#if RX_BUFFER_SIZE1 != 256
+if (rx_rd_index1 == RX_BUFFER_SIZE1) rx_rd_index1=0;
+#endif
+#asm("cli")
+--rx_counter1;
+#asm("sei")
+return data;
+}
+#pragma used-
+// USART1 Transmitter buffer
+#define TX_BUFFER_SIZE1 8
+char tx_buffer1[TX_BUFFER_SIZE1];
+
+#if TX_BUFFER_SIZE1 <= 256
+unsigned char tx_wr_index1,tx_rd_index1,tx_counter1;
+#else
+unsigned int tx_wr_index1,tx_rd_index1,tx_counter1;
+#endif
+
+// USART1 Transmitter interrupt service routine
+interrupt [USART1_TXC] void usart1_tx_isr(void)
+{
+if (tx_counter1)
+   {
+   --tx_counter1;
+   UDR1=tx_buffer1[tx_rd_index1++];
+#if TX_BUFFER_SIZE1 != 256
+   if (tx_rd_index1 == TX_BUFFER_SIZE1) tx_rd_index1=0;
+#endif
+   }
+}
+
+// Write a character to the USART1 Transmitter buffer
+#pragma used+
+void putchar1(char c)
+{
+while (tx_counter1 == TX_BUFFER_SIZE1);
+#asm("cli")
+if (tx_counter1 || ((UCSR1A & DATA_REGISTER_EMPTY)==0))
+   {
+   tx_buffer1[tx_wr_index1++]=c;
+#if TX_BUFFER_SIZE1 != 256
+   if (tx_wr_index1 == TX_BUFFER_SIZE1) tx_wr_index1=0;
+#endif
+   ++tx_counter1;
+   }
+else
+   UDR1=c;
+#asm("sei")
+}
+#pragma used-
+
+#define BTN_StartX 0
+#define BTN_StartY 240
+#define BTN_Width 100
+#define BTN_Height 30
+#define BTN_Between 20
+
+unsigned int BTN1_Y_Begin = BTN_StartY;
+unsigned int BTN1_Y_End = BTN_StartY + BTN_Height;
+unsigned int BTN1_X_Begin = BTN_StartX;
+unsigned int BTN1_X_End = BTN_StartX + BTN_Width;
+
+unsigned int BTN2_Y_Begin = BTN_StartY;
+unsigned int BTN2_Y_End = BTN_StartY + BTN_Height;
+unsigned int BTN2_X_Begin = BTN_StartX + BTN_Width + BTN_Between;
+unsigned int BTN2_X_End = BTN_StartX + (BTN_Width * 2) + BTN_Between;
+
+unsigned int BTN3_Y_Begin = BTN_StartY;
+unsigned int BTN3_Y_End = BTN_StartY + BTN_Height;
+unsigned int BTN3_X_Begin = BTN_StartX + (BTN_Width * 2) + (BTN_Between * 2);
+unsigned int BTN3_X_End = BTN_StartX + (BTN_Width * 3) + (BTN_Between * 2);
+
+unsigned int BTN4_Y_Begin = BTN_StartY;
+unsigned int BTN4_Y_End = BTN_StartY + BTN_Height;
+unsigned int BTN4_X_Begin = BTN_StartX + (BTN_Width * 3) + (BTN_Between * 3);
+unsigned int BTN4_X_End = BTN_StartX + (BTN_Width * 4) + (BTN_Between * 3);
+
+volatile char Button_Pressed;
+
+#define BACKLIGHT 6
+#define LEDGREEN 3
+#define LEDRED 4
+#define LEDBLUE 5
+
+volatile char Hour, Minute, Seconds, mSeconds, Day, Month;
+volatile unsigned int Year;
+
+#define DateTime_X 300
+#define DateTime_Y 256
+
+volatile unsigned int mSec;
+
+char SD_Ready;
+unsigned char error, FAT32_active;
+volatile long cluster, firstSector, nextSector;
+volatile unsigned char buffer[512];
+volatile long firstDataSector, rootCluster, totalClusters, byteCounter, fileSize;
+volatile unsigned int bytesPerSector, sectorPerCluster, reservedSectorCount;
+
+volatile unsigned int LEDGREEN_mSec, LEDRED_mSec, LEDBLUE_mSec, LEDGREEN_max = 3000, LEDRED_max = 250, LEDBLUE_max = 1000;
+
+#define Pulse_X_Min 270
+#define Pulse_X_Max 430
+#define Pulse_Y_Min 0
+#define Pulse_Y_Max 48
+volatile unsigned int Pulse_X, Pulse_Y_Last, Pulse_mSec, Pulse_Value, Pulse_Counter, Pulse_ScreenValue;
+volatile char Pulse_Flag, Pulse_ScreenFlag;
+
+#define Pulse_Value_X 430
+#define Pulse_Value_Y 0
+
+#define Pulse_Enable PORTB.0
+
+#define Cardio_X_Min 0
+#define Cardio_X_Max 480
+#define Cardio_Y_Min 50
+#define Cardio_Y_Max 232
+volatile unsigned int Cardio_X, Cardio_Y_Last, Cardio_mSec, Cardio_Value, Cardio_Counter;
+volatile float Cardio_Divider;
+volatile int CardioMassive[128], CardioMassive_Counter;
+
+// 0 - высота осциллограммы
+// 1 - длина шага осциллограммы
+// 2 - высота отпределителя пульса
+eeprom unsigned int WorkParameters[3] = {500, 10, 300};
+flash unsigned int Default_Parameters[3] = {500, 10, 300};
+eeprom char EEPROM_FLAG;
+char Parameter_Counter;
+
+// Красный светодиод - был пульс и пропал
+// Синий светодиод - низкий заряд батареи
+// Зеленый светодиод - нормальная работа
+
+volatile char Alarm, Battery_Discharged, State;
+
+#define Battery_Width 24
+#define Battery_Height 50
+#define Battery_X 0
+#define Battery_Y 0
+
+#define ScanLine_Length 25
+unsigned int ScanLine_X;
+
+volatile unsigned int Refresh_mSec, Battery_Value, ADC0, ADC1, ADC2, Sleep_mSec;
+volatile long longADC;
+unsigned int Alarm_mSec;
+
+void SwitchPORTF(char Number, char Value)
+{
+  switch(Value)
+  {
+    case 0 :
+      PORTF &= ~(0b00000001 << Number);
+    break;
+    case 1 :
+      PORTF |= 0b00000001 << Number;
+    break;
+  }
+}
+
+// Timer 0 overflow interrupt service routine
+interrupt [TIM0_OVF] void timer0_ovf_isr(void)
+{
+  TCNT0=0x06;
+  mSec++;
+  Pulse_mSec++;
+  Refresh_mSec++;
+  Sleep_mSec++;
+  Alarm_mSec++;
+  if (Alarm < 1)
+  {
+    if (Battery_Discharged < 1)
+    {
+      SwitchPORTF(LEDRED, 1);
+      SwitchPORTF(LEDBLUE, 1);
+      LEDGREEN_mSec++;
+      if (LEDGREEN_mSec > 30) SwitchPORTF(LEDGREEN, 1);
+      if (LEDGREEN_mSec > LEDGREEN_max) {LEDGREEN_mSec = 0; SwitchPORTF(LEDGREEN, 0);}
+    }
+    else
+    {
+      SwitchPORTF(LEDGREEN, 1);
+      SwitchPORTF(LEDRED, 1);
+      LEDBLUE_mSec++;
+      if (LEDBLUE_mSec > 30) SwitchPORTF(LEDBLUE, 1);
+      if (LEDBLUE_mSec > LEDBLUE_max) {LEDBLUE_mSec = 0; SwitchPORTF(LEDBLUE, 0);}
+    }
+  }
+  else
+  {
+    SwitchPORTF(LEDGREEN, 1);
+    SwitchPORTF(LEDBLUE, 1);
+    LEDRED_mSec++;
+    if (LEDRED_mSec > 30) SwitchPORTF(LEDRED, 1);
+    if (LEDRED_mSec > LEDRED_max) {LEDRED_mSec = 0; SwitchPORTF(LEDRED, 0);}
+  }
+}
+
+#define ADC_VREF_TYPE 0x00
+
+// Read the AD conversion result
+unsigned int read_adc(unsigned char adc_input)
+{
+ADMUX=adc_input | (ADC_VREF_TYPE & 0xff);
+// Delay needed for the stabilization of the ADC input voltage
+delay_us(10);
+// Start the AD conversion
+ADCSRA|=0x40;
+// Wait for the AD conversion to complete
+while ((ADCSRA & 0x10)==0);
+ADCSRA|=0x10;
+return ADCW;
+}
+
+char SDCardInit(void)
+{
+  delay_ms(50);
+  if (SD_init() == 1)
+  {
+    SD_Ready = 0;
+    //PutString(SDAbsent, 199);
+  }
+  else
+  {
+    SD_Ready = 1;
+    //PutString(SDReady, 99);
+    //Minute_mSec = 0;
+    //while (Minute_mSec < 999)
+    //{
+//      PutAntAnimation(49); // выводить анимацию
+//      RefreshLEDDisplay();
+    //}
+  }
+  delay_ms(1);
+
+  FAT32_active = 1;
+  error = getBootSectorData (); //read boot sector and keep necessary data in global variables
+  if(error)
+  {
+//    PutString(SDnoFAT32, 199); // FAT32 incompatible drive
+    FAT32_active = 0;
+    SD_Ready = 0;
+  }
+  return SD_Ready;
+}
+
+char GetButton(void)
+{
+  char res = 0;
+  if (TSC2046_GetCoordinates())
+  {
+    if ((TOUCH_X > BTN1_X_Begin) && (TOUCH_X < BTN1_X_End)) // если X внутри заданного диапазона
+    {
+      if ((TOUCH_Y > BTN1_Y_Begin) && (TOUCH_Y < BTN1_Y_End)) res = 1;
+    }
+    if ((TOUCH_X > BTN2_X_Begin) && (TOUCH_X < BTN2_X_End)) // если X внутри заданного диапазона
+    {
+      if ((TOUCH_Y > BTN2_Y_Begin) && (TOUCH_Y < BTN2_Y_End)) res = 2;
+    }
+    if ((TOUCH_X > BTN3_X_Begin) && (TOUCH_X < BTN3_X_End)) // если X внутри заданного диапазона
+    {
+      if ((TOUCH_Y > BTN3_Y_Begin) && (TOUCH_Y < BTN3_Y_End)) res = 3;
+    }
+    if ((TOUCH_X > BTN4_X_Begin) && (TOUCH_X < BTN4_X_End)) // если X внутри заданного диапазона
+    {
+      if ((TOUCH_Y > BTN4_Y_Begin) && (TOUCH_Y < BTN4_Y_End)) res = 4;
+    }
+
+  }
+  return res;
+}
+
+long CalcLongValue(long Value1, unsigned int Value2)
+{
+  return (Value1 * Value2) / 1000;
+}
+
+void Repaint_Button(unsigned char* String, char Number, unsigned int Color, unsigned int BackColor)
+{
+  switch(Number)
+  {
+    case 1 :
+      SSD1963_PutString16("     ", BTN1_X_Begin + 10, BTN1_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
+      SSD1963_PutString16(String, BTN1_X_Begin + 10, BTN1_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
+    break;
+    case 2 :
+      SSD1963_PutString16("     ", BTN2_X_Begin + 10, BTN2_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
+      SSD1963_PutString16(String, BTN2_X_Begin + 10, BTN2_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
+    break;
+    case 3 :
+      SSD1963_PutString16("     ", BTN3_X_Begin + 10, BTN3_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
+      SSD1963_PutString16(String, BTN3_X_Begin + 10, BTN3_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
+    break;
+    case 4 :
+      SSD1963_PutString16("     ", BTN4_X_Begin + 10, BTN4_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
+      SSD1963_PutString16(String, BTN4_X_Begin + 10, BTN4_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
+    break;
+  }
+}
+
+void Prepare_Screen(void)
+{
+  // рисуем окошко под батарею
+  SSD1963_DrawFillRect(Battery_X + 3, Battery_Width - 3, Battery_Y, Battery_Y + 2, GREEN);
+  SSD1963_DrawRect(Battery_X, Battery_Width, Battery_Y + 2, Battery_Height, 1, GREEN);
+  // рисуем кнопки
+  SSD1963_DrawFillRect(BTN1_X_Begin, BTN1_X_End, BTN1_Y_Begin, BTN1_Y_End, WHITE);
+  SSD1963_DrawFillRect(BTN2_X_Begin, BTN2_X_End, BTN2_Y_Begin, BTN2_Y_End, WHITE);
+  SSD1963_DrawFillRect(BTN3_X_Begin, BTN3_X_End, BTN3_Y_Begin, BTN3_Y_End, WHITE);
+  SSD1963_DrawFillRect(BTN4_X_Begin, BTN4_X_End, BTN4_Y_Begin, BTN4_Y_End, WHITE);
+  // рисуем окантовку
+  SSD1963_DrawRect(BTN1_X_Begin + 1, BTN1_X_End - 1, BTN1_Y_Begin + 1, BTN1_Y_End - 1, 1, BLACK);
+  SSD1963_DrawRect(BTN2_X_Begin + 1, BTN2_X_End - 1, BTN2_Y_Begin + 1, BTN2_Y_End - 1, 1, BLACK);
+  SSD1963_DrawRect(BTN3_X_Begin + 1, BTN3_X_End - 1, BTN3_Y_Begin + 1, BTN3_Y_End - 1, 1, BLACK);
+  SSD1963_DrawRect(BTN4_X_Begin + 1, BTN4_X_End - 1, BTN4_Y_Begin + 1, BTN4_Y_End - 1, 1, BLACK);
+
+  Repaint_Button("МЕНЮ", 1, BLACK, WHITE);
+  Repaint_Button("  +", 2, BLACK, WHITE);
+  Repaint_Button("  -", 3, BLACK, WHITE);
+  Repaint_Button("ПАУЗА", 4, BLACK, WHITE);
+  /*SSD1963_PutChar16('К', 0, 136, WHITE, BLACK);
+  SSD1963_PutChar16('А', 0, 152, WHITE, BLACK);
+  SSD1963_PutChar16('Р', 0, 168, WHITE, BLACK);
+  SSD1963_PutChar16('Д', 0, 184, WHITE, BLACK);
+  SSD1963_PutChar16('И', 0, 200, WHITE, BLACK);
+  SSD1963_PutChar16('О', 0, 216, WHITE, BLACK);      */
+}
+
+void Paint_ScanLine(unsigned int X_Min, unsigned int X_Max, unsigned int Y_Min, unsigned int Y_Max, unsigned int Color, unsigned int Length)
+{
+  signed int ScanLine_NetHeight, ScanLine_NetWidth;
+  if (ScanLine_X == 0) ScanLine_X = X_Min;
+  ScanLine_NetHeight = (Y_Max - Y_Min) - Length;
+  ScanLine_NetWidth = (X_Max - X_Min) - Length;
+  while (ScanLine_NetHeight > 0)
+  {
+    SSD1963_DrawFastLine(X_Min, X_Max, Y_Min + ScanLine_NetHeight, Y_Min + ScanLine_NetHeight, Color);
+    ScanLine_NetHeight -= Length;
+  }
+  while (ScanLine_NetWidth > 0)
+  {
+    SSD1963_DrawFastLine(X_Min + ScanLine_NetWidth, X_Min + ScanLine_NetWidth, Y_Min, Y_Max, Color);
+    ScanLine_NetWidth -= Length;
+  }
+
+//  if ((ScanLine_X % Length) < 1)  SSD1963_DrawFastLine(ScanLine_X, ScanLine_X, Y_Min, Y_Max, Color);
+  //if ((Counter % Length) < 1)  SSD1963_DrawFastLine(Counter, Counter, Y_Min, Y_Max, Color);
+//  ScanLine_X += Counter; // увеличеваем Х сетки
+//  if (ScanLine_X > X_Max - Length - 1) // если добежали до конца отведённого пространства
+//  {
+//    ScanLine_X = X_Min; // уходим обратно
+//  }
+}
+
+void Paint_Pulse(unsigned int Value, unsigned int Color)
+{
+  if (Pulse_ScreenFlag != Pulse_Flag)
+  {
+    if (Pulse_Flag == 1) Pulse_ScreenValue = Pulse_Y_Min + 5;
+    else if (Pulse_Flag == 0) Pulse_ScreenValue = Pulse_Y_Max - 5;
+    Pulse_ScreenFlag = Pulse_Flag;
+    Alarm_mSec = 0;
+    Alarm = 0;
+  }
+
+  SSD1963_DrawFastLine(Pulse_X, Pulse_X + Value, Pulse_Y_Min, Pulse_Y_Max, BLACK); // очищаем за собой столбец пикселей
+  SSD1963_DrawLine(Pulse_X, Pulse_X + Value, Pulse_Y_Last, Pulse_ScreenValue, Color, 1); // пишем точку в столбце
+  Pulse_X += Value; // увеличиваем Х пульса
+  Pulse_Y_Last = Pulse_ScreenValue; // определяем предыдущую точку пульса
+  Pulse_ScreenValue = Pulse_Y_Max / 2;
+  if (Pulse_X > Pulse_X_Max - (2 * Value)) // если добежали до конца отведённого пространства
+  {
+    SSD1963_DrawFastLine(Pulse_X, Pulse_X_Max, Pulse_Y_Min, Pulse_Y_Max, BLACK); // очищаем столбец в начале для красоты работы
+    Pulse_X = Pulse_X_Min; // уходим обратно
+    SSD1963_DrawFastLine(Pulse_X - Value, Pulse_X, Pulse_Y_Min, Pulse_Y_Max, BLACK); // очищаем столбец в начале для красоты работы
+  }
+}
+
+void Paint_Cardio(unsigned int Value, unsigned int Color, unsigned int Length)
+{
+  signed int temp, temp2;
+  temp = Cardio_Y_Max - (Value / Cardio_Divider);
+  if (temp < Cardio_Y_Min) temp = Cardio_Y_Min;
+  if (temp > Cardio_Y_Max) temp = Cardio_Y_Max - 1;
+  temp2 = Cardio_Y_Max - (WorkParameters[2] / Cardio_Divider);
+  if (temp2 < Cardio_Y_Min) temp2 = Cardio_Y_Min;
+
+  SSD1963_DrawFillRect(Cardio_X, Cardio_X + Length, Cardio_Y_Min, Cardio_Y_Max + 1, BLACK); // очищаем за собой столбец пикселей
+//  Paint_ScanLine(Cardio_X, Cardio_X + Length, Cardio_Y_Min, Cardio_Y_Max, DGRAY, 25);
+  //SSD1963_DrawFastLine(Cardio_X, Cardio_X + Length, Cardio_Y_Min, Cardio_Y_Min, DGRAY);
+  SSD1963_DrawFastLine(Cardio_X, Cardio_X + Length, Cardio_Y_Min + 25, Cardio_Y_Min + 25, DGRAY);
+  SSD1963_DrawFastLine(Cardio_X, Cardio_X + Length, Cardio_Y_Min + 50, Cardio_Y_Min + 50, DGRAY);
+  SSD1963_DrawFastLine(Cardio_X, Cardio_X + Length, Cardio_Y_Min + 75, Cardio_Y_Min + 75, DGRAY);
+  SSD1963_DrawFastLine(Cardio_X, Cardio_X + Length, Cardio_Y_Min + 100, Cardio_Y_Min + 100, DGRAY);
+  SSD1963_DrawFastLine(Cardio_X, Cardio_X + Length, Cardio_Y_Min + 125, Cardio_Y_Min + 125, DGRAY);
+  SSD1963_DrawFastLine(Cardio_X, Cardio_X + Length, Cardio_Y_Min + 150, Cardio_Y_Min + 150, DGRAY);
+
+  //if ((Cardio_X % Length) < 1)  SSD1963_DrawFastLine(Cardio_X, Cardio_X, Cardio_Y_Min, Cardio_Y_Max, DGRAY);
+  SSD1963_DrawLine(Cardio_X, Cardio_X + Length, temp2, temp2, YELLOW, 1); // пишем точку в столбце
+  SSD1963_DrawLine(Cardio_X, Cardio_X + Length, Cardio_Y_Last, temp, Color, 2); // пишем точку в столбце
+  Cardio_X += Length; // увеличеваем Х кардиограммы
+  Cardio_Y_Last = temp; // определяем предыдущую точку кардиограммы
+  if (Cardio_X > Cardio_X_Max - Length) // если добежали до конца отведённого пространства
+  {
+    SSD1963_DrawFillRect(Cardio_X, Cardio_X_Max, Cardio_Y_Min, Cardio_Y_Max + 1, BLACK); // очищаем столбец в начале для красоты работы
+    Cardio_X = Cardio_X_Min; // уходим обратно
+    SSD1963_DrawFillRect(Cardio_X, Cardio_X + Length, Cardio_Y_Min, Cardio_Y_Max + 1, BLACK); // очищаем столбец в начале для красоты работы
+  }
+}
+
+void Calc_Pulse(unsigned int Value)
+{
+  if (Value > WorkParameters[2])
+  {
+    if (Pulse_Flag < 1)
+    {
+      Pulse_Counter++;
+      Pulse_Flag = 1;
+    }
+  }
+  else if (Pulse_Flag > 0) Pulse_Flag = 0;
+
+  if (Pulse_mSec > 59999)
+  {
+    Pulse_mSec = 0;
+    Pulse_Value = Pulse_Counter;
+    Pulse_Counter = 0;
+  }
+}
+
+void Paint_Battery(unsigned int Value)
+{
+  SSD1963_DrawFillRect(Battery_X + 4, Battery_Width - 4, Battery_Y + 4, Battery_Height - 4, BLACK);
+  SSD1963_DrawFillRect(Battery_X + 4, Battery_Width - 4, Battery_Y + 4 + (45 - Value), Battery_Height - 4, GREEN);
+}
+
+void PutParameterText(char Number, char X, char Y, unsigned int Color)
+{
+  SSD1963_PutString16("                ", X, Y, Color, BLACK);
+  SSD1963_PutString16("                ", X, Y + FONT_HEIGHT, Color, BLACK);
+  switch (Number)
+  {
+    case 0 :
+      SSD1963_PutString16("ВЫСОТА", X, Y, Color, BLACK);
+      SSD1963_PutString16("КАРДИОГРАММЫ", X, Y + FONT_HEIGHT, Color, BLACK);
+    break;
+    case 1 :
+      SSD1963_PutString16("ДЛИНА", X, Y, Color, BLACK);
+      SSD1963_PutString16("КАРДИОГРАММЫ", X, Y + FONT_HEIGHT, Color, BLACK);
+    break;
+    case 2 :
+      SSD1963_PutString16("ОПРЕДЕЛИТЕЛЬ", X, Y, Color, BLACK);
+      SSD1963_PutString16("ПУЛЬСА", X, Y + FONT_HEIGHT, Color, BLACK);
+    break;
+    case 3 :
+      SSD1963_PutString16("ВРЕМЯ ОБРАБОТКИ", X, Y, Color, BLACK);
+      SSD1963_PutString16("СКОРОСТИ", X, Y + FONT_HEIGHT, Color, BLACK);
+    break;
+    case 4 :
+      SSD1963_PutString16("СКОРОСТЬ ТПЧ", X, Y, Color, BLACK);
+      SSD1963_PutString16("МАКСИМАЛЬНАЯ", X, Y + FONT_HEIGHT, Color, BLACK);
+    break;
+    case 5 :
+      SSD1963_PutString16("НЕ ИСПОЛЬЗУЕТСЯ", X, Y, Color, BLACK);
+      SSD1963_PutString16("В ТЕКУЩЕЙ ВЕРСИИ", X, Y + FONT_HEIGHT, Color, BLACK);
+    break;
+    case 6 :
+      SSD1963_PutString16("ВНУТРЕННИЕ ЧАСЫ", X, Y, Color, BLACK);
+      SSD1963_PutString16("ДЕНЬ", X, Y + FONT_HEIGHT, Color, BLACK);
+    break;
+    case 7 :
+      SSD1963_PutString16("ВНУТРЕННИЕ ЧАСЫ", X, Y, Color, BLACK);
+      SSD1963_PutString16("МЕСЯЦ", X, Y + FONT_HEIGHT, Color, BLACK);
+    break;
+    case 8 :
+      SSD1963_PutString16("ВНУТРЕННИЕ ЧАСЫ", X, Y, Color, BLACK);
+      SSD1963_PutString16("ЧАС", X, Y + FONT_HEIGHT, Color, BLACK);
+    break;
+    case 9 :
+      SSD1963_PutString16("ВНУТРЕННИЕ ЧАСЫ", X, Y, Color, BLACK);
+      SSD1963_PutString16("МИНУТЫ", X, Y + FONT_HEIGHT, Color, BLACK);
+    break;
+  }
+}
+
+void main(void)
+{
+unsigned int ii = 0xffff;
+{
+// Input/Output Ports initialization
+// Port A initialization
+// Func7=Out Func6=Out Func5=Out Func4=Out Func3=Out Func2=Out Func1=Out Func0=Out
+// State7=0 State6=0 State5=0 State4=0 State3=0 State2=0 State1=0 State0=0
+PORTA=0x00;
+DDRA=0xFF;
+
+// Port B initialization
+// Func7=Out Func6=Out Func5=Out Func4=Out Func3=In Func2=Out Func1=Out Func0=Out
+// State7=0 State6=0 State5=0 State4=0 State3=T State2=0 State1=0 State0=0
+PORTB=0x00;
+DDRB=0xF7;
+
+// Port C initialization
+// Func7=Out Func6=Out Func5=Out Func4=Out Func3=Out Func2=Out Func1=Out Func0=Out
+// State7=0 State6=0 State5=0 State4=0 State3=0 State2=0 State1=0 State0=0
+PORTC=0x00;
+DDRC=0xFF;
+
+// Port D initialization
+// Func7=Out Func6=Out Func5=Out Func4=Out Func3=Out Func2=In Func1=Out Func0=Out
+// State7=0 State6=0 State5=0 State4=0 State3=0 State2=T State1=0 State0=0
+PORTD=0x00;
+DDRD=0xFB;
+
+// Port E initialization
+// Func7=Out Func6=In Func5=Out Func4=Out Func3=In Func2=Out Func1=Out Func0=In
+// State7=0 State6=T State5=0 State4=0 State3=T State2=0 State1=0 State0=T
+PORTE=0x00;
+DDRE=0xB6;
+
+// Port F initialization
+// Func7=Out Func6=Out Func5=Out Func4=Out Func3=Out Func2=In Func1=In Func0=In
+// State7=0 State6=0 State5=0 State4=0 State3=0 State2=T State1=T State0=T
+PORTF=0x00;
+DDRF=0xF8;
+
+// Port G initialization
+// Func4=Out Func3=Out Func2=Out Func1=Out Func0=Out
+// State4=0 State3=0 State2=0 State1=0 State0=0
+PORTG=0x00;
+DDRG=0x1F;
+
+// Timer/Counter 0 initialization
+// Clock source: System Clock
+// Clock value: 250,000 kHz
+// Mode: Normal top=0xFF
+// OC0 output: Disconnected
+ASSR=0x00;
+TCCR0=0x04;
+TCNT0=0x06;
+OCR0=0x00;
+
+// Timer/Counter 1 initialization
+// Clock source: System Clock
+// Clock value: Timer1 Stopped
+// Mode: Normal top=0xFFFF
+// OC1A output: Discon.
+// OC1B output: Discon.
+// OC1C output: Discon.
+// Noise Canceler: Off
+// Input Capture on Falling Edge
+// Timer1 Overflow Interrupt: Off
+// Input Capture Interrupt: Off
+// Compare A Match Interrupt: Off
+// Compare B Match Interrupt: Off
+// Compare C Match Interrupt: Off
+TCCR1A=0x00;
+TCCR1B=0x00;
+TCNT1H=0x00;
+TCNT1L=0x00;
+ICR1H=0x00;
+ICR1L=0x00;
+OCR1AH=0x00;
+OCR1AL=0x00;
+OCR1BH=0x00;
+OCR1BL=0x00;
+OCR1CH=0x00;
+OCR1CL=0x00;
+
+// Timer/Counter 2 initialization
+// Clock source: System Clock
+// Clock value: Timer2 Stopped
+// Mode: Normal top=0xFF
+// OC2 output: Disconnected
+TCCR2=0x00;
+TCNT2=0x00;
+OCR2=0x00;
+
+// Timer/Counter 3 initialization
+// Clock source: System Clock
+// Clock value: Timer3 Stopped
+// Mode: Normal top=0xFFFF
+// OC3A output: Discon.
+// OC3B output: Discon.
+// OC3C output: Discon.
+// Noise Canceler: Off
+// Input Capture on Falling Edge
+// Timer3 Overflow Interrupt: Off
+// Input Capture Interrupt: Off
+// Compare A Match Interrupt: Off
+// Compare B Match Interrupt: Off
+// Compare C Match Interrupt: Off
+TCCR3A=0x00;
+TCCR3B=0x00;
+TCNT3H=0x00;
+TCNT3L=0x00;
+ICR3H=0x00;
+ICR3L=0x00;
+OCR3AH=0x00;
+OCR3AL=0x00;
+OCR3BH=0x00;
+OCR3BL=0x00;
+OCR3CH=0x00;
+OCR3CL=0x00;
+
+// External Interrupt(s) initialization
+// INT0: Off
+// INT1: Off
+// INT2: Off
+// INT3: Off
+// INT4: Off
+// INT5: Off
+// INT6: Off
+// INT7: Off
+EICRA=0x00;
+EICRB=0x00;
+EIMSK=0x00;
+
+// Timer(s)/Counter(s) Interrupt(s) initialization
+TIMSK=0x01;
+
+ETIMSK=0x00;
+
+// USART0 initialization
+// USART0 disabled
+UCSR0B=0x00;
+
+// USART1 initialization
+// Communication Parameters: 8 Data, 1 Stop, No Parity
+// USART1 Receiver: On
+// USART1 Transmitter: On
+// USART1 Mode: Asynchronous
+// USART1 Baud Rate: 9600
+UCSR1A=0x00;
+UCSR1B=0xD8;
+UCSR1C=0x06;
+UBRR1H=0x00;
+UBRR1L=0x67;
+
+// Analog Comparator initialization
+// Analog Comparator: Off
+// Analog Comparator Input Capture by Timer/Counter 1: Off
+ACSR=0x80;
+SFIOR=0x00;
+
+// ADC initialization
+// ADC Clock frequency: 1000,000 kHz
+// ADC Voltage Reference: AREF pin
+ADMUX=ADC_VREF_TYPE & 0xff;
+ADCSRA=0x84;
+
+// SPI initialization
+// SPI Type: Master
+// SPI Clock Rate: 2*250,000 kHz
+// SPI Clock Phase: Cycle Start
+// SPI Clock Polarity: Low
+// SPI Data Order: MSB First
+SPCR=0x52;
+SPSR=0x00;
+
+// TWI initialization
+// TWI disabled
+TWCR=0x00;
+
+// I2C Bus initialization
+i2c_init();
+
+// Global enable interrupts
+#asm("sei")
+}
+
+  //PORTE.6 = 1;
+  SwitchPORTF(LEDGREEN, 1);
+  SwitchPORTF(LEDRED, 1);
+  SwitchPORTF(LEDBLUE, 1);
+  delay_ms(1000);
+
+  SSD1963_Init();
+  SwitchPORTF(BACKLIGHT, 1);
+  SSD1963_ClearScreen(BLACK);
+  SSD1963_PutString16("ИНИЦИАЛИЗАЦИЯ...", 0, 0, WHITE, BLACK);
+  SSD1963_PutString16("ВНУТРЕННЯЯ ПАМЯТЬ...", 0, FONT_HEIGHT * 1, WHITE, BLACK);
+  if (EEPROM_FLAG > 1)
+  {
+    for(i = 0; i < 3; i++)
+    WorkParameters[i] = Default_Parameters[i];
+    EEPROM_FLAG = 0;
+  }
+  SSD1963_PutString16("ВНУТРЕННИЕ ЧАСЫ...", 0, FONT_HEIGHT * 2, WHITE, BLACK);
+  rtc_init(0, 0);
+  rtc_get_time(0, &Hour, &Minute, &Seconds, &mSeconds);
+  rtc_get_date(0, &Day, &Month, &Year);
+
+  SSD1963_ClearScreen(BLACK);
+
+  SSD1963_PutString16("ДЕСКОМ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2) - FONT_HEIGHT, RED, BLACK);
+  delay_ms(300);
+  SSD1963_PutString16("ДЕСКОМ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2), YELLOW, BLACK);
+  delay_ms(300);
+  SSD1963_PutString16("ДЕСКОМ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2) + FONT_HEIGHT, RED, BLACK);
+  delay_ms(300);
+  SSD1963_PutString16("      ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2) - FONT_HEIGHT, BLACK, BLACK);
+  delay_ms(300);
+  SSD1963_PutString16("      ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2), BLACK, BLACK);
+  delay_ms(300);
+  SSD1963_PutString16("      ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2) + FONT_HEIGHT, BLACK, BLACK);
+
+  Prepare_Screen();
+  TSC2046_Init();
+
+  Cardio_Y_Last = Cardio_Y_Min;
+  Cardio_X = Cardio_X_Min;
+  Cardio_Divider = WorkParameters[0] / (Cardio_Y_Max - Cardio_Y_Min);
+  PutParameterText(Parameter_Counter, 30, 16, BLUE);
+  Pulse_X = Pulse_X_Min;
+
+  //Paint_ScanLine(Cardio_X_Min, Cardio_X_Max, Cardio_Y_Min, Cardio_Y_Max, DGRAY, 50);
+
+while (1)
+      {
+        if (Alarm_mSec > 2499) Alarm = 1;
+        switch(State)
+        {
+          case 0 : // основной рабочий режим
+          {
+            /*if (ADC0 > WorkParameters[0]) ADC0 = WorkParameters[0];
+            for (i = 0; i < 192; i++) longADC += read_adc(0);
+            longADC = longADC / 192;
+            ADC0 = longADC;
+            longADC = 0;*/
+            putchar('G');
+            ADC0 = (getchar(C_H) << 8 + getchar(C_L));
+
+            if (ADC0 > WorkParameters[0]) ADC0 = WorkParameters[0];
+            Cardio_Divider = WorkParameters[0] / (Cardio_Y_Max - Cardio_Y_Min);
+            Paint_Cardio(ADC0, RED, WorkParameters[1]);
+
+            Calc_Pulse(ADC0);
+            Paint_Pulse(5, YELLOW);
+            SSD1963_PutValue16(Pulse_Value, Pulse_Value_X, Pulse_Value_Y, 3, YELLOW, BLACK);
+            if (Refresh_mSec > 4999)
+            {
+              Battery_Value = read_adc(2);
+              //SSD1963_PutValue16(Battery_Value, 400, 20, 4, BLUE, BLACK);
+              //SSD1963_PutValue16(((Battery_Value * 8.203125) - 2700) / 14.83, 400, 40, 4, BLUE, BLACK);
+              Paint_Battery((((Battery_Value * 8.203125) - 2700) / 14.83) / 2.3);
+              if ((Battery_Value / 15) < 10) Battery_Discharged = 1;
+              else Battery_Discharged = 0;
+
+              rtc_get_time(0, &Hour, &Minute, &Seconds, &mSeconds);
+              SSD1963_PutValue16(Hour, 30, 0, 2, WHITE, BLACK);
+              SSD1963_PutChar16(':', 62, 0, WHITE, BLACK);
+              SSD1963_PutValue16(Minute, 78, 0, 2, WHITE, BLACK);
+              SSD1963_PutChar16(':', 110, 0, WHITE, BLACK);
+              SSD1963_PutValue16(Seconds, 126, 0, 2, WHITE, BLACK);
+
+              rtc_get_date(0, &Day, &Month, &Year);
+              SSD1963_PutValue16(Day, 174, 0, 2, WHITE, BLACK);
+              SSD1963_PutChar16('/', 206, 0, WHITE, BLACK);
+              SSD1963_PutValue16(Month, 222, 0, 2, WHITE, BLACK);
+              Refresh_mSec = 0;
+            }
+
+            if (TSC2046_GetCoordinates() > 0)
+            {
+              Sleep_mSec = 0;
+              Button_Pressed = GetButton();
+              switch (Button_Pressed)
+              {
+                case 1 :
+                  Parameter_Counter++;
+                  if (Parameter_Counter > 2) Parameter_Counter = 0;
+                  PutParameterText(Parameter_Counter, 30, 16, BLUE);
+                break;
+                case 2 :
+                  if (Parameter_Counter == 0) {if (WorkParameters[Parameter_Counter] > 1) WorkParameters[Parameter_Counter] -= 10;}
+                  else {if (WorkParameters[Parameter_Counter] < 1000) WorkParameters[Parameter_Counter]++;}
+                break;
+                case 3 :
+                  if (Parameter_Counter == 0) {if (WorkParameters[Parameter_Counter] < 1000) WorkParameters[Parameter_Counter] += 10;}
+                  else {if (WorkParameters[Parameter_Counter] > 1) WorkParameters[Parameter_Counter]--;}
+                break;
+                case 4 :
+                  State = 200;
+                  Repaint_Button("СТАРТ", 4, BLACK, WHITE);
+                  delay_ms(250);
+                break;
+              }
+            }
+          }
+          break;
+          case 1 : // настройки
+          {
+          }
+          break;
+          case 200 : // пауза
+          if (TSC2046_GetCoordinates() > 0)
+          {
+            Sleep_mSec = 0;
+            Button_Pressed = GetButton();
+            switch (Button_Pressed)
+            {
+              case 1 :
+              break;
+              case 2 :
+              break;
+              case 3 :
+              break;
+              case 4 :
+                State = 0;
+                Repaint_Button("ПАУЗА", 4, BLACK, WHITE);
+                delay_ms(250);
+              break;
+            }
+          }
+          break;
+          case 250 : // спящий режим
+          {
+            if (TSC2046_GetCoordinates() > 0)
+            {
+              State = 0;
+              SwitchPORTF(BACKLIGHT, 1);
+            }
+          }
+          break;
+        }
+
+      }
+}
