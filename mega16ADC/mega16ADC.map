@@ -1,0 +1,33 @@
+RAM Allocation
+Variable                                                          Address   Size
+--------------------------------------------------------------------------------
+rx_buffer                                                         0x0160       8
+tx_buffer                                                         0x0168     128
+adc_data                                                          0x01E8     320
+adc_current                                                       0x0328      32
+adc_real                                                          0x0348      32
+adc_count                                                         0x0368       8
+s_val                                                             0x0370       8
+adc_rd_index                                                      0x0378       1
+isRising                                                          0x0379       8
+isUpdate                                                          0x0381       8
+last_time                                                         0x0389       2
+
+EEPROM Allocation
+Variable                                                          Address   Size
+--------------------------------------------------------------------------------
+
+Register Allocation
+Variable                                                          Register  Size
+--------------------------------------------------------------------------------
+rx_wr_index                                                       R5           1
+rx_rd_index                                                       R4           1
+rx_counter                                                        R7           1
+rx_buffer_overflow                                                R2.0      1bit
+tx_wr_index                                                       R6           1
+tx_rd_index                                                       R9           1
+tx_counter                                                        R8           1
+adc_temp                                                          R11          1
+adc_rd_input                                                      R10          1
+adc_wr_input                                                      R13          1
+adc_wr_index                                                      R12          1
