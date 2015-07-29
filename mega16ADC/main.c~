@@ -60,7 +60,7 @@ Data Stack size         : 256
 #define RX_COMPLETE (1<<RXC)
 
 // USART Receiver buffer
-#define RX_BUFFER_SIZE 8
+#define RX_BUFFER_SIZE 4
 char rx_buffer[RX_BUFFER_SIZE];
 
 #if RX_BUFFER_SIZE <= 256
@@ -115,7 +115,7 @@ return data;
 }
 #pragma used-
 #endif
-
+/*
 // USART Transmitter buffer
 #define TX_BUFFER_SIZE 128
 char tx_buffer[TX_BUFFER_SIZE];
@@ -138,7 +138,7 @@ if (tx_counter)
 #endif
    }
 }
-
+ 
 #ifndef _DEBUG_TERMINAL_IO_
 // Write a character to the USART Transmitter buffer
 #define _ALTERNATE_PUTCHAR_
@@ -161,27 +161,19 @@ else
 }
 #pragma used-
 #endif
-
+*/
 // Standard Input/Output functions
 #include <stdio.h>
 
 #define MIGMIG PORTB.5
-// Timer2 overflow interrupt service routine
-interrupt [TIM2_OVF] void timer2_ovf_isr(void)
-{
-// Reinitialize Timer2 value
-TCNT2=0x06;
-// Place your code here
-MIGMIG ^= 1;
-}
 
 
 // Timer 0 overflow interrupt service routine
 interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 {
 // Reinitialize Timer 0 value
-TCNT0=0x5F;
 TCCR0=0x00;
+TCNT0=0x00;
 }
  
 #define FIRST_U_ADC_INPUT 5
@@ -189,7 +181,7 @@ TCCR0=0x00;
 #define ZU_ADC_INPUT 4
 #define ZI_ADC_INPUT 0   
 #define FREQUENCY_ADC_INPUT 6
-#define ADC_BUF_SIZE 40
+#define ADC_BUF_SIZE 90
 #define ADC_VREF_TYPE 0x00
 
 unsigned char adc_data[8][ADC_BUF_SIZE];
@@ -199,6 +191,23 @@ unsigned char adc_temp;
 unsigned char adc_rd_input, adc_wr_input, adc_wr_index, adc_rd_index;
 unsigned char isRising[8] = {0,0,0,0,0,0,0,0}, isUpdate[8] = {0,0,0,0,0,0,0,0};
 unsigned int last_time = 0;
+
+
+// Timer2 overflow interrupt service routine
+interrupt [TIM2_OVF] void timer2_ovf_isr(void)
+{
+// Reinitialize Timer2 value
+TCNT2=0x06;
+// Place your code here
+
+if(adc_rd_input == 0)
+{
+     TCNT0=0xEA; //11us
+     TCCR0=0x02;
+     MIGMIG ^= 1;
+}
+}
+
 
 // ADC interrupt service routine
 // with auto input scanning
@@ -211,14 +220,17 @@ interrupt [ADC_INT] void adc_isr(void)
     if(adc_rd_input > 7) adc_rd_input = 0;
     ADMUX=(ADC_VREF_TYPE & 0xff) | adc_rd_input;
 // Delay needed for the stabilization of the ADC input voltage
-    TCNT0=0x5F;
-    TCCR0=0x01;
+    if(adc_rd_input)
+    {
+      TCNT0=0xEA;  //11us
+      TCCR0=0x02;
+    }
 
 adc_data[adc_wr_input][adc_wr_index] = adc_temp;
 
 if(adc_temp & 0x80)
 {
-  if(!isRising[adc_wr_input] && 0)  //0000000000
+  if(!isRising[adc_wr_input])  
   {
     //Нарастающий  
     if(adc_wr_input == FREQUENCY_ADC_INPUT)
@@ -370,11 +382,11 @@ DDRD=0x00;
 
 // Timer/Counter 0 initialization
 // Clock source: System Clock
-// Clock value: 16000,000 kHz
+// Clock value: 2000,000 kHz
 // Mode: Normal top=0xFF
 // OC0 output: Disconnected
-TCCR0=0x01;
-TCNT0=0x5F;
+//TCCR0=0x02;
+TCNT0=0xE2;
 OCR0=0x00;
 
 // Timer/Counter 1 initialization
@@ -420,7 +432,7 @@ MCUCSR=0x00;
 // Timer(s)/Counter(s) Interrupt(s) initialization
 TIMSK=0x41;
 
-// USART initialization
+// USART initialization  
 // Communication Parameters: 8 Data, 1 Stop, No Parity
 // USART Receiver: On
 // USART Transmitter: On
@@ -428,6 +440,18 @@ TIMSK=0x41;
 // USART Baud Rate: 115200
 UCSRA=0x00;
 UCSRB=0xD8;
+UCSRC=0x86;
+UBRRH=0x00;
+UBRRL=0x08;
+
+// USART initialization  // Без ТХ прерывания
+// Communication Parameters: 8 Data, 1 Stop, No Parity
+// USART Receiver: On
+// USART Transmitter: On
+// USART Mode: Asynchronous
+// USART Baud Rate: 115200
+UCSRA=0x00;
+UCSRB=0x98;
 UCSRC=0x86;
 UBRRH=0x00;
 UBRRL=0x08;
@@ -444,6 +468,15 @@ SFIOR=0x00;
 // ADC Auto Trigger Source: Timer0 Overflow
 ADMUX=(ADC_VREF_TYPE & 0xff);
 ADCSRA=0xAE;
+SFIOR&=0x1F;
+SFIOR|=0x80;
+
+// ADC initialization // На штатной частоте
+// ADC Clock frequency: 125,000 kHz
+// ADC Voltage Reference: AREF pin
+// ADC Auto Trigger Source: Timer0 Overflow
+ADMUX= (ADC_VREF_TYPE & 0xff);
+ADCSRA=0xAF;
 SFIOR&=0x1F;
 SFIOR|=0x80;
 

@@ -6663,7 +6663,7 @@
 ;
 ;
 ;// USART0 Receiver buffer
-;#define RX_BUFFER_SIZE0 128
+;#define RX_BUFFER_SIZE0 240
 ;char rx_buffer0[RX_BUFFER_SIZE0];
 ;
 ;#if RX_BUFFER_SIZE0 <= 256
@@ -10178,11 +10178,11 @@ _0x1F6:
 ; 0000 0441 
 ; 0000 0442 
 ; 0000 0443 
-; 0000 0444 
-; 0000 0445             while(rx_counter0>2 || (rx_counter0>1 && Parameter_Counter==2))
+; 0000 0444              if(WaitADC_mSec>10)
 ;PCODE: $00001803 VOL: 0
 ;PCODE: $00001804 VOL: 0
 ;PCODE: $00001805 VOL: 0
+; 0000 0445             while(rx_counter0>2 || (rx_counter0>1 && Parameter_Counter==2))
 ;PCODE: $00001806 VOL: 0
 ;PCODE: $00001807 VOL: 0
 ;PCODE: $00001808 VOL: 0
@@ -10194,26 +10194,23 @@ _0x1F6:
 ;PCODE: $0000180E VOL: 0
 ;PCODE: $0000180F VOL: 0
 ;PCODE: $00001810 VOL: 0
-; 0000 0446             {
-; 0000 0447             yiii[0] = getchar0();
 ;PCODE: $00001811 VOL: 0
 ;PCODE: $00001812 VOL: 0
-; 0000 0448             yiii[1] = getchar0();
 ;PCODE: $00001813 VOL: 0
+; 0000 0446             {
+; 0000 0447 
+; 0000 0448             if(Parameter_Counter<2) Paint_3phase(getchar0(),getchar0(),getchar0());
 ;PCODE: $00001814 VOL: 0
-; 0000 0449             putchar1(yiii[0]);
 ;PCODE: $00001815 VOL: 0
 ;PCODE: $00001816 VOL: 0
 ;PCODE: $00001817 VOL: 0
-; 0000 044A             putchar1(yiii[1]);
 ;PCODE: $00001818 VOL: 0
 ;PCODE: $00001819 VOL: 0
 ;PCODE: $0000181A VOL: 0
-; 0000 044B 
-; 0000 044C             if(Parameter_Counter<2) Paint_3phase(yiii[0],yiii[1],getchar0());
 ;PCODE: $0000181B VOL: 0
 ;PCODE: $0000181C VOL: 0
 ;PCODE: $0000181D VOL: 0
+; 0000 0449                 else Paint_2phase(getchar0(),getchar0());
 ;PCODE: $0000181E VOL: 0
 ;PCODE: $0000181F VOL: 0
 ;PCODE: $00001820 VOL: 0
@@ -10221,288 +10218,284 @@ _0x1F6:
 ;PCODE: $00001822 VOL: 0
 ;PCODE: $00001823 VOL: 0
 ;PCODE: $00001824 VOL: 0
-; 0000 044D                 else Paint_2phase(yiii[0],yiii[1]);
+; 0000 044A 
+; 0000 044B 
+; 0000 044C             }
 ;PCODE: $00001825 VOL: 0
 ;PCODE: $00001826 VOL: 0
 ;PCODE: $00001827 VOL: 0
+; 0000 044D             if(tx_counter0==0 && WaitADC_mSec > 400)
 ;PCODE: $00001828 VOL: 0
 ;PCODE: $00001829 VOL: 0
 ;PCODE: $0000182A VOL: 0
 ;PCODE: $0000182B VOL: 0
-; 0000 044E 
-; 0000 044F 
-; 0000 0450             }
 ;PCODE: $0000182C VOL: 0
 ;PCODE: $0000182D VOL: 0
 ;PCODE: $0000182E VOL: 0
-; 0000 0451             if(tx_counter0==0 && WaitADC_mSec > 800)
 ;PCODE: $0000182F VOL: 0
 ;PCODE: $00001830 VOL: 0
 ;PCODE: $00001831 VOL: 0
 ;PCODE: $00001832 VOL: 0
+; 0000 044E             {
+; 0000 044F             WaitADC_mSec = 0;
 ;PCODE: $00001833 VOL: 0
 ;PCODE: $00001834 VOL: 0
+; 0000 0450             getclear0();
 ;PCODE: $00001835 VOL: 0
+; 0000 0451             Cardio_X = Cardio_X_Min;
 ;PCODE: $00001836 VOL: 0
-;PCODE: $00001837 VOL: 0
+;PCODE: $00001837 VOL: 1
+; 0000 0452             switch(Parameter_Counter)
 ;PCODE: $00001838 VOL: 0
-; 0000 0452             {
-; 0000 0453             WaitADC_mSec = 0;
 ;PCODE: $00001839 VOL: 0
+; 0000 0453             {
+; 0000 0454                 case 0: putchar0('U'); break;
 ;PCODE: $0000183A VOL: 0
-; 0000 0454             getclear0();
 ;PCODE: $0000183B VOL: 0
-; 0000 0455             switch(Parameter_Counter)
 ;PCODE: $0000183C VOL: 0
 ;PCODE: $0000183D VOL: 0
-; 0000 0456             {
-; 0000 0457                 case 0: putchar0('U'); break;
 ;PCODE: $0000183E VOL: 0
 ;PCODE: $0000183F VOL: 0
+; 0000 0455                 case 1: putchar0('I'); break;
 ;PCODE: $00001840 VOL: 0
 ;PCODE: $00001841 VOL: 0
 ;PCODE: $00001842 VOL: 0
 ;PCODE: $00001843 VOL: 0
-; 0000 0458                 case 1: putchar0('I'); break;
 ;PCODE: $00001844 VOL: 0
 ;PCODE: $00001845 VOL: 0
 ;PCODE: $00001846 VOL: 0
+; 0000 0456                 case 2: putchar0('Z'); break;
 ;PCODE: $00001847 VOL: 0
 ;PCODE: $00001848 VOL: 0
 ;PCODE: $00001849 VOL: 0
 ;PCODE: $0000184A VOL: 0
-; 0000 0459                 case 2: putchar0('Z'); break;
 ;PCODE: $0000184B VOL: 0
 ;PCODE: $0000184C VOL: 0
 ;PCODE: $0000184D VOL: 0
+; 0000 0457             }
 ;PCODE: $0000184E VOL: 0
+; 0000 0458             }
+; 0000 0459 
+; 0000 045A 
+; 0000 045B 
+; 0000 045C             if (TSC2046_GetCoordinates() > 0)
 ;PCODE: $0000184F VOL: 0
 ;PCODE: $00001850 VOL: 0
 ;PCODE: $00001851 VOL: 0
-; 0000 045A             }
 ;PCODE: $00001852 VOL: 0
-; 0000 045B             }
-; 0000 045C 
-; 0000 045D 
-; 0000 045E 
-; 0000 045F             if (TSC2046_GetCoordinates() > 0)
+; 0000 045D             {
+; 0000 045E               Sleep_mSec = 0;
 ;PCODE: $00001853 VOL: 0
-;PCODE: $00001854 VOL: 0
+;PCODE: $00001854 VOL: 1
+; 0000 045F               Button_Pressed = GetButton();
 ;PCODE: $00001855 VOL: 0
-;PCODE: $00001856 VOL: 0
-; 0000 0460             {
-; 0000 0461               Sleep_mSec = 0;
-;PCODE: $00001857 VOL: 0
-;PCODE: $00001858 VOL: 1
-; 0000 0462               Button_Pressed = GetButton();
+;PCODE: $00001856 VOL: 1
+; 0000 0460               switch (Button_Pressed)
+;PCODE: $00001857 VOL: 1
+;PCODE: $00001858 VOL: 0
+; 0000 0461               {
+; 0000 0462                 case 1 :
 ;PCODE: $00001859 VOL: 0
-;PCODE: $0000185A VOL: 1
-; 0000 0463               switch (Button_Pressed)
-;PCODE: $0000185B VOL: 1
+;PCODE: $0000185A VOL: 0
+; 0000 0463                   getclear0();
+;PCODE: $0000185B VOL: 0
+; 0000 0464                   Parameter_Counter++;
 ;PCODE: $0000185C VOL: 0
-; 0000 0464               {
-; 0000 0465                 case 1 :
 ;PCODE: $0000185D VOL: 0
 ;PCODE: $0000185E VOL: 0
-; 0000 0466                   getclear0();
+; 0000 0465                   if (Parameter_Counter > 2) Parameter_Counter = 0;
 ;PCODE: $0000185F VOL: 0
-; 0000 0467                   Parameter_Counter++;
 ;PCODE: $00001860 VOL: 0
 ;PCODE: $00001861 VOL: 0
 ;PCODE: $00001862 VOL: 0
-; 0000 0468                   if (Parameter_Counter > 2) Parameter_Counter = 0;
 ;PCODE: $00001863 VOL: 0
+; 0000 0466                   PutParameterText(Parameter_Counter, 30, 16, BLUE);
 ;PCODE: $00001864 VOL: 0
 ;PCODE: $00001865 VOL: 0
 ;PCODE: $00001866 VOL: 0
 ;PCODE: $00001867 VOL: 0
-; 0000 0469                   PutParameterText(Parameter_Counter, 30, 16, BLUE);
 ;PCODE: $00001868 VOL: 0
 ;PCODE: $00001869 VOL: 0
 ;PCODE: $0000186A VOL: 0
 ;PCODE: $0000186B VOL: 0
 ;PCODE: $0000186C VOL: 0
 ;PCODE: $0000186D VOL: 0
+; 0000 0467                 break;
 ;PCODE: $0000186E VOL: 0
+; 0000 0468                 case 2 :
 ;PCODE: $0000186F VOL: 0
 ;PCODE: $00001870 VOL: 0
 ;PCODE: $00001871 VOL: 0
-; 0000 046A                 break;
+; 0000 0469                 if(multiplier<200)multiplier+=10;
 ;PCODE: $00001872 VOL: 0
-; 0000 046B                 case 2 :
 ;PCODE: $00001873 VOL: 0
 ;PCODE: $00001874 VOL: 0
 ;PCODE: $00001875 VOL: 0
-; 0000 046C                 if(multiplier<200)multiplier+=10;
 ;PCODE: $00001876 VOL: 0
 ;PCODE: $00001877 VOL: 0
+; 0000 046A 
+; 0000 046B                   //if (Parameter_Counter == 0) {if (WorkParameters[Parameter_Counter] > 1) WorkParameters[Parameter_Counter] -= 10;}
+; 0000 046C                   //else {if (WorkParameters[Parameter_Counter] < 1000) WorkParameters[Parameter_Counter]++;}
+; 0000 046D                 break;
 ;PCODE: $00001878 VOL: 0
 ;PCODE: $00001879 VOL: 0
+; 0000 046E                 case 3 :
 ;PCODE: $0000187A VOL: 0
 ;PCODE: $0000187B VOL: 0
-; 0000 046D 
-; 0000 046E                   //if (Parameter_Counter == 0) {if (WorkParameters[Parameter_Counter] > 1) WorkParameters[Parameter_Counter] -= 10;}
-; 0000 046F                   //else {if (WorkParameters[Parameter_Counter] < 1000) WorkParameters[Parameter_Counter]++;}
-; 0000 0470                 break;
 ;PCODE: $0000187C VOL: 0
+; 0000 046F                 if(multiplier>20)multiplier-=10;
 ;PCODE: $0000187D VOL: 0
-; 0000 0471                 case 3 :
 ;PCODE: $0000187E VOL: 0
 ;PCODE: $0000187F VOL: 0
 ;PCODE: $00001880 VOL: 0
-; 0000 0472                 if(multiplier>20)multiplier-=10;
 ;PCODE: $00001881 VOL: 0
 ;PCODE: $00001882 VOL: 0
+; 0000 0470 
+; 0000 0471                   //if (Parameter_Counter == 0) {if (WorkParameters[Parameter_Counter] < 1000) WorkParameters[Parameter_Counter] += 10;}
+; 0000 0472                   //else {if (WorkParameters[Parameter_Counter] > 1) WorkParameters[Parameter_Counter]--;}
+; 0000 0473                 break;
 ;PCODE: $00001883 VOL: 0
 ;PCODE: $00001884 VOL: 0
+; 0000 0474                 case 4 :
 ;PCODE: $00001885 VOL: 0
 ;PCODE: $00001886 VOL: 0
-; 0000 0473 
-; 0000 0474                   //if (Parameter_Counter == 0) {if (WorkParameters[Parameter_Counter] < 1000) WorkParameters[Parameter_Counter] += 10;}
-; 0000 0475                   //else {if (WorkParameters[Parameter_Counter] > 1) WorkParameters[Parameter_Counter]--;}
-; 0000 0476                 break;
 ;PCODE: $00001887 VOL: 0
+; 0000 0475                   State = 200;
 ;PCODE: $00001888 VOL: 0
-; 0000 0477                 case 4 :
-;PCODE: $00001889 VOL: 0
+;PCODE: $00001889 VOL: 1
+; 0000 0476                   Repaint_Button("СТАРТ", 4, BLACK, WHITE);
 ;PCODE: $0000188A VOL: 0
 ;PCODE: $0000188B VOL: 0
-; 0000 0478                   State = 200;
 ;PCODE: $0000188C VOL: 0
-;PCODE: $0000188D VOL: 1
-; 0000 0479                   Repaint_Button("СТАРТ", 4, BLACK, WHITE);
+;PCODE: $0000188D VOL: 0
 ;PCODE: $0000188E VOL: 0
 ;PCODE: $0000188F VOL: 0
 ;PCODE: $00001890 VOL: 0
 ;PCODE: $00001891 VOL: 0
 ;PCODE: $00001892 VOL: 0
 ;PCODE: $00001893 VOL: 0
+; 0000 0477                   delay_ms(250);
 ;PCODE: $00001894 VOL: 0
 ;PCODE: $00001895 VOL: 0
 ;PCODE: $00001896 VOL: 0
+; 0000 0478                 break;
 ;PCODE: $00001897 VOL: 0
-; 0000 047A                   delay_ms(250);
+; 0000 0479               }
 ;PCODE: $00001898 VOL: 0
+; 0000 047A             }
+; 0000 047B           }
 ;PCODE: $00001899 VOL: 0
+; 0000 047C           break;
 ;PCODE: $0000189A VOL: 0
-; 0000 047B                 break;
+; 0000 047D           case 1 : // настройки
 ;PCODE: $0000189B VOL: 0
-; 0000 047C               }
 ;PCODE: $0000189C VOL: 0
-; 0000 047D             }
-; 0000 047E           }
 ;PCODE: $0000189D VOL: 0
-; 0000 047F           break;
+; 0000 047E           {
+; 0000 047F           }
+; 0000 0480           break;
 ;PCODE: $0000189E VOL: 0
-; 0000 0480           case 1 : // настройки
+; 0000 0481           case 200 : // пауза
 ;PCODE: $0000189F VOL: 0
 ;PCODE: $000018A0 VOL: 0
 ;PCODE: $000018A1 VOL: 0
-; 0000 0481           {
-; 0000 0482           }
-; 0000 0483           break;
+; 0000 0482           if (TSC2046_GetCoordinates() > 0)
 ;PCODE: $000018A2 VOL: 0
-; 0000 0484           case 200 : // пауза
 ;PCODE: $000018A3 VOL: 0
 ;PCODE: $000018A4 VOL: 0
+; 0000 0483           {
+; 0000 0484             Sleep_mSec = 0;
 ;PCODE: $000018A5 VOL: 0
-; 0000 0485           if (TSC2046_GetCoordinates() > 0)
-;PCODE: $000018A6 VOL: 0
+;PCODE: $000018A6 VOL: 1
+; 0000 0485             Button_Pressed = GetButton();
 ;PCODE: $000018A7 VOL: 0
-;PCODE: $000018A8 VOL: 0
-; 0000 0486           {
-; 0000 0487             Sleep_mSec = 0;
-;PCODE: $000018A9 VOL: 0
-;PCODE: $000018AA VOL: 1
-; 0000 0488             Button_Pressed = GetButton();
+;PCODE: $000018A8 VOL: 1
+; 0000 0486             switch (Button_Pressed)
+;PCODE: $000018A9 VOL: 1
+;PCODE: $000018AA VOL: 0
+; 0000 0487             {
+; 0000 0488               case 1 :
 ;PCODE: $000018AB VOL: 0
-;PCODE: $000018AC VOL: 1
-; 0000 0489             switch (Button_Pressed)
-;PCODE: $000018AD VOL: 1
+;PCODE: $000018AC VOL: 0
+; 0000 0489               break;
+;PCODE: $000018AD VOL: 0
+; 0000 048A               case 2 :
 ;PCODE: $000018AE VOL: 0
-; 0000 048A             {
-; 0000 048B               case 1 :
 ;PCODE: $000018AF VOL: 0
 ;PCODE: $000018B0 VOL: 0
-; 0000 048C               break;
+; 0000 048B               break;
 ;PCODE: $000018B1 VOL: 0
-; 0000 048D               case 2 :
+; 0000 048C               case 3 :
 ;PCODE: $000018B2 VOL: 0
 ;PCODE: $000018B3 VOL: 0
 ;PCODE: $000018B4 VOL: 0
-; 0000 048E               break;
+; 0000 048D               break;
 ;PCODE: $000018B5 VOL: 0
-; 0000 048F               case 3 :
+; 0000 048E               case 4 :
 ;PCODE: $000018B6 VOL: 0
 ;PCODE: $000018B7 VOL: 0
 ;PCODE: $000018B8 VOL: 0
-; 0000 0490               break;
+; 0000 048F                 State = 0;
 ;PCODE: $000018B9 VOL: 0
-; 0000 0491               case 4 :
-;PCODE: $000018BA VOL: 0
+;PCODE: $000018BA VOL: 1
+; 0000 0490                 Repaint_Button("ПАУЗА", 4, BLACK, WHITE);
 ;PCODE: $000018BB VOL: 0
 ;PCODE: $000018BC VOL: 0
-; 0000 0492                 State = 0;
 ;PCODE: $000018BD VOL: 0
-;PCODE: $000018BE VOL: 1
-; 0000 0493                 Repaint_Button("ПАУЗА", 4, BLACK, WHITE);
+;PCODE: $000018BE VOL: 0
 ;PCODE: $000018BF VOL: 0
 ;PCODE: $000018C0 VOL: 0
 ;PCODE: $000018C1 VOL: 0
 ;PCODE: $000018C2 VOL: 0
 ;PCODE: $000018C3 VOL: 0
 ;PCODE: $000018C4 VOL: 0
+; 0000 0491                 delay_ms(250);
 ;PCODE: $000018C5 VOL: 0
 ;PCODE: $000018C6 VOL: 0
 ;PCODE: $000018C7 VOL: 0
+; 0000 0492               break;
 ;PCODE: $000018C8 VOL: 0
-; 0000 0494                 delay_ms(250);
+; 0000 0493             }
 ;PCODE: $000018C9 VOL: 0
+; 0000 0494           }
+; 0000 0495           break;
 ;PCODE: $000018CA VOL: 0
 ;PCODE: $000018CB VOL: 0
-; 0000 0495               break;
+; 0000 0496           case 250 : // спящий режим
 ;PCODE: $000018CC VOL: 0
-; 0000 0496             }
 ;PCODE: $000018CD VOL: 0
-; 0000 0497           }
-; 0000 0498           break;
 ;PCODE: $000018CE VOL: 0
+; 0000 0497           {
+; 0000 0498             if (TSC2046_GetCoordinates() > 0)
 ;PCODE: $000018CF VOL: 0
-; 0000 0499           case 250 : // спящий режим
 ;PCODE: $000018D0 VOL: 0
 ;PCODE: $000018D1 VOL: 0
+; 0000 0499             {
+; 0000 049A               State = 0;
 ;PCODE: $000018D2 VOL: 0
-; 0000 049A           {
-; 0000 049B             if (TSC2046_GetCoordinates() > 0)
-;PCODE: $000018D3 VOL: 0
+;PCODE: $000018D3 VOL: 1
+; 0000 049B               SwitchPORTF(BACKLIGHT, 1);
 ;PCODE: $000018D4 VOL: 0
 ;PCODE: $000018D5 VOL: 0
-; 0000 049C             {
-; 0000 049D               State = 0;
 ;PCODE: $000018D6 VOL: 0
-;PCODE: $000018D7 VOL: 1
-; 0000 049E               SwitchPORTF(BACKLIGHT, 1);
+;PCODE: $000018D7 VOL: 0
 ;PCODE: $000018D8 VOL: 0
+; 0000 049C             }
+; 0000 049D           }
 ;PCODE: $000018D9 VOL: 0
+; 0000 049E           break;
 ;PCODE: $000018DA VOL: 0
+; 0000 049F         }
 ;PCODE: $000018DB VOL: 0
+; 0000 04A0 
+; 0000 04A1   }
 ;PCODE: $000018DC VOL: 0
-; 0000 049F             }
-; 0000 04A0           }
 ;PCODE: $000018DD VOL: 0
-; 0000 04A1           break;
+; 0000 04A2 }
 ;PCODE: $000018DE VOL: 0
-; 0000 04A2         }
 ;PCODE: $000018DF VOL: 0
-; 0000 04A3 
-; 0000 04A4   }
 ;PCODE: $000018E0 VOL: 0
 ;PCODE: $000018E1 VOL: 0
-; 0000 04A5 }
-;PCODE: $000018E2 VOL: 0
-;PCODE: $000018E3 VOL: 0
-;PCODE: $000018E4 VOL: 0
-;PCODE: $000018E5 VOL: 0
 
 	.DSEG
 _0x201:

@@ -62,7 +62,7 @@ unsigned C_H, C_L;
 
 
 // USART0 Receiver buffer
-#define RX_BUFFER_SIZE0 128
+#define RX_BUFFER_SIZE0 240
 char rx_buffer0[RX_BUFFER_SIZE0];
 
 #if RX_BUFFER_SIZE0 <= 256
@@ -1089,23 +1089,20 @@ while (1)
             
             
             
-            
+             if(WaitADC_mSec>10)
             while(rx_counter0>2 || (rx_counter0>1 && Parameter_Counter==2))
             {
-            yiii[0] = getchar0();
-            yiii[1] = getchar0();
-            putchar1(yiii[0]);
-            putchar1(yiii[1]);
-               
-            if(Parameter_Counter<2) Paint_3phase(yiii[0],yiii[1],getchar0()); 
-                else Paint_2phase(yiii[0],yiii[1]); 
+           
+            if(Parameter_Counter<2) Paint_3phase(getchar0(),getchar0(),getchar0()); 
+                else Paint_2phase(getchar0(),getchar0()); 
                 
                 
             }
-            if(tx_counter0==0 && WaitADC_mSec > 800) 
+            if(tx_counter0==0 && WaitADC_mSec > 400) 
             {
             WaitADC_mSec = 0;
-            getclear0();
+            getclear0(); 
+            Cardio_X = Cardio_X_Min;
             switch(Parameter_Counter) 
             {
                 case 0: putchar0('U'); break; 
