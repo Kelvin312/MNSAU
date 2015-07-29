@@ -22,6 +22,7 @@
 #include <i2c.h>
 
 
+#define sinf sin
 unsigned int k;
 unsigned C_H, C_L;
 
@@ -58,23 +59,16 @@ unsigned C_H, C_L;
 #define DATA_OVERRUN (1<<DOR)
 #define DATA_REGISTER_EMPTY (1<<UDRE)
 #define RX_COMPLETE (1<<RXC)
-#define sinf sin
 
 
 // USART0 Receiver buffer
-#define RX_BUFFER_SIZE0 8
+#define RX_BUFFER_SIZE0 128
 char rx_buffer0[RX_BUFFER_SIZE0];
 
 #if RX_BUFFER_SIZE0 <= 256
-unsigned char rx_wr_index0=0,rx_rd_index0=0;
+unsigned char rx_wr_index0,rx_rd_index0,rx_counter0;
 #else
-unsigned int rx_wr_index0=0,rx_rd_index0=0;
-#endif
-
-#if RX_BUFFER_SIZE0 < 256
-unsigned char rx_counter0=0;
-#else
-unsigned int rx_counter0=0;
+unsigned int rx_wr_index0,rx_rd_index0,rx_counter0;
 #endif
 
 // This flag is set on USART0 Receiver buffer overflow
@@ -91,15 +85,16 @@ if ((status & (FRAMING_ERROR | PARITY_ERROR | DATA_OVERRUN))==0)
    rx_buffer0[rx_wr_index0++]=data;
 #if RX_BUFFER_SIZE0 == 256
    // special case for receiver buffer size=256
-   if (++rx_counter0 == 0) rx_buffer_overflow0=1;
+   if (++rx_counter0 == 0)
+      {
 #else
    if (rx_wr_index0 == RX_BUFFER_SIZE0) rx_wr_index0=0;
    if (++rx_counter0 == RX_BUFFER_SIZE0)
       {
       rx_counter0=0;
+#endif
       rx_buffer_overflow0=1;
       }
-#endif
    }
 }
 
@@ -107,7 +102,7 @@ if ((status & (FRAMING_ERROR | PARITY_ERROR | DATA_OVERRUN))==0)
 // Get a character from the USART0 Receiver buffer
 #define _ALTERNATE_GETCHAR_
 #pragma used+
-char getchar(void)
+char getchar0(void)
 {
 char data;
 while (rx_counter0==0);
@@ -123,20 +118,28 @@ return data;
 #pragma used-
 #endif
 
+void getclear0(void)
+{
+while (rx_counter0 > 0)
+{
+   rx_rd_index0++;
+   #if RX_BUFFER_SIZE0 != 256
+   if (rx_rd_index0 == RX_BUFFER_SIZE0) rx_rd_index0=0;
+   #endif
+   #asm("cli")
+   --rx_counter0;
+   #asm("sei")
+}
+}
+
 // USART0 Transmitter buffer
 #define TX_BUFFER_SIZE0 8
 char tx_buffer0[TX_BUFFER_SIZE0];
 
 #if TX_BUFFER_SIZE0 <= 256
-unsigned char tx_wr_index0=0,tx_rd_index0=0;
+unsigned char tx_wr_index0,tx_rd_index0,tx_counter0;
 #else
-unsigned int tx_wr_index0=0,tx_rd_index0=0;
-#endif
-
-#if TX_BUFFER_SIZE0 < 256
-unsigned char tx_counter0=0;
-#else
-unsigned int tx_counter0=0;
+unsigned int tx_wr_index0,tx_rd_index0,tx_counter0;
 #endif
 
 // USART0 Transmitter interrupt service routine
@@ -152,12 +155,11 @@ if (tx_counter0)
    }
 }
 
-
 #ifndef _DEBUG_TERMINAL_IO_
 // Write a character to the USART0 Transmitter buffer
 #define _ALTERNATE_PUTCHAR_
 #pragma used+
-void putchar(char c)
+void putchar0(char c)
 {
 while (tx_counter0 == TX_BUFFER_SIZE0);
 #asm("cli")
@@ -176,9 +178,8 @@ else
 #pragma used-
 #endif
 
-
 // USART1 Receiver buffer
-#define RX_BUFFER_SIZE1 8
+#define RX_BUFFER_SIZE1 32
 char rx_buffer1[RX_BUFFER_SIZE1];
 
 #if RX_BUFFER_SIZE1 <= 256
@@ -231,7 +232,7 @@ return data;
 }
 #pragma used-
 // USART1 Transmitter buffer
-#define TX_BUFFER_SIZE1 8
+#define TX_BUFFER_SIZE1 128
 char tx_buffer1[TX_BUFFER_SIZE1];
 
 #if TX_BUFFER_SIZE1 <= 256
@@ -272,6 +273,8 @@ else
 #asm("sei")
 }
 #pragma used-
+
+
 
 #define BTN_StartX 0
 #define BTN_StartY 240
@@ -362,6 +365,8 @@ volatile char Alarm, Battery_Discharged, State;
 #define Battery_X 0
 #define Battery_Y 0
 
+#define RS485 PORTD.4
+
 #define ScanLine_Length 25
 unsigned int ScanLine_X;
 
@@ -384,11 +389,14 @@ void SwitchPORTF(char Number, char Value)
   }
 }
 
+unsigned int WaitADC_mSec;
+
 // Timer 0 overflow interrupt service routine
 interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 {
   TCNT0=0x06;
-  mSec++;
+  mSec++; 
+  WaitADC_mSec++;
   Pulse_mSec++;
   Refresh_mSec++;
   Sleep_mSec++;
@@ -602,6 +610,105 @@ void Paint_Pulse(unsigned int Value, unsigned int Color)
   }
 }
 
+signed int ValueLast[3]={Cardio_Y_Min,Cardio_Y_Min,Cardio_Y_Min};
+signed int multiplier = 60;
+
+void Paint_3phase(char a, char b, char c)
+{
+    signed int Value[3];
+    unsigned int Color[] = {GREEN, YELLOW, RED}; 
+    unsigned int Length = WorkParameters[1];
+    signed int mid = ((Cardio_Y_Max - Cardio_Y_Min)>>1) + Cardio_Y_Min; 
+    unsigned int temp;
+    char i;
+    
+    Value[0] = a;
+    Value[1] = b; 
+    Value[2] = c; 
+    
+    // очищаем за собой столбец пикселей
+    SSD1963_DrawFillRect(Cardio_X, Cardio_X + Length, Cardio_Y_Min, Cardio_Y_Max + 1, BLACK);
+     
+    //Линия нуля 
+    SSD1963_DrawFastLine(Cardio_X, Cardio_X + Length, mid, mid, DGRAY);
+    SSD1963_DrawFastLine(Cardio_X, Cardio_X + Length, mid+50, mid+50, DGRAY);
+    SSD1963_DrawFastLine(Cardio_X, Cardio_X + Length, mid-50, mid-50, DGRAY);
+           
+    for(i=0; i<3; i++)
+    {
+        Value[i] -= 128;
+        Value[i] *= multiplier;
+        Value[i] >>= 7; 
+        if(Value[i]&0x0100) Value[i] |= 0xFF00;
+        
+        Value[i] += mid; 
+        if(Value[i] >= Cardio_Y_Max) Value[i] = Cardio_Y_Max - 1;
+        if(Value[i] < Cardio_Y_Min) Value[i] = Cardio_Y_Min; 
+
+        // пишем точку в столбце
+        SSD1963_DrawLine(Cardio_X, Cardio_X + Length, ValueLast[i], Value[i], Color[i], 2);  
+        ValueLast[i] = Value[i]; // определяем предыдущую точку кардиограммы
+    }
+    
+    Cardio_X += Length; // увеличеваем Х кардиограммы
+   
+  if (Cardio_X > Cardio_X_Max - Length) // если добежали до конца отведённого пространства
+  {
+    SSD1963_DrawFillRect(Cardio_X, Cardio_X_Max, Cardio_Y_Min, Cardio_Y_Max + 1, BLACK); // очищаем столбец в начале для красоты работы
+    Cardio_X = Cardio_X_Min; // уходим обратно
+    SSD1963_DrawFillRect(Cardio_X, Cardio_X + Length, Cardio_Y_Min, Cardio_Y_Max + 1, BLACK); // очищаем столбец в начале для красоты работы
+  }
+}
+
+void Paint_2phase(char a, char b)
+{
+    signed int Value[3];
+    unsigned int Color[] = {GREEN, YELLOW, RED}; 
+    unsigned int Length = WorkParameters[1];
+    signed int mid = ((Cardio_Y_Max - Cardio_Y_Min)>>1) + Cardio_Y_Min; 
+    unsigned int temp;
+    char i;
+    
+    Value[0] = a;
+    Value[1] = b; 
+    //Value[2] = c; 
+      
+    // очищаем за собой столбец пикселей
+    SSD1963_DrawFillRect(Cardio_X, Cardio_X + Length, Cardio_Y_Min, Cardio_Y_Max + 1, BLACK);
+    
+    //Линия нуля 
+    //SSD1963_DrawFastLine(Cardio_X, Cardio_X + Length, mid, mid, DGRAY);
+    SSD1963_DrawFastLine(Cardio_X, Cardio_X + Length, mid+40, mid+40, DGRAY);
+    SSD1963_DrawFastLine(Cardio_X, Cardio_X + Length, mid-40, mid-40, DGRAY);
+           
+    for(i=0; i<2; i++)
+    {
+        Value[i] -= 128;
+        Value[i] *= multiplier;
+        Value[i] >>= 7; 
+        if(Value[i]&0x0100) Value[i] |= 0xFF00;
+        
+        if(i==0) Value[i] += mid+40; 
+        if(i==1) Value[i] += mid-40; 
+        if(Value[i] >= Cardio_Y_Max) Value[i] = Cardio_Y_Max - 1;
+        if(Value[i] < Cardio_Y_Min) Value[i] = Cardio_Y_Min; 
+
+        // пишем точку в столбце
+        SSD1963_DrawLine(Cardio_X, Cardio_X + Length, ValueLast[i], Value[i], Color[i], 2);  
+        ValueLast[i] = Value[i]; // определяем предыдущую точку кардиограммы
+    }
+    
+    Cardio_X += Length; // увеличеваем Х кардиограммы
+   
+  if (Cardio_X > Cardio_X_Max - Length) // если добежали до конца отведённого пространства
+  {
+    SSD1963_DrawFillRect(Cardio_X, Cardio_X_Max, Cardio_Y_Min, Cardio_Y_Max + 1, BLACK); // очищаем столбец в начале для красоты работы
+    Cardio_X = Cardio_X_Min; // уходим обратно
+    SSD1963_DrawFillRect(Cardio_X, Cardio_X + Length, Cardio_Y_Min, Cardio_Y_Max + 1, BLACK); // очищаем столбец в начале для красоты работы
+  }
+}
+
+
 void Paint_Cardio(unsigned int Value, unsigned int Color, unsigned int Length)
 {
   signed int temp, temp2;
@@ -712,6 +819,8 @@ void PutParameterText(char Number, char X, char Y, unsigned int Color)
 void main(void)
 {
 unsigned int ii = 0xffff;
+char yiii[3];
+
 {
 // Input/Output Ports initialization
 // Port A initialization
@@ -853,9 +962,9 @@ ETIMSK=0x00;
 // USART0 Transmitter: On
 // USART0 Mode: Asynchronous
 // USART0 Baud Rate: 115200
-UCSR0A=(0<<RXC0) | (0<<TXC0) | (0<<UDRE0) | (0<<FE0) | (0<<DOR0) | (0<<UPE0) | (0<<U2X0) | (0<<MPCM0);
-UCSR0B=(1<<RXCIE0) | (1<<TXCIE0) | (0<<UDRIE0) | (1<<RXEN0) | (1<<TXEN0) | (0<<UCSZ02) | (0<<RXB80) | (0<<TXB80);
-UCSR0C=(0<<UMSEL0) | (0<<UPM01) | (0<<UPM00) | (0<<USBS0) | (1<<UCSZ01) | (1<<UCSZ00) | (0<<UCPOL0);
+UCSR0A=0x00;
+UCSR0B=0xD8;
+UCSR0C=0x06;
 UBRR0H=0x00;
 UBRR0L=0x08;
 
@@ -957,7 +1066,7 @@ i2c_init();
 while (1)
 {
 
-        {
+        
         switch(State)
         {
           case 0 : // основной рабочий режим
@@ -969,15 +1078,42 @@ while (1)
             longADC = 0;*/
             //ADC0 = read_adc(0);
             //if (ADC0 > WorkParameters[0]) ADC0 = WorkParameters[0];
-            putchar(Address_Slave);
-            if (rx_counter0 > 0)
+           // putchar(Address_Slave);
+           // if (rx_counter0 > 0)
+           // {
+              //  ADC0 = ((getchar() << 8) + getchar());
+            //}
+
+           // Cardio_Divider = WorkParameters[0] / (Cardio_Y_Max - Cardio_Y_Min);
+            //Paint_Cardio(ADC0, RED, WorkParameters[1]);
+            
+            
+            
+            
+            while(rx_counter0>2 || (rx_counter0>1 && Parameter_Counter==2))
             {
-                ADC0 = ((getchar() << 8) + getchar());
+            yiii[0] = getchar0();
+            yiii[1] = getchar0();
+            putchar1(yiii[0]);
+            putchar1(yiii[1]);
+               
+            if(Parameter_Counter<2) Paint_3phase(yiii[0],yiii[1],getchar0()); 
+                else Paint_2phase(yiii[0],yiii[1]); 
+                
+                
+            }
+            if(tx_counter0==0 && WaitADC_mSec > 800) 
+            {
+            WaitADC_mSec = 0;
+            getclear0();
+            switch(Parameter_Counter) 
+            {
+                case 0: putchar0('U'); break; 
+                case 1: putchar0('I'); break;
+                case 2: putchar0('Z'); break;
+            }
             }
 
-            Cardio_Divider = WorkParameters[0] / (Cardio_Y_Max - Cardio_Y_Min);
-            Paint_Cardio(ADC0, RED, WorkParameters[1]);
-            }
 
 
             if (TSC2046_GetCoordinates() > 0)
@@ -987,17 +1123,22 @@ while (1)
               switch (Button_Pressed)
               {
                 case 1 :
+                  getclear0();
                   Parameter_Counter++;
                   if (Parameter_Counter > 2) Parameter_Counter = 0;
                   PutParameterText(Parameter_Counter, 30, 16, BLUE);
                 break;
                 case 2 :
-                  if (Parameter_Counter == 0) {if (WorkParameters[Parameter_Counter] > 1) WorkParameters[Parameter_Counter] -= 10;}
-                  else {if (WorkParameters[Parameter_Counter] < 1000) WorkParameters[Parameter_Counter]++;}
+                if(multiplier<200)multiplier+=10;
+                
+                  //if (Parameter_Counter == 0) {if (WorkParameters[Parameter_Counter] > 1) WorkParameters[Parameter_Counter] -= 10;}
+                  //else {if (WorkParameters[Parameter_Counter] < 1000) WorkParameters[Parameter_Counter]++;}
                 break;
                 case 3 :
-                  if (Parameter_Counter == 0) {if (WorkParameters[Parameter_Counter] < 1000) WorkParameters[Parameter_Counter] += 10;}
-                  else {if (WorkParameters[Parameter_Counter] > 1) WorkParameters[Parameter_Counter]--;}
+                if(multiplier>20)multiplier-=10;
+                
+                  //if (Parameter_Counter == 0) {if (WorkParameters[Parameter_Counter] < 1000) WorkParameters[Parameter_Counter] += 10;}
+                  //else {if (WorkParameters[Parameter_Counter] > 1) WorkParameters[Parameter_Counter]--;}
                 break;
                 case 4 :
                   State = 200;
@@ -1043,7 +1184,6 @@ while (1)
           }
           break;
         }
-
-      }
-}
+  
+  }
 }

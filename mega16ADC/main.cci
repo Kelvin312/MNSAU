@@ -1,4 +1,4 @@
-VERSION:3 SOURCE_TIMESTAMP:46FC9497
+VERSION:3 SOURCE_TIMESTAMP:46FD64C7
 NODE:I LEVEL:0 LINE:24 "C:\cvavreval\inc\mega16.h"
 NODE:I LEVEL:0 LINE:26 "C:\cvavreval\inc\delay.h"
 NODE:M LEVEL:0 LINE:56 "FRAMING_ERROR"
@@ -48,6 +48,6 @@ NODE:V LEVEL:0 LINE:200 "isRising -> RAM:????"
 NODE:V LEVEL:0 LINE:200 "isUpdate -> RAM:????"
 NODE:V LEVEL:0 LINE:201 "last_time -> RAM:????"
 NODE:F LEVEL:0 LINE:205 "adc_isr(void)"
-NODE:F LEVEL:0 LINE:255 "isqrt(unsigned int from)"
-NODE:F LEVEL:0 LINE:272 "main_loop(void)"
-NODE:F LEVEL:0 LINE:337 "main(void)"
+NODE:F LEVEL:0 LINE:259 "isqrt(unsigned int from)"
+NODE:F LEVEL:0 LINE:276 "main_loop(void)"
+NODE:F LEVEL:0 LINE:342 "main(void)"

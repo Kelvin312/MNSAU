@@ -192,7 +192,7 @@ TCCR0=0x00;
 #define ADC_BUF_SIZE 40
 #define ADC_VREF_TYPE 0x00
 
-signed char adc_data[8][ADC_BUF_SIZE];
+unsigned char adc_data[8][ADC_BUF_SIZE];
 unsigned long adc_current[8], adc_real[8];
 unsigned char adc_count[8], s_val[8];
 unsigned char adc_temp;
@@ -214,11 +214,11 @@ interrupt [ADC_INT] void adc_isr(void)
     TCNT0=0x5F;
     TCCR0=0x01;
 
-adc_data[adc_wr_input][adc_wr_index] = adc_temp ^ 0x80;
+adc_data[adc_wr_input][adc_wr_index] = adc_temp;
 
 if(adc_temp & 0x80)
 {
-  if(!isRising[adc_wr_input])
+  if(!isRising[adc_wr_input])// && 0)  //0000000000
   {
     //Нарастающий  
     if(adc_wr_input == FREQUENCY_ADC_INPUT)
@@ -249,6 +249,10 @@ if (++adc_wr_input > 7)
 {
     adc_wr_input = 0;
     if(++adc_wr_index >= ADC_BUF_SIZE) adc_wr_index = 0; 
+	if(adc_wr_index == adc_rd_index)
+	{
+		if(++adc_rd_index >= ADC_BUF_SIZE) adc_rd_index = 0;
+	}
 }
 }
 
@@ -306,7 +310,7 @@ inline void main_loop()
                         {
                             putchar(adc_data[i][adc_rd_index]);
                         }
-                    
+                    if(++adc_rd_index >= ADC_BUF_SIZE) adc_rd_index = 0;
                 }
             break;
             case 'Z':
@@ -314,6 +318,7 @@ inline void main_loop()
                 {   
                     putchar(adc_data[ZU_ADC_INPUT][adc_rd_index]); 
                     putchar(adc_data[ZI_ADC_INPUT][adc_rd_index]);
+					
                     if(++adc_rd_index >= ADC_BUF_SIZE) adc_rd_index = 0;
                 }
             break;
