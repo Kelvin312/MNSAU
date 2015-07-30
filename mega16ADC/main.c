@@ -181,7 +181,7 @@ TCNT0=0x00;
 #define ZU_ADC_INPUT 4
 #define ZI_ADC_INPUT 0   
 #define FREQUENCY_ADC_INPUT 6
-#define ADC_BUF_SIZE 80
+#define ADC_BUF_SIZE 64   //Больше - глючит
 #define ADC_VREF_TYPE 0x00
 
 unsigned char adc_data[8][ADC_BUF_SIZE];
@@ -189,8 +189,9 @@ unsigned long adc_current[8], adc_real[8];
 unsigned char adc_count[8], s_val[8];
 unsigned char adc_temp;
 unsigned char adc_rd_input, adc_wr_input, adc_wr_index, adc_rd_index;
-unsigned char isRising[8] = {0,0,0,0,0,0,0,0}, isUpdate[8] = {0,0,0,0,0,0,0,0};
+unsigned char isRising[8] = {0,0,0,0,0,0,0,0}, isUpdate[8] = {0,0,0,0,0,0,0,0}, isFregUpd = 0;
 unsigned int last_time = 0;
+unsigned int freg = 0;
 
 
 // Timer2 overflow interrupt service routine
@@ -202,7 +203,7 @@ TCNT2=0x06;
 
 if(adc_rd_input == 0)
 {
-     TCNT0=0xEA; //11us
+     TCNT0=0xEC; //10us
      TCCR0=0x02;
      MIGMIG ^= 1;
 }
@@ -222,7 +223,7 @@ interrupt [ADC_INT] void adc_isr(void)
 // Delay needed for the stabilization of the ADC input voltage
     if(adc_rd_input)
     {
-      TCNT0=0xEA;  //11us
+      TCNT0=0xEC;  //10us
       TCCR0=0x02;
     }
 
@@ -237,7 +238,8 @@ if(adc_temp & 0x80)
     {
         last_time = TCNT1;
         TCNT1H=0x00;
-        TCNT1L=0x00;  
+        TCNT1L=0x00;
+        isFregUpd = 1;  
     }
     adc_real[adc_wr_input] =  adc_current[adc_wr_input];
     adc_current[adc_wr_input] = 0;
@@ -298,6 +300,13 @@ inline void main_loop()
             s_val[i] = isqrt(s_tval);
         }
     }
+    if(isFregUpd)
+    {
+      // Период в тиках 62,500 kHz
+      freg = 62500 / last_time; 
+      isFregUpd = 0;
+    }
+    
     
     if(rx_counter)
     {
@@ -309,7 +318,10 @@ inline void main_loop()
                 {
                         for(i=FIRST_U_ADC_INPUT; i<j; i++)
                         {
-                            putchar(adc_data[i][adc_rd_index]);
+                            putchar(adc_data[i][adc_rd_index]); 
+                            #asm("nop")
+                            #asm("wdr")
+                            #asm("nop")
                         }
                     if(++adc_rd_index >= ADC_BUF_SIZE) adc_rd_index = 0;
                 }
@@ -321,6 +333,9 @@ inline void main_loop()
                         for(i=FIRST_I_ADC_INPUT; i<j; i++)
                         {
                             putchar(adc_data[i][adc_rd_index]);
+                            #asm("nop")
+                            #asm("wdr")
+                            #asm("nop")
                         }
                     if(++adc_rd_index >= ADC_BUF_SIZE) adc_rd_index = 0;
                 }
@@ -329,19 +344,26 @@ inline void main_loop()
                 while(adc_rd_index != adc_wr_index)
                 {   
                     putchar(adc_data[ZU_ADC_INPUT][adc_rd_index]); 
+                    #asm("nop")
+                    #asm("wdr")
+                    #asm("nop")
                     putchar(adc_data[ZI_ADC_INPUT][adc_rd_index]);
-					
+					          #asm("nop")
+                    #asm("wdr")
+                    #asm("nop")
                     if(++adc_rd_index >= ADC_BUF_SIZE) adc_rd_index = 0;
                 }
             break;
             case 'S': 
-                // Период в тиках 250 КГц
-                putchar(last_time & 0xFF); 
-                putchar(last_time >> 8); 
+                // Частота Гц
+                putchar(freg & 0xFF); 
                 // Среднеквадратичные
                 for(i=0; i<8; i++)
                 {
                     putchar(s_val[i]);
+                    #asm("nop")
+                    #asm("wdr")
+                    #asm("nop")
                 }
             break;
         }
@@ -391,7 +413,7 @@ OCR0=0x00;
 
 // Timer/Counter 1 initialization
 // Clock source: System Clock
-// Clock value: 250,000 kHz
+// Clock value: 62,500 kHz
 // Mode: Normal top=0xFFFF
 // OC1A output: Discon.
 // OC1B output: Discon.
@@ -402,9 +424,9 @@ OCR0=0x00;
 // Compare A Match Interrupt: Off
 // Compare B Match Interrupt: Off
 TCCR1A=0x00;
-TCCR1B=0x03;
+TCCR1B=0x04;
 TCNT1H=0x00;
-TCNT1L=0x02;
+TCNT1L=0x00;
 ICR1H=0x00;
 ICR1L=0x00;
 OCR1AH=0x00;

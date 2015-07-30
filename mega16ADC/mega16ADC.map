@@ -2,13 +2,15 @@ RAM Allocation
 Variable                                                          Address   Size
 --------------------------------------------------------------------------------
 rx_buffer                                                         0x0160       4
-adc_data                                                          0x0164     640
-adc_current                                                       0x03E4      32
-adc_real                                                          0x0404      32
-adc_count                                                         0x0424       8
-s_val                                                             0x042C       8
-isRising                                                          0x0434       8
-isUpdate                                                          0x043C       8
+adc_data                                                          0x0164     512
+adc_current                                                       0x0364      32
+adc_real                                                          0x0384      32
+adc_count                                                         0x03A4       8
+s_val                                                             0x03AC       8
+isRising                                                          0x03B4       8
+isUpdate                                                          0x03BC       8
+last_time                                                         0x03C4       2
+freg                                                              0x03C6       2
 
 EEPROM Allocation
 Variable                                                          Address   Size
@@ -26,4 +28,4 @@ adc_rd_input                                                      R9           1
 adc_wr_input                                                      R8           1
 adc_wr_index                                                      R11          1
 adc_rd_index                                                      R10          1
-last_time                                                         R12,R13      2
+isFregUpd                                                         R13          1

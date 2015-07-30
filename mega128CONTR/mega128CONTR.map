@@ -1,0 +1,41 @@
+RAM Allocation
+Variable                                                          Address   Size
+--------------------------------------------------------------------------------
+tempX                                                             0x05B7       4
+tempY                                                             0x05BB       4
+rx_buffer0                                                        0x05BF     250
+rx_counter0                                                       0x06B9       1
+tx_buffer0                                                        0x06BA       8
+tx_wr_index0                                                      0x06C2       1
+tx_rd_index0                                                      0x06C3       1
+tx_counter0                                                       0x06C4       1
+rx_buffer1                                                        0x06C5      32
+rx_wr_index1                                                      0x06E5       1
+rx_rd_index1                                                      0x06E6       1
+rx_counter1                                                       0x06E7       1
+tx_buffer1                                                        0x06E8      32
+tx_wr_index1                                                      0x0708       1
+tx_rd_index1                                                      0x0709       1
+tx_counter1                                                       0x070A       1
+State                                                             0x070B       1
+ParameterState                                                    0x070C       1
+Graph_X                                                           0x070D       2
+Amplitude                                                         0x070F       2
+ValueLast                                                         0x0711       6
+WaitADC_mSec                                                      0x0717       2
+
+EEPROM Allocation
+Variable                                                          Address   Size
+--------------------------------------------------------------------------------
+
+Register Allocation
+Variable                                                          Register  Size
+--------------------------------------------------------------------------------
+TOUCH_X                                                           R4,R5        2
+TOUCH_Y                                                           R6,R7        2
+TOUCH_X_LAST                                                      R8,R9        2
+TOUCH_Y_LAST                                                      R10,R11      2
+rx_wr_index0                                                      R13          1
+rx_rd_index0                                                      R12          1
+rx_buffer_overflow0                                               R2.0      1bit
+rx_buffer_overflow1                                               R2.1      1bit
