@@ -2,15 +2,16 @@ RAM Allocation
 Variable                                                          Address   Size
 --------------------------------------------------------------------------------
 rx_buffer                                                         0x0160       4
-adc_data                                                          0x0164     512
-adc_current                                                       0x0364      32
-adc_real                                                          0x0384      32
-adc_count                                                         0x03A4       8
-s_val                                                             0x03AC       8
-isRising                                                          0x03B4       8
-isUpdate                                                          0x03BC       8
-last_time                                                         0x03C4       2
-freg                                                              0x03C6       2
+adc_data                                                          0x0164     496
+adc_current                                                       0x0354      32
+adc_real                                                          0x0374      32
+adc_count                                                         0x0394       8
+s_val                                                             0x039C       8
+isRising                                                          0x03A4       8
+isUpdate                                                          0x03AC       8
+valClear                                                          0x03B4       9
+last_time                                                         0x03BD       2
+freg                                                              0x03BF       2
 
 EEPROM Allocation
 Variable                                                          Address   Size

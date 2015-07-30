@@ -163,7 +163,16 @@ else
 #endif
 */
 // Standard Input/Output functions
-#include <stdio.h>
+//#include <stdio.h>  
+
+#define _ALTERNATE_PUTCHAR_
+void putchar(char c) 
+{
+    // Wait for empty transmit buffer
+    while ( !(UCSRA & DATA_REGISTER_EMPTY) );
+    // Start transmission
+    UDR = c; 
+}
 
 #define MIGMIG PORTB.5
 
@@ -181,7 +190,7 @@ TCNT0=0x00;
 #define ZU_ADC_INPUT 4
 #define ZI_ADC_INPUT 0   
 #define FREQUENCY_ADC_INPUT 6
-#define ADC_BUF_SIZE 64   //Больше - глючит
+#define ADC_BUF_SIZE 62 //На 64 глючит   
 #define ADC_VREF_TYPE 0x00
 
 unsigned char adc_data[8][ADC_BUF_SIZE];
@@ -190,6 +199,7 @@ unsigned char adc_count[8], s_val[8];
 unsigned char adc_temp;
 unsigned char adc_rd_input, adc_wr_input, adc_wr_index, adc_rd_index;
 unsigned char isRising[8] = {0,0,0,0,0,0,0,0}, isUpdate[8] = {0,0,0,0,0,0,0,0}, isFregUpd = 0;
+unsigned char valClear[9] = {0,0,0,0,0,0,0,0,0};
 unsigned int last_time = 0;
 unsigned int freg = 0;
 
@@ -199,7 +209,18 @@ interrupt [TIM2_OVF] void timer2_ovf_isr(void)
 {
 // Reinitialize Timer2 value
 TCNT2=0x06;
-// Place your code here
+// Очищаем значения, если ничего не происходит больше 250 мс
+{
+valClear[0]++;
+valClear[1]++;
+valClear[2]++;
+valClear[3]++;
+valClear[4]++;
+valClear[5]++;
+valClear[6]++;
+valClear[7]++;
+valClear[8]++;
+}
 
 if(adc_rd_input == 0)
 {
@@ -295,18 +316,29 @@ inline void main_loop()
     {
         if(isUpdate[i])
         {
+            valClear[i] = 0;
             s_tval = adc_real[i]/isUpdate[i];
             isUpdate[i] = 0;
             s_val[i] = isqrt(s_tval);
         }
+        if(valClear[i] > 250)
+        {
+            valClear[i] = 0;
+            s_val[i] = 0;
+        }
     }
     if(isFregUpd)
     {
+      valClear[8] = 0;
       // Период в тиках 62,500 kHz
       freg = 62500 / last_time; 
       isFregUpd = 0;
     }
-    
+    if(valClear[8] > 250)
+    {  
+        valClear[8] = 0;
+        freg = 0;
+    }
     
     if(rx_counter)
     {
@@ -319,10 +351,8 @@ inline void main_loop()
                         for(i=FIRST_U_ADC_INPUT; i<j; i++)
                         {
                             putchar(adc_data[i][adc_rd_index]); 
-                            #asm("nop")
-                            #asm("wdr")
-                            #asm("nop")
                         }
+                        #asm("wdr")
                     if(++adc_rd_index >= ADC_BUF_SIZE) adc_rd_index = 0;
                 }
             break;
@@ -333,10 +363,8 @@ inline void main_loop()
                         for(i=FIRST_I_ADC_INPUT; i<j; i++)
                         {
                             putchar(adc_data[i][adc_rd_index]);
-                            #asm("nop")
-                            #asm("wdr")
-                            #asm("nop")
-                        }
+                        } 
+                        #asm("wdr")
                     if(++adc_rd_index >= ADC_BUF_SIZE) adc_rd_index = 0;
                 }
             break;
@@ -344,27 +372,29 @@ inline void main_loop()
                 while(adc_rd_index != adc_wr_index)
                 {   
                     putchar(adc_data[ZU_ADC_INPUT][adc_rd_index]); 
-                    #asm("nop")
-                    #asm("wdr")
-                    #asm("nop")
                     putchar(adc_data[ZI_ADC_INPUT][adc_rd_index]);
-					          #asm("nop")
                     #asm("wdr")
-                    #asm("nop")
                     if(++adc_rd_index >= ADC_BUF_SIZE) adc_rd_index = 0;
                 }
             break;
             case 'S': 
                 // Частота Гц
                 putchar(freg & 0xFF); 
-                // Среднеквадратичные
-                for(i=0; i<8; i++)
+                // Среднеквадратичные U
+				        j = FIRST_U_ADC_INPUT + 3;
+                for(i=FIRST_U_ADC_INPUT; i<j; i++)
                 {
                     putchar(s_val[i]);
-                    #asm("nop")
-                    #asm("wdr")
-                    #asm("nop")
                 }
+                // Среднеквадратичные I
+				        j = FIRST_I_ADC_INPUT + 3; 
+                for(i=FIRST_I_ADC_INPUT; i<j; i++)
+				        {
+					          putchar(s_val[i]);
+				        }
+                // Среднеквадратичные ZUI
+				        putchar(s_val[ZU_ADC_INPUT]); 
+                putchar(s_val[ZI_ADC_INPUT]);
             break;
         }
     }

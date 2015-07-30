@@ -19,7 +19,6 @@ void TSC2046_PortInit(void)
 }
 
 #pragma used+
-
 long tempX, tempY;
 unsigned int TOUCH_X, TOUCH_Y, TOUCH_X_LAST, TOUCH_Y_LAST;
 
@@ -111,17 +110,15 @@ char TSC2046_GetCoordinates(void)
     tempY = 0;
     for (i = 0; i < TOUCH_Calc_Max; i++)
     {
-      tempX += TSC2046_getADC_X();
-      tempY += TSC2046_getADC_Y();      
+        tempX += TSC2046_getADC_X() - ADC_X_MIN; 
+        tempY += TSC2046_getADC_Y() - ADC_Y_MIN;
     }
-    tempX -= ADC_X_MIN * TOUCH_Calc_Max;  
-    tempY -= ADC_Y_MIN * TOUCH_Calc_Max;
-    if(tempX < 0) tempX = 0; 
-    if(tempY < 0) tempY = 0;
+    if (tempX < 0) tempX = 0;
+    if (tempY < 0) tempY = 0;
     
     TOUCH_X = tempX / (TOUCH_Calc_Max * ADC_X_K);
-    TOUCH_Y = tempY / (TOUCH_Calc_Max * ADC_Y_K); 
-    
+    TOUCH_Y = tempY / (TOUCH_Calc_Max * ADC_Y_K);
+
     TSC2046_Stop(); 
     res = 1;
   }
@@ -131,6 +128,7 @@ char TSC2046_GetCoordinates(void)
 
 void TSC2046_Init(void)
 {
+  char i;
   TSC2046_PortInit();
   TOUCH_CS = 0;
   TOUCH_IRQ_PORT = 0;   
@@ -138,10 +136,14 @@ void TSC2046_Init(void)
   TOUCH_CS = 1;
   TOUCH_IRQ_PORT = 1;
   tempX = 0;
-  tempY = 0;
-
-    TOUCH_X = TSC2046_getX();
-    TOUCH_Y = TSC2046_getY(); 
+    tempY = 0;
+    for (i = 0; i < TOUCH_Calc_Max; i++)
+    {
+      tempX += TSC2046_getX();
+      tempY += TSC2046_getY();      
+    }
+    TOUCH_X = tempX / TOUCH_Calc_Max;
+    TOUCH_Y = tempY / TOUCH_Calc_Max;
     TSC2046_Stop();    
 }
 
