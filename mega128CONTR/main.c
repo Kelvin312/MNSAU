@@ -61,8 +61,21 @@ Data Stack size         : 1024
 #define DATA_REGISTER_EMPTY (1<<UDRE)
 #define RX_COMPLETE (1<<RXC)
 
+// USART2 Receiver buffer
+#define RX_BUFFER_SIZE2 20
+char rx_buffer2[RX_BUFFER_SIZE2];
+
+#if RX_BUFFER_SIZE2 <= 256
+unsigned char rx_wr_index2,rx_rd_index2,rx_counter2;
+#else
+unsigned int rx_wr_index2,rx_rd_index2,rx_counter2;
+#endif
+
+//Переключатель юарта
+char uart_swap = 0;
+
 // USART0 Receiver buffer
-#define RX_BUFFER_SIZE0 250
+#define RX_BUFFER_SIZE0 256
 char rx_buffer0[RX_BUFFER_SIZE0];
 
 #if RX_BUFFER_SIZE0 <= 256
@@ -81,6 +94,13 @@ char status,data;
 status=UCSR0A;
 data=UDR0;
 if ((status & (FRAMING_ERROR | PARITY_ERROR | DATA_OVERRUN))==0)
+{
+   if(uart_swap) //Юарт 2
+   {
+      rx_buffer2[rx_wr_index2++]=data; 
+      ++rx_counter2;
+   }
+   else //Юарт 0
    {
    rx_buffer0[rx_wr_index0++]=data;
 #if RX_BUFFER_SIZE0 == 256
@@ -91,11 +111,14 @@ if ((status & (FRAMING_ERROR | PARITY_ERROR | DATA_OVERRUN))==0)
    if (rx_wr_index0 == RX_BUFFER_SIZE0) rx_wr_index0=0;
    if (++rx_counter0 == RX_BUFFER_SIZE0)
       {
-      rx_counter0=0;
+      //rx_counter0=0;
 #endif
-      rx_buffer_overflow0=1;
+      rx_buffer_overflow0=1;  //Ааааа переполнение
+      rx_counter0=RX_BUFFER_SIZE0-1; 
+      if(rx_wr_index0) rx_wr_index0--; else rx_wr_index0=rx_counter0;
       }
    }
+}
 }
 
 #ifndef _DEBUG_TERMINAL_IO_
@@ -115,6 +138,20 @@ if (rx_rd_index0 == RX_BUFFER_SIZE0) rx_rd_index0=0;
 #asm("sei")
 return data;
 }
+
+
+char getchar2(void) //Юарт 2
+{
+char data;
+while (rx_counter2==0);
+data=rx_buffer2[rx_rd_index2++];
+if (rx_rd_index2 == RX_BUFFER_SIZE2) rx_rd_index2=0;
+#asm("cli")
+--rx_counter2;
+#asm("sei")
+return data;
+}
+
 #pragma used-
 #endif
 
@@ -145,7 +182,7 @@ if (tx_counter0)
 // Write a character to the USART0 Transmitter buffer
 #define _ALTERNATE_PUTCHAR_
 #pragma used+
-void putchar0(char c)
+inline void putchar0_i(char c)
 {
 while (tx_counter0 == TX_BUFFER_SIZE0);
 #asm("cli")
@@ -161,6 +198,19 @@ else
    UDR0=c;
 #asm("sei")
 }
+
+void putchar0(char c)
+{
+    uart_swap = 0;
+    putchar0_i(c);
+}
+
+void putchar2(char c)
+{
+    uart_swap = 2;
+    putchar0_i(c);
+}
+
 #pragma used-
 #endif
 
@@ -270,18 +320,18 @@ else
 #define BACKLIGHT PORTB.7
 
 #define Graph_X_Min 0
-#define Graph_X_Max 479
-#define Graph_Y_Min 52
+#define Graph_X_Max 478
+#define Graph_Y_Min 42
 #define Graph_Y_Max 232
 
-#define Graph_X_Step ((Graph_X_Max-Graph_X_Min+1)/60)
-#define Graph_Y_Mid ((Graph_Y_Max-Graph_Y_Min)/2 + Graph_Y_Min)
+flash unsigned int Graph_X_Step = (Graph_X_Max-Graph_X_Min)/82;
+flash unsigned int Graph_Y_Mid = (Graph_Y_Max-Graph_Y_Min)/2 + Graph_Y_Min;
 
 #define Text_StartX 30 
-#define Text_StartY 16
+#define Text_StartY 6
 
 #define Value_StartX 290 
-#define Value_StartY 16
+#define Value_StartY 6
 #define Value_Lenght (16*4)
 
 #define BTN_StartX 6
@@ -378,6 +428,18 @@ char GetButton(void)
   return res;
 }
 
+
+///////////////////////////////////////////////
+char State=0, ParameterState=0, ValueState=0, GraphState=0, ConfigState=0;
+unsigned int WaitADC_mSec = 0, ValueUpd_mSec = 0, GraphUpd_mSec = 0;
+
+unsigned int GraphUpdTime = 0;
+signed int Graph_X = -Graph_X_Step; 
+signed int Amplitude[3] = {90, 90, 50}; 
+signed int ValueLast[3] = {0,0,0};
+
+//////////////////////////////////////////////
+
 void PutParameterText(char Number, unsigned int Color)
 {
   int X = Text_StartX; 
@@ -409,18 +471,84 @@ void PutParameterText(char Number, unsigned int Color)
       SSD1963_PutString16("МАКСИМАЛЬНАЯ", X, Y + FONT_HEIGHT, Color, BLACK);
     break;
    */
+   
+    case 5:
+      SSD1963_PutString16("UPD", X, Y, Color, BLACK);
+      SSD1963_PutString16("AMP", X, Y + FONT_HEIGHT, Color, BLACK);
+      X += Value_Lenght;
+      SSD1963_PutValue16(GraphUpdTime, X, Y, 4, Color, BLACK);  
+      X += Value_Lenght + FONT_HEIGHT;
+      SSD1963_PutString16("OVF", X, Y, Color, BLACK);
+      X += Value_Lenght;
+      SSD1963_PutValue16(rx_buffer_overflow0, X, Y, 1, Color, BLACK);
+      
+      X = Text_StartX + Value_Lenght;
+      Y = Text_StartY + FONT_HEIGHT;
+      SSD1963_PutValue16(Amplitude[0], X, Y, 3, Color, DGRAY);
+      X += Value_Lenght; 
+      SSD1963_PutValue16(Amplitude[1], X, Y, 3, Color, BLACK);
+      X += Value_Lenght;
+      SSD1963_PutValue16(Amplitude[2], X, Y, 3, Color, BLACK);
+    break; 
+    case 6:
+      SSD1963_PutString16("UPD", X, Y, Color, BLACK);
+      SSD1963_PutString16("AMP", X, Y + FONT_HEIGHT, Color, BLACK);
+      X += Value_Lenght;
+      SSD1963_PutValue16(GraphUpdTime, X, Y, 4, Color, BLACK);  
+      X += Value_Lenght + FONT_HEIGHT;
+      SSD1963_PutString16("OVF", X, Y, Color, BLACK);
+      X += Value_Lenght;
+      SSD1963_PutValue16(rx_buffer_overflow0, X, Y, 1, Color, BLACK);
+      
+      X = Text_StartX + Value_Lenght;
+      Y = Text_StartY + FONT_HEIGHT;
+      SSD1963_PutValue16(Amplitude[0], X, Y, 3, Color, BLACK);
+      X += Value_Lenght; 
+      SSD1963_PutValue16(Amplitude[1], X, Y, 3, Color, DGRAY);
+      X += Value_Lenght;
+      SSD1963_PutValue16(Amplitude[2], X, Y, 3, Color, BLACK);
+    break;
+    case 7:
+      SSD1963_PutString16("UPD", X, Y, Color, BLACK);
+      SSD1963_PutString16("AMP", X, Y + FONT_HEIGHT, Color, BLACK);
+      X += Value_Lenght;
+      SSD1963_PutValue16(GraphUpdTime, X, Y, 4, Color, BLACK);  
+      X += Value_Lenght + FONT_HEIGHT;
+      SSD1963_PutString16("OVF", X, Y, Color, BLACK);
+      X += Value_Lenght;
+      SSD1963_PutValue16(rx_buffer_overflow0, X, Y, 1, Color, BLACK);
+      
+      X = Text_StartX + Value_Lenght;
+      Y = Text_StartY + FONT_HEIGHT;
+      SSD1963_PutValue16(Amplitude[0], X, Y, 3, Color, BLACK);
+      X += Value_Lenght; 
+      SSD1963_PutValue16(Amplitude[1], X, Y, 3, Color, BLACK);
+      X += Value_Lenght;
+      SSD1963_PutValue16(Amplitude[2], X, Y, 3, Color, DGRAY);
+    break;
+    case 8:
+      SSD1963_PutString16(" KU", X, Y, Color, BLACK);
+      SSD1963_PutString16(" KI", X, Y + FONT_HEIGHT, Color, BLACK);
+      X += Value_Lenght;
+      //SSD1963_PutValue16(Amplitude[0], X, Y, 3, Color, BLACK);
+      X += Value_Lenght; 
+      //SSD1963_PutValue16(Amplitude[1], X, Y, 3, Color, BLACK);
+      X += Value_Lenght;
+      //SSD1963_PutValue16(Amplitude[2], X, Y, 3, Color, BLACK);
+    break;
+    case 14:
+      SSD1963_PutString16("KUI", X, Y, Color, BLACK);
+      SSD1963_PutString16("FastADC", X, Y + FONT_HEIGHT, Color, BLACK);
+      X += Value_Lenght;
+      //SSD1963_PutValue16(Amplitude[0], X, Y, 3, Color, BLACK);
+      X += Value_Lenght; 
+      //SSD1963_PutValue16(Amplitude[1], X, Y, 3, Color, BLACK);
+      X += Value_Lenght;
+      //SSD1963_PutValue16(Amplitude[2], X, Y, 3, Color, BLACK);
+    break;
   }
 }
 
-///////////////////////////////////////////////
-char State=0, ParameterState=0, ValueState=0;
-signed int Graph_X = -Graph_X_Step; 
-signed int Amplitude[3] = {90, 90, 50}; 
-signed int ValueLast[3] = {0,0,0};
-unsigned int WaitADC_mSec = 0;
-
-
-//////////////////////////////////////////////
 
 //Функция вывода напряжения(тока) и частоты
 void PutParameterValue(char v1, char v2, char v3, char fHz)
@@ -434,16 +562,16 @@ void PutParameterValue(char v1, char v2, char v3, char fHz)
     
     if(ParameterState != 2) 
     {
-        SSD1963_PutValue16(v3, X, Y, 3, Color, BLACK);
+        SSD1963_PutValue16(v1, X, Y, 3, Color, BLACK);
         X += Value_Lenght;
         SSD1963_PutValue16(v2, X, Y, 3, Color, BLACK);
         X += Value_Lenght;
-        SSD1963_PutValue16(v1, X, Y, 3, Color, BLACK);
+        SSD1963_PutValue16(v3, X, Y, 3, Color, BLACK);
         X = Value_StartX + Value_Lenght; 
         Y += FONT_HEIGHT;
         SSD1963_PutValue16(fHz, X, Y, 3, Color, BLACK); 
         X += Value_Lenght; 
-        SSD1963_PutString16("ГЦ", X, Y, Color, BLACK);
+        SSD1963_PutString16("Гц", X, Y, Color, BLACK);
     }
     else
     {
@@ -454,130 +582,295 @@ void PutParameterValue(char v1, char v2, char v3, char fHz)
     }
 }
 
-
 void StartPaint()
 {
     //Чтоб первая точка легла
     Graph_X = -Graph_X_Step;   
 }
 
-
-void Paint_3phase(char a, char b, char c)
+inline void Paint_Phase(void)
 {
     signed int Value[3];
     unsigned int Color[] = {GREEN, YELLOW, RED}; 
-    signed int Lenght = Graph_X + Graph_X_Step; 
+    signed int Lenght = Graph_X + (Graph_X_Step << 2); 
     signed int mid = Graph_Y_Mid;
-    char i;
+    char i, j;
     
-    if(Graph_X > Graph_X_Max) return; //Некуда дальше  
-    if(Lenght > Graph_X_Max) Lenght = Graph_X_Max; 
-    Value[0] = a;
-    Value[1] = b; 
-    Value[2] = c; 
+    if(Graph_X > Graph_X_Max)  //Некуда дальше 
+    {
+        GraphUpdTime = GraphUpd_mSec; 
+        while(rx_counter0) getchar0(); 
+        GraphState = 0;
+    }
+    
+    if( rx_counter0 < 2 || (rx_counter0 < 3 && ParameterState != 2))
+    {
+        if(GraphUpd_mSec > 100) 
+        {  
+            GraphUpdTime = GraphUpd_mSec; 
+            while(rx_counter0) getchar0(); 
+            GraphState = 0;
+        }      
+    }
+    
+    if(GraphState == 0) return;
+    
+    if(Lenght > Graph_X_Max) Lenght = Graph_X_Max;  
     
     if(Graph_X >= Graph_X_Min)
     {
-    // очищаем перед собой столбец пикселей
-    SSD1963_DrawFillRect(Graph_X, Lenght+2, Graph_Y_Min, Graph_Y_Max+1, BLACK);
-    //Линия нуля 
-    SSD1963_DrawFastLine(Graph_X, Lenght, mid, mid, DGRAY);
-    SSD1963_DrawFastLine(Graph_X, Lenght, mid+45, mid+45, DGRAY);
-    SSD1963_DrawFastLine(Graph_X, Lenght, mid-45, mid-45, DGRAY);
-    SSD1963_DrawFastLine(Graph_X, Lenght, mid+90, mid+90, DGRAY);
-    SSD1963_DrawFastLine(Graph_X, Lenght, mid-90, mid-90, DGRAY);
-    }
-           
-    for(i=0; i<3; i++)
-    {
-        Value[i] = 128 - Value[i];
-        Value[i] *= Amplitude[ParameterState];
-        Value[i] >>= 7; 
-        if(Value[i]&0x0100) Value[i] |= 0xFF00;
-        
-        Value[i] += mid;
-        if(ParameterState==2)
-        { 
-            Value[i] += (i==1)?(45):(-45);
-        }
-        if(Value[i] > Graph_Y_Max) Value[i] = Graph_Y_Max;
-        if(Value[i] < Graph_Y_Min) Value[i] = Graph_Y_Min; 
-
-        if(Graph_X >= Graph_X_Min)
-        {   // пишем точку в столбце
-            SSD1963_DrawLine(Graph_X, Lenght, ValueLast[i], Value[i], Color[i], 2); 
-        }
-        // определяем предыдущую точку диограммы  
-        ValueLast[i] = Value[i]; 
-        
-        if(ParameterState==2 && i==1) break;
+        // очищаем перед собой столбец пикселей
+        SSD1963_DrawFillRect(Graph_X, Lenght+2, Graph_Y_Min, Graph_Y_Max+1, BLACK);
+        //Линия нуля 
+        SSD1963_DrawFastLine(Graph_X, Lenght, mid, mid, DGRAY);
+        SSD1963_DrawFastLine(Graph_X, Lenght, mid+45, mid+45, DGRAY);
+        SSD1963_DrawFastLine(Graph_X, Lenght, mid-45, mid-45, DGRAY);
+        SSD1963_DrawFastLine(Graph_X, Lenght, mid+90, mid+90, DGRAY);
+        SSD1963_DrawFastLine(Graph_X, Lenght, mid-90, mid-90, DGRAY);
     }
     
-    Graph_X += Graph_X_Step; // увеличеваем Х диограммы 
+     
+    
+    if(ParameterState != 2)
+    {
+        for(j=0; j<4; j++)
+        {
+            if(Graph_X > Graph_X_Max) break;
+            Lenght = Graph_X + Graph_X_Step; 
+            if(Lenght > Graph_X_Max) Lenght = Graph_X_Max; 
+            
+            Value[0] = getchar0();
+            Value[1] = getchar0(); 
+            Value[2] = getchar0();
+            
+            for(i=0; i<3; i++)
+            {
+                Value[i] = 128 - Value[i];
+                Value[i] *= Amplitude[ParameterState];
+                Value[i] >>= 7; 
+                if(Value[i]&0x0100) Value[i] |= 0xFF00;
+        
+                Value[i] += mid;
+                if(Value[i] > Graph_Y_Max) Value[i] = Graph_Y_Max;
+                if(Value[i] < Graph_Y_Min) Value[i] = Graph_Y_Min;
+                
+                if(Graph_X >= Graph_X_Min)
+                {   // пишем точку в столбце
+                    SSD1963_DrawLine(Graph_X, Lenght, ValueLast[i], Value[i], Color[i], 2); 
+                }
+                    // определяем предыдущую точку диограммы  
+                    ValueLast[i] = Value[i];
+            }
+            Graph_X += Graph_X_Step; // увеличеваем Х диограммы  
+        } 
+    }
+    else
+    {
+        for(j=0; j<4; j++)
+        {
+            if(Graph_X > Graph_X_Max) break;
+            Lenght = Graph_X + Graph_X_Step; 
+            if(Lenght > Graph_X_Max) Lenght = Graph_X_Max; 
+            
+            Value[0] = getchar0();
+            Value[1] = getchar0(); 
+            
+            for(i=0; i<2; i++)
+            {
+                Value[i] = 128 - Value[i];
+                Value[i] *= Amplitude[ParameterState];
+                Value[i] >>= 7; 
+                if(Value[i]&0x0100) Value[i] |= 0xFF00;
+        
+                Value[i] += mid + (i==1)?(45):(-45);
+                if(Value[i] > Graph_Y_Max) Value[i] = Graph_Y_Max;
+                if(Value[i] < Graph_Y_Min) Value[i] = Graph_Y_Min;
+                
+                if(Graph_X >= Graph_X_Min)
+                {   // пишем точку в столбце
+                    SSD1963_DrawLine(Graph_X, Lenght, ValueLast[i], Value[i], Color[i], 2); 
+                }
+                    // определяем предыдущую точку диограммы  
+                    ValueLast[i] = Value[i];
+            }
+            Graph_X += Graph_X_Step; // увеличеваем Х диограммы  
+        } 
+    }  
+}
+
+//Функция посылающаа управление куда подальше
+void TestParameterFun(char a, char b, char c, char fHz)
+{
+    RS485 = 1; //Передача
+    if(b > 110) printf("Напругу убавь \n");
+    if(b < 90)  printf("Напруги прибавь \n");
+    if(fHz < 50)printf("Поддай оборотов \n"); 
+    if(fHz > 50)printf("Не гони, помедленнее \n"); 
 }
 
 inline void main_loop()  // основной рабочий режим
 {
-    char fHz;
+    char fHz, a, b, c;
     
-            if(ValueState == 0 && rx_counter0 > 8)
+            switch(ValueState)
             {
-                  ValueState = 1;
-                  
-                  fHz = getchar0();
-                  switch(ParameterState) 
-                  { 
-                              case 2:
-                              {
-                              getchar0();
-                              getchar0();
-                              getchar0();
-                              getchar0();
-                              getchar0();
-                              getchar0();
-                              }
-                              PutParameterValue(getchar0(), getchar0(), 0, fHz);
-                              break;
-                              case 1:
-                              {
-                              getchar0();
-                              getchar0();
-                              getchar0();
-                              }
-                              case 0:
-                              PutParameterValue(getchar0(), getchar0(), getchar0(), fHz);
-                              break; 
-                  }
-                  
-                  StartPaint();
-                  while(rx_counter0) getchar0();
-                  switch(ParameterState) 
+                case 0: 
+                  if(ValueUpd_mSec > 300) //Надо обновить значения
                   {
-                      case 0: putchar0('U'); break; 
-                      case 1: putchar0('I'); break;
-                      case 2: putchar0('Z'); break;
-                  }   
-            }        
+                      if(ValueState < 2) 
+                      {
+                          putchar2('S');
+                          ValueState = 1;
+                          ValueUpd_mSec = 0; 
+                      }
+                  }
+                  if(GraphState == 0 && State == 0) //Надо обновить график
+                  {
+                      StartPaint();
+                      while(rx_counter0) getchar0(); 
+                      switch(ParameterState) 
+                      {
+                          case 0: putchar0('U'); break; 
+                          case 1: putchar0('I'); break;
+                          case 2: putchar0('Z'); break;
+                      }
+                      ValueState = 2;
+                      GraphState = 1; 
+                      GraphUpd_mSec = 0;    
+                  }
+                break;
+                case 1:
+                  if(rx_counter2 > 8)
+                  { 
+                      ValueState = 0;
+                      fHz = getchar2();
+                      a = getchar2();
+                      b = getchar2(); 
+                      c = getchar2();
+                      TestParameterFun(a, b, c, fHz);
+                      
+                      if(State == 0) //Надо обновить значения на дисплее
+                      {
+                        switch(ParameterState) 
+                        { 
+                          case 2:
+                              {
+                              getchar2();
+                              getchar2();
+                              getchar2();
+                              }
+                              a = getchar2();
+                              b = getchar2();
+                              PutParameterValue(a, b, c, fHz);
+                          break;
+                          case 1:
+                              a = getchar2();
+                              b = getchar2(); 
+                              c = getchar2();
+                          case 0:
+                              PutParameterValue(a, b, c, fHz);
+                          break; 
+                        }
+                      }
+                      
+                      while(rx_counter2) getchar2();    
+                  }
+                break;
+                case 2:
+                    if(GraphUpd_mSec > 200)
+                    {
+                        ValueState = 0;
+                    }
+                break;
+            } 
             
-            if(ValueState == 1)
-            { 
-                if(ParameterState<2 && rx_counter0>2) 
-                {
-                    Paint_3phase(getchar0(),getchar0(),getchar0());  
-                }
-                else if(ParameterState==2 && rx_counter0>1) 
-                {
-                    Paint_3phase(getchar0(),getchar0(),0); 
-                } 
-            }
-
-            if(WaitADC_mSec > 1500)
+            switch(State)
             {
-                WaitADC_mSec = 0;
-                ValueState = 0;
-                while(rx_counter0) getchar0(); 
-                putchar0('S');
-            }
+                case 0: // основной рабочий режим
+                { 
+                      if(GraphState) Paint_Phase(); //Рисуем график
+                
+                      switch (GetButton())
+                      {
+                          case 1:  //Переключение графиков
+                              if(++ParameterState > 2) ParameterState = 0;
+                              PutParameterText(ParameterState, BLUE); 
+                              delay_ms(100);
+                          break;
+                          case 2: 
+                              if(Amplitude[ParameterState] < 200) 
+                              {
+                                  Amplitude[ParameterState] += 10;
+                                  delay_ms(20);
+                              }
+                          break;
+                          case 3 :
+                              if(Amplitude[ParameterState] > 20) 
+                              {
+                                  Amplitude[ParameterState] -= 10;
+                                  delay_ms(20);
+                              }
+                          break;
+                          case 4 :  //Уходим в настройки
+                              State = 5;
+                              ConfigState = 0;
+                              Repaint_Button("СТАРТ", 4, BLACK, WHITE);
+                              PutParameterText(ConfigState + State, GREEN);
+                              delay_ms(200);
+                          break;
+                      }
+                }
+                break;
+                case 5: // настройки
+                {
+                    switch (GetButton())
+                    {
+                        case 1:
+                            if(++ConfigState > 2) ConfigState = 0;
+                            PutParameterText(ConfigState + State, GREEN);
+                            delay_ms(100);
+                        break;
+                        case 2:
+                        break;
+                        case 3:
+                        break;
+                        case 4:
+                            State = 0;
+                            Repaint_Button("ПАУЗА", 4, BLACK, WHITE);
+                            PutParameterText(ParameterState, BLUE);
+                            delay_ms(250);
+                        break;
+                    }
+                }
+                break;
+                case 200 : // пауза
+                //Sleep_mSec = 0;
+                    switch (GetButton())
+                    {
+                        case 1:
+                        break;
+                        case 2:
+                        break;
+                        case 3:
+                        break;
+                        case 4:
+                            State = 0;
+                            Repaint_Button("ПАУЗА", 4, BLACK, WHITE);
+                            delay_ms(250);
+                        break;
+                    }
+          
+                break;
+                case 250 : // сп¤щий режим
+                {
+                    if (TSC2046_GetCoordinates() > 0)
+                    {
+                        State = 0;
+                        BACKLIGHT = 0; //On
+                    }
+                }
+                break;
+            }      
 }
 
 // Timer 0 overflow interrupt 1 ms
@@ -587,6 +880,8 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 TCNT0=0x06;
 // Place your code here
 WaitADC_mSec++;
+ValueUpd_mSec++;
+GraphUpd_mSec++;
 }
 
 // Declare your global variables here
@@ -814,73 +1109,6 @@ PutParameterText(ParameterState, BLUE);
 while (1)
       {
       #asm("wdr") 
-      switch(State)
-        {
-          case 0: // основной рабочий режим
-          {
-              main_loop();
-
-              switch (GetButton())
-              {
-              case 1 :  
-                  if(++ParameterState > 2) ParameterState = 0;
-                  PutParameterText(ParameterState, BLUE); 
-                  delay_ms(250);
-              break;
-              case 2 : 
-                  if(Amplitude[ParameterState] < 200) 
-                  {
-                      Amplitude[ParameterState] += 10;
-                      delay_ms(100);
-                  }
-              break;
-              case 3 :
-                  if(Amplitude[ParameterState] > 20) 
-                  {
-                      Amplitude[ParameterState] -= 10;
-                      delay_ms(100);
-                  }
-              break;
-              case 4 :
-                State = 200;
-                Repaint_Button("СТАРТ", 4, BLACK, WHITE);
-                delay_ms(250);
-              break;
-              }
-          }
-          break;
-          case 3: // настройки
-          {
-          }
-          break;
-          case 200 : // пауза
-            //Sleep_mSec = 0;
-            switch (GetButton())
-            {
-              case 1 :
-              break;
-              case 2 :
-              break;
-              case 3 :
-              break;
-              case 4 :
-                State = 0;
-                Repaint_Button("ПАУЗА", 4, BLACK, WHITE);
-                delay_ms(250);
-              break;
-            }
-          
-          break;
-          case 250 : // сп¤щий режим
-          {
-            if (TSC2046_GetCoordinates() > 0)
-            {
-              State = 0;
-              BACKLIGHT = 0; //On
-            }
-          }
-          break;
-        }
-      
+      main_loop();
       }
 }

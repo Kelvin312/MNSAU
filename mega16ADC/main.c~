@@ -19,6 +19,10 @@ AVR Core Clock frequency: 16,000000 MHz
 Memory model            : Small
 External RAM size       : 0
 Data Stack size         : 256
+*****************************************************
+ADC Operation amplitude : 0.15 - 2.6 V
+ADC Operation frequency : 10 - 200 Hz
+ADC Convert time        : 0.530 / 1.0 ms
 *****************************************************/
 
 #include <mega16.h>
@@ -60,7 +64,7 @@ Data Stack size         : 256
 #define RX_COMPLETE (1<<RXC)
 
 // USART Receiver buffer
-#define RX_BUFFER_SIZE 4
+#define RX_BUFFER_SIZE 8
 char rx_buffer[RX_BUFFER_SIZE];
 
 #if RX_BUFFER_SIZE <= 256
@@ -194,14 +198,18 @@ TCNT0=0x00;
 #define ADC_VREF_TYPE 0x00
 
 unsigned char adc_data[8][ADC_BUF_SIZE];
-unsigned long adc_current[8], adc_real[8];
-unsigned char adc_count[8], s_val[8];
+unsigned char adc_rd_input, adc_wr_input, adc_wr_index, adc_rd_index; 
 unsigned char adc_temp;
-unsigned char adc_rd_input, adc_wr_input, adc_wr_index, adc_rd_index;
-unsigned char isRising[8] = {0,0,0,0,0,0,0,0}, isUpdate[8] = {0,0,0,0,0,0,0,0}, isFregUpd = 0;
-unsigned char valClear[9] = {0,0,0,0,0,0,0,0,0}
-unsigned int last_time = 0;
-unsigned int freg = 0;
+unsigned int adc_sqr;
+unsigned long adc_current[8], adc_real[8];
+unsigned char adc_count[8] = {0,0,0,0,0,0,0,0}, isUpdate[8] = {0,0,0,0,0,0,0,0}, s_val[8];
+unsigned char isRising[8] = {0,0,0,0,0,0,0,0}, valClear[8] = {0,0,0,0,0,0,0,0}; 
+unsigned int freg = 0, last_time = 0;
+unsigned char freg_count = 0, isFregUpd = 0;
+
+eeprom unsigned int adc_coef_mem[9];
+flash unsigned int adc_coef_def[9] = {95, 95, 95, 95, 95, 95, 95, 95, 0}; //95 попугаев
+unsigned int adc_coef[9];
 
 
 // Timer2 overflow interrupt service routine
@@ -219,10 +227,9 @@ valClear[4]++;
 valClear[5]++;
 valClear[6]++;
 valClear[7]++;
-valClear[8]++;
 }
 
-if(adc_rd_input == 0)
+if(adc_rd_input == 0 && adc_coef[8] == 0)
 {
      TCNT0=0xEC; //10us
      TCCR0=0x02;
@@ -236,47 +243,59 @@ if(adc_rd_input == 0)
 interrupt [ADC_INT] void adc_isr(void)
 {
 // Read the AD conversion result
-    adc_temp = ADCW>>2;
+    adc_sqr = ADCW;
 // Select next ADC input
     adc_rd_input = adc_wr_input + 1;
     if(adc_rd_input > 7) adc_rd_input = 0;
     ADMUX=(ADC_VREF_TYPE & 0xff) | adc_rd_input;
 // Delay needed for the stabilization of the ADC input voltage
-    if(adc_rd_input)
+    if(adc_rd_input || adc_coef[8])
     {
       TCNT0=0xEC;  //10us
       TCCR0=0x02;
+      MIGMIG ^= adc_coef[8]; 
     }
-
+// Save ADC point
+adc_temp = adc_sqr>>2;
 adc_data[adc_wr_input][adc_wr_index] = adc_temp;
 
-if(adc_temp & 0x80)
+if(adc_temp & 0x80) //Положительная полуволна
 {
-  if(!isRising[adc_wr_input])  
+  if(!isRising[adc_wr_input]) //Нарастающий   
   {
-    //Нарастающий  
-    if(adc_wr_input == FREQUENCY_ADC_INPUT)
+    if(adc_wr_input == FREQUENCY_ADC_INPUT) 
     {
+      if(++freg_count > 9) //10 периодов
+      {
         last_time = TCNT1;
         TCNT1H=0x00;
         TCNT1L=0x00;
-        isFregUpd = 1;  
+        freg_count = 0;
+        isFregUpd = 1; 
+      } 
     }
-    adc_real[adc_wr_input] =  adc_current[adc_wr_input];
-    adc_current[adc_wr_input] = 0;
+    if(adc_count[adc_wr_input] > 110) //Если намерили достаточно
+    {
+        adc_real[adc_wr_input] =  adc_current[adc_wr_input];
+        adc_current[adc_wr_input] = 0;
+        isUpdate[adc_wr_input] = adc_count[adc_wr_input]; 
+        adc_count[adc_wr_input] = 0; 
+    }
+    
+    valClear[adc_wr_input] = 0;
     isRising[adc_wr_input] = 1;
-    isUpdate[adc_wr_input] = adc_count[adc_wr_input]; 
-    adc_count[adc_wr_input] = 0;
   }
 }
-else
+else //Отрицательная
 {
-  if(adc_temp < 120) isRising[adc_wr_input] = 0;
-  adc_temp = 127 - adc_temp;
+  if(adc_temp < 121) isRising[adc_wr_input] = 0;
+  adc_sqr = 0x1FF - adc_sqr;
 }
-
-adc_temp &= 0x7F;
-adc_current[adc_wr_input] += adc_temp * adc_temp; 
+// Считаем квадраты 
+adc_sqr &= 0x1FF;
+adc_sqr >>= 1;
+//adc_temp = adc_sqr;
+adc_current[adc_wr_input] += adc_sqr * adc_sqr; 
 adc_count[adc_wr_input]++;
 
 // Select next ADC input
@@ -284,14 +303,15 @@ if (++adc_wr_input > 7)
 {
     adc_wr_input = 0;
     if(++adc_wr_index >= ADC_BUF_SIZE) adc_wr_index = 0; 
-	if(adc_wr_index == adc_rd_index)
-	{
-		if(++adc_rd_index >= ADC_BUF_SIZE) adc_rd_index = 0;
-	}
+    //Чтоб буфер не переполнился
+    if(adc_wr_index == adc_rd_index)
+    {
+		    if(++adc_rd_index >= ADC_BUF_SIZE) adc_rd_index = 0;
+    }
 }
 }
 
-unsigned char isqrt( unsigned int from) 
+unsigned char isqrt( unsigned int from) //Корняизвлекатель 
 {
      unsigned int mask = 0x4000, sqr = 0, temp;
      do 
@@ -314,30 +334,27 @@ inline void main_loop()
     unsigned int s_tval;
     for(i=0; i<8; i++)
     {
-        if(isUpdate[i])
-        {
-            valClear[i] = 0;
-            s_tval = adc_real[i]/isUpdate[i];
-            isUpdate[i] = 0;
-            s_val[i] = isqrt(s_tval);
-        }
-        if(valClear[i] > 250)
+        if(valClear[i] > 250) //Нет периодов
         {
             valClear[i] = 0;
             s_val[i] = 0;
+            if(i == FREQUENCY_ADC_INPUT) freg = 0;
         }
+        else
+        if(isUpdate[i])
+        {
+            // sqrt( сумма(X^2) * coef / (count * 255) )
+            s_tval = (adc_real[i]*adc_coef[i])/((unsigned int)isUpdate[i]*255);
+            isUpdate[i] = 0; 
+            s_val[i] = isqrt(s_tval);
+        }
+        
     }
     if(isFregUpd)
     {
-      valClear[8] = 0;
-      // Период в тиках 62,500 kHz
-      freg = 62500 / last_time; 
+      // 10 периодов в тиках 62,500 kHz
+      freg = 625000 / last_time;
       isFregUpd = 0;
-    }
-    if(valClear[8] > 250)
-    {  
-        valClear[8] = 0;
-        freg = 0;
     }
     
     if(rx_counter)
@@ -396,6 +413,24 @@ inline void main_loop()
 				        putchar(s_val[ZU_ADC_INPUT]); 
                 putchar(s_val[ZI_ADC_INPUT]);
             break;
+            case 'G': //Настройки
+                for(i=0; i<9; i++)
+                {
+                    putchar(adc_coef[i] & 0xFF);
+                    putchar(adc_coef[i] >> 8);
+                }
+            break;
+            case 'K': //Изменить настройки
+                if(rx_counter > 2)
+                {
+                    i = getchar();
+                    s_tval = getchar();
+                    s_tval |= (unsigned int)getchar()<<8;
+                    if(i<8) adc_coef[i] = s_tval; 
+                    #asm("wdr")
+                    if(i<9) adc_coef_mem[i] = s_tval;
+                }
+            break;
         }
     }
 }
@@ -406,6 +441,14 @@ inline void main_loop()
 void main(void)
 {
 // Declare your local variables here
+char i; //Загружаем настройки
+for(i=0; i<9; i++)
+{
+    adc_coef[i] =  adc_coef_mem[i];
+    if(adc_coef[i] > 999 || adc_coef[i] == 0) 
+        adc_coef[i] = adc_coef_def[i];
+}
+adc_coef[8] &= 1;
 
 // Input/Output Ports initialization
 // Port A initialization
@@ -514,21 +557,14 @@ UBRRL=0x08;
 ACSR=0x80;
 SFIOR=0x00;
 
-// ADC initialization
-// ADC Clock frequency: 250,000 kHz
-// ADC Voltage Reference: AREF pin
-// ADC Auto Trigger Source: Timer0 Overflow
-ADMUX=(ADC_VREF_TYPE & 0xff);
-ADCSRA=0xAE;
-SFIOR&=0x1F;
-SFIOR|=0x80;
 
 // ADC initialization // На штатной частоте
-// ADC Clock frequency: 125,000 kHz
+// ADC Clock frequency: 125,000 kHz 
 // ADC Voltage Reference: AREF pin
 // ADC Auto Trigger Source: Timer0 Overflow
 ADMUX= (ADC_VREF_TYPE & 0xff);
-ADCSRA=0xAF;
+// FastADC 250,000 kHz / 125,000 kHz 
+ADCSRA= (adc_coef[8])?0xAE:0xAF;
 SFIOR&=0x1F;
 SFIOR|=0x80;
 
