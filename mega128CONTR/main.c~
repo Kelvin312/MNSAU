@@ -183,7 +183,7 @@ if (tx_counter0)
 // Write a character to the USART0 Transmitter buffer
 #define _ALTERNATE_PUTCHAR_
 #pragma used+
-inline void putchar0_i(char c)
+void putchar0_i(char c)
 {
 while (tx_counter0 == TX_BUFFER_SIZE0);
 #asm("cli")
@@ -200,13 +200,13 @@ else
 #asm("sei")
 }
 
-void putchar0(char c)
+inline void putchar0(char c)
 {
     uart_swap = 0;
     putchar0_i(c);
 }
 
-void putchar2(char c)
+inline void putchar2(char c)
 {
     uart_swap = 2;
     putchar0_i(c);
@@ -326,7 +326,7 @@ else
 #define Graph_Y_Max 232
 #define Graph_Step_N 2 //1..3
 
-flash unsigned int Graph_X_Step = (Graph_X_Max-Graph_X_Min)/74;
+flash unsigned int Graph_X_Step = (Graph_X_Max-Graph_X_Min)/72;
 flash unsigned int Graph_Y_Mid = (Graph_Y_Max-Graph_Y_Min)/2 + Graph_Y_Min;
 
 #define Text_StartX 16 
@@ -398,20 +398,51 @@ void Prepare_Screen(void)
   SSD1963_DrawRect(BTN3_X_Begin + 1, BTN3_X_End - 1, BTN3_Y_Begin + 1, BTN3_Y_End - 1, 1, BLACK);
   SSD1963_DrawRect(BTN4_X_Begin + 1, BTN4_X_End - 1, BTN4_Y_Begin + 1, BTN4_Y_End - 1, 1, BLACK);
 
-  Repaint_Button("МЕНЮ", 1, BLACK, WHITE);
+  Repaint_Button("СЛЕД", 1, BLACK, WHITE);
   Repaint_Button("  +", 2, BLACK, WHITE);
   Repaint_Button("  -", 3, BLACK, WHITE);
   Repaint_Button("ПАУЗА", 4, BLACK, WHITE);
 }
 
+///////////////////////////////////////////////
+char State=0, ParameterState=0, ValueState=0, GraphState=0, ConfigState=0;
+unsigned int Touch_mSec = 0, ValueUpd_mSec = 0, GraphUpd_mSec = 0;
+
+unsigned int GraphUpdTime = 0;
+signed int Graph_X = -Graph_X_Step; 
+signed int ValueLast[3] = {0,0,0};
+
+unsigned int ConfigValue[12], old_confVal; 
+eeprom unsigned int ConfigValue_mem[3];
+flash unsigned int ConfigParam[4][12] = {
+//Графики        //АЦП                              //FastAdc
+{10,  10,  10,  5,   5,   5,   5,   5,   5,   5,   5,   1}, //0 - шаг 
+{20,  20,  20,  5,   5,   5,   5,   5,   5,   5,   5,   0}, //1 - мин  
+{220, 220, 220, 500, 500, 500, 500, 500, 500, 500, 500, 1}, //2 - макс  
+{90,  90,  45,  100, 100, 100, 100, 100, 100, 100, 100, 0}  //3 - дефолт
+};
+
+//////////////////////////////////////////////
+
+// Timer 0 overflow interrupt 1 ms
+interrupt [TIM0_OVF] void timer0_ovf_isr(void)
+{
+// Reinitialize Timer 0 value
+TCNT0=0x06;
+// Place your code here
+if(Touch_mSec < 0xFF) Touch_mSec++;
+ValueUpd_mSec++;
+GraphUpd_mSec++;
+}
+
 char GetButton(void)
 {
   char res = 0;
-  if (TSC2046_GetCoordinates())
+  if (Touch_mSec > 50 && TSC2046_GetCoordinates())
   {
     if ((TOUCH_X > BTN1_X_Begin) && (TOUCH_X < BTN1_X_End)) // если X внутри заданного диапазона
     {
-      if ((TOUCH_Y > BTN1_Y_Begin) && (TOUCH_Y < BTN1_Y_End)) res = 1;
+      if ((TOUCH_Y > BTN1_Y_Begin) && (TOUCH_Y < BTN1_Y_End) && (Touch_mSec > 150)) res = 1;
     }
     if ((TOUCH_X > BTN2_X_Begin) && (TOUCH_X < BTN2_X_End)) // если X внутри заданного диапазона
     {
@@ -423,24 +454,12 @@ char GetButton(void)
     }
     if ((TOUCH_X > BTN4_X_Begin) && (TOUCH_X < BTN4_X_End)) // если X внутри заданного диапазона
     {
-      if ((TOUCH_Y > BTN4_Y_Begin) && (TOUCH_Y < BTN4_Y_End)) res = 4;
+      if ((TOUCH_Y > BTN4_Y_Begin) && (TOUCH_Y < BTN4_Y_End) && (Touch_mSec > 150)) res = 4;
     }
-
+      Touch_mSec = 0;
   }
   return res;
 }
-
-
-///////////////////////////////////////////////
-char State=0, ParameterState=0, ValueState=0, GraphState=0, ConfigState=0;
-unsigned int WaitADC_mSec = 0, ValueUpd_mSec = 0, GraphUpd_mSec = 0;
-
-unsigned int GraphUpdTime = 0;
-signed int Graph_X = -Graph_X_Step; 
-signed int Amplitude[3] = {90, 90, 50}; 
-signed int ValueLast[3] = {0,0,0};
-
-//////////////////////////////////////////////
 
 void PutParameterText(char Number, unsigned int Color)
 {
@@ -475,78 +494,61 @@ void PutParameterText(char Number, unsigned int Color)
    */
    
     case 5:
-      SSD1963_PutString16("ДИС", X, Y, Color, BLACK);
+    case 6:
+    case 7:
+      SSD1963_PutString16("ОБН", X, Y, Color, BLACK);
       SSD1963_PutString16("АМП", X, Y + FONT_HEIGHT, Color, BLACK);
-      X += Value_Lenght;
+      
+      X = Text_StartX + Value_Lenght;
       SSD1963_PutValue16(GraphUpdTime, X, Y, 4, Color, BLACK);  
       X += Value_Lenght + FONT_HEIGHT + FONT_HEIGHT;
-      SSD1963_PutString16("ОВЕ", X, Y, Color, BLACK);
+      SSD1963_PutString16("ПЕР", X, Y, Color, BLACK);
       X += Value_Lenght;
       SSD1963_PutValue16(rx_buffer_overflow0, X, Y, 1, Color, BLACK);
       
       X = Text_StartX + Value_Lenght;
       Y = Text_StartY + FONT_HEIGHT;
-      SSD1963_PutValue16(Amplitude[0], X, Y, 3, Color, DGRAY);
+      SSD1963_PutValue16(ConfigValue[0], X, Y, 3, Color, (Number==5)?DGRAY:BLACK);
       X += Value_Lenght; 
-      SSD1963_PutValue16(Amplitude[1], X, Y, 3, Color, BLACK);
+      SSD1963_PutValue16(ConfigValue[1], X, Y, 3, Color, (Number==6)?DGRAY:BLACK);
       X += Value_Lenght;
-      SSD1963_PutValue16(Amplitude[2], X, Y, 3, Color, BLACK);
+      SSD1963_PutValue16(ConfigValue[2], X, Y, 3, Color, (Number==7)?DGRAY:BLACK);
     break; 
-    case 6:
-      SSD1963_PutString16("ДИС", X, Y, Color, BLACK);
-      SSD1963_PutString16("АМП", X, Y + FONT_HEIGHT, Color, BLACK);
-      X += Value_Lenght;
-      SSD1963_PutValue16(GraphUpdTime, X, Y, 4, Color, BLACK);  
-      X += Value_Lenght + FONT_HEIGHT;
-      SSD1963_PutString16("ОВЕ", X, Y, Color, BLACK);
-      X += Value_Lenght;
-      SSD1963_PutValue16(rx_buffer_overflow0, X, Y, 1, Color, BLACK);
-      
-      X = Text_StartX + Value_Lenght;
-      Y = Text_StartY + FONT_HEIGHT;
-      SSD1963_PutValue16(Amplitude[0], X, Y, 3, Color, BLACK);
-      X += Value_Lenght; 
-      SSD1963_PutValue16(Amplitude[1], X, Y, 3, Color, DGRAY);
-      X += Value_Lenght;
-      SSD1963_PutValue16(Amplitude[2], X, Y, 3, Color, BLACK);
-    break;
-    case 7:
-      SSD1963_PutString16("ДИС", X, Y, Color, BLACK);
-      SSD1963_PutString16("АМП", X, Y + FONT_HEIGHT, Color, BLACK);
-      X += Value_Lenght;
-      SSD1963_PutValue16(GraphUpdTime, X, Y, 4, Color, BLACK);  
-      X += Value_Lenght + FONT_HEIGHT;
-      SSD1963_PutString16("ОВЕ", X, Y, Color, BLACK);
-      X += Value_Lenght;
-      SSD1963_PutValue16(rx_buffer_overflow0, X, Y, 1, Color, BLACK);
-      
-      X = Text_StartX + Value_Lenght;
-      Y = Text_StartY + FONT_HEIGHT;
-      SSD1963_PutValue16(Amplitude[0], X, Y, 3, Color, BLACK);
-      X += Value_Lenght; 
-      SSD1963_PutValue16(Amplitude[1], X, Y, 3, Color, BLACK);
-      X += Value_Lenght;
-      SSD1963_PutValue16(Amplitude[2], X, Y, 3, Color, DGRAY);
-    break;
     case 8:
-      SSD1963_PutString16(" KU", X, Y, Color, BLACK);
-      SSD1963_PutString16(" KI", X, Y + FONT_HEIGHT, Color, BLACK);
-      X += Value_Lenght;
-      //SSD1963_PutValue16(Amplitude[0], X, Y, 3, Color, BLACK);
+    case 9:
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+      SSD1963_PutString16(" КН", X, Y, Color, BLACK);
+      SSD1963_PutString16(" КТ", X, Y + FONT_HEIGHT, Color, BLACK);
+      
+      X = Text_StartX + Value_Lenght;
+      SSD1963_PutValue16(ConfigValue[3], X, Y, 3, Color, (Number==8)?DGRAY:BLACK);
       X += Value_Lenght; 
-      //SSD1963_PutValue16(Amplitude[1], X, Y, 3, Color, BLACK);
+      SSD1963_PutValue16(ConfigValue[4], X, Y, 3, Color, (Number==9)?DGRAY:BLACK);
       X += Value_Lenght;
-      //SSD1963_PutValue16(Amplitude[2], X, Y, 3, Color, BLACK);
+      SSD1963_PutValue16(ConfigValue[5], X, Y, 3, Color, (Number==10)?DGRAY:BLACK);
+      
+      X = Text_StartX + Value_Lenght;
+      Y = Text_StartY + FONT_HEIGHT;
+      SSD1963_PutValue16(ConfigValue[6], X, Y, 3, Color, (Number==11)?DGRAY:BLACK);
+      X += Value_Lenght; 
+      SSD1963_PutValue16(ConfigValue[7], X, Y, 3, Color, (Number==12)?DGRAY:BLACK);
+      X += Value_Lenght;
+      SSD1963_PutValue16(ConfigValue[8], X, Y, 3, Color, (Number==13)?DGRAY:BLACK);
     break;
     case 14:
-      SSD1963_PutString16("KUI", X, Y, Color, BLACK);
-      SSD1963_PutString16("FastADC", X, Y + FONT_HEIGHT, Color, BLACK);
+    case 15:
+    case 16:
+      SSD1963_PutString16("КНТ", X, Y, Color, BLACK);
+      SSD1963_PutString16("БЫСТАЦП", X, Y + FONT_HEIGHT, Color, BLACK);
       X += Value_Lenght;
-      //SSD1963_PutValue16(Amplitude[0], X, Y, 3, Color, BLACK);
+      SSD1963_PutValue16(ConfigValue[9], X, Y, 3, Color, (Number==14)?DGRAY:BLACK);
       X += Value_Lenght; 
-      //SSD1963_PutValue16(Amplitude[1], X, Y, 3, Color, BLACK);
-      X += Value_Lenght;
-      //SSD1963_PutValue16(Amplitude[2], X, Y, 3, Color, BLACK);
+      SSD1963_PutValue16(ConfigValue[10], X, Y, 3, Color, (Number==15)?DGRAY:BLACK);
+      Y += FONT_HEIGHT;
+      SSD1963_PutValue16(ConfigValue[11], X, Y, 1, Color, (Number==16)?DGRAY:BLACK);
     break;
   }
 }
@@ -614,7 +616,7 @@ inline void Paint_Phase(void)
         }      
     }
     
-    if(GraphState == 0) return;
+    if(GraphState == 0 || (TOUCH_IRQ < 1 && Touch_mSec > 50)) goto _return; //Увеличиваем
     
     if(Lenght > Graph_X_Max) Lenght = Graph_X_Max;  
     
@@ -630,6 +632,8 @@ inline void Paint_Phase(void)
         SSD1963_DrawFastLine(Graph_X, Lenght, mid-90, mid-90, DGRAY);
     }
     
+    if(TOUCH_IRQ < 1 && Touch_mSec > 60) goto _return; //Отзывчивость
+    
     if(ParameterState != 2)
     {
         for(j=0; j<Graph_Step_N; j++)
@@ -638,7 +642,7 @@ inline void Paint_Phase(void)
             Lenght = Graph_X + Graph_X_Step; 
             if(Lenght > Graph_X_Max) Lenght = Graph_X_Max; 
             
-            if(rx_counter0 < 3 || (TOUCH_IRQ < 1)) break; 
+            if(rx_counter0 < 3 || (TOUCH_IRQ < 1 && Touch_mSec > 70)) goto _return; //Интерфейса
             
             Value[0] = getchar0();
             Value[1] = getchar0(); 
@@ -647,7 +651,7 @@ inline void Paint_Phase(void)
             for(i=0; i<3; i++)
             {
                 Value[i] = 128 - Value[i];
-                Value[i] *= Amplitude[ParameterState];
+                Value[i] *= ConfigValue[ParameterState];
                 Value[i] >>= 7; 
                 if(Value[i]&0x0100) Value[i] |= 0xFF00;
         
@@ -673,7 +677,7 @@ inline void Paint_Phase(void)
             Lenght = Graph_X + Graph_X_Step; 
             if(Lenght > Graph_X_Max) Lenght = Graph_X_Max; 
             
-            if(rx_counter0 < 2 || (TOUCH_IRQ < 1)) break;
+            if(rx_counter0 < 2 || (TOUCH_IRQ < 1 && Touch_mSec > 70)) goto _return;
             
             Value[0] = getchar0();
             Value[1] = getchar0(); 
@@ -681,7 +685,7 @@ inline void Paint_Phase(void)
             for(i=0; i<2; i++)
             {
                 Value[i] = 128 - Value[i];
-                Value[i] *= Amplitude[ParameterState];
+                Value[i] *= ConfigValue[ParameterState];
                 Value[i] >>= 7; 
                 if(Value[i]&0x0100) Value[i] |= 0xFF00;
         
@@ -698,7 +702,8 @@ inline void Paint_Phase(void)
             }
             Graph_X += Graph_X_Step; // увеличеваем Х диограммы  
         } 
-    }  
+    }
+    _return:;  
 }
 
 //Функция посылающаа управление куда подальше
@@ -711,6 +716,22 @@ void TestParameterFun(char a, char b, char c, char fHz)
     if(fHz > 50)printf("Не гони, помедленнее \n"); 
 }
 
+void Save_Eeprom(char Number)
+{
+    if(Number > 2)
+    {
+        putchar0_i('K');
+        putchar0_i(Number-3);
+        putchar0_i(ConfigValue[Number] & 0xFF); 
+        putchar0_i(ConfigValue[Number] >> 8);
+    }
+    else
+    {
+        ConfigValue_mem[Number] = ConfigValue[Number]; 
+    }
+       
+}
+
 inline void main_loop()  // основной рабочий режим
 {
     char fHz, a, b, c;
@@ -718,10 +739,11 @@ inline void main_loop()  // основной рабочий режим
             switch(ValueState)
             {
                 case 0: 
-                  if(ValueUpd_mSec > 400) //Надо обновить значения, но как?
+                  if(ValueUpd_mSec > 300) //Надо обновить значения, но как?
                   {
                       if(ValueState < 2) 
                       {
+                          while(rx_counter2) getchar2();
                           putchar2('S');
                           ValueState = 1;
                           ValueUpd_mSec = 0; 
@@ -789,6 +811,11 @@ inline void main_loop()  // основной рабочий режим
             
             switch(State)
             {
+                case 1:
+                    State = 0;
+                    Repaint_Button("МЕНЮ", 4, BLACK, WHITE);
+                    PutParameterText(ParameterState, BLUE);
+                    
                 case 0: // основной рабочий режим
                 { 
                       if(GraphState) Paint_Phase(); //Рисуем график
@@ -798,62 +825,62 @@ inline void main_loop()  // основной рабочий режим
                           case 1:  //Переключение графиков
                               if(++ParameterState > 2) ParameterState = 0;
                               PutParameterText(ParameterState, BLUE); 
-                              delay_ms(100);
                           break;
                           case 2: 
-                              if(Amplitude[ParameterState] < 200) 
+                              if(ConfigValue[ParameterState] < ConfigParam[2][ParameterState])
                               {
-                                  Amplitude[ParameterState] += 10;
-                                  delay_ms(20);
+                                  ConfigValue[ParameterState] += ConfigParam[0][ParameterState];   
+                              } 
+                          break;
+                          case 3:
+                              if(ConfigValue[ParameterState] > ConfigParam[1][ParameterState])
+                              {
+                                  ConfigValue[ParameterState] -= ConfigParam[0][ParameterState];   
                               }
                           break;
-                          case 3 :
-                              if(Amplitude[ParameterState] > 20) 
-                              {
-                                  Amplitude[ParameterState] -= 10;
-                                  delay_ms(20);
-                              }
-                          break;
-                          case 4 :  //Уходим в настройки
-                              State = 5;
-                              ConfigState = 0;
-                              Repaint_Button("СТАРТ", 4, BLACK, WHITE);
-                              PutParameterText(ConfigState + State, PURPLE);
-                              delay_ms(200);
+                          case 4:  //Уходим в настройки
+                               State = 4;
                           break;
                       }
                 }
                 break;
+                case 4:
+                    State = 5;
+                    ConfigState = 0;
+                    Repaint_Button("НАЗАД", 4, BLACK, WHITE);
+                    PutParameterText(ConfigState + State, PURPLE); 
+                    old_confVal = ConfigValue[ConfigState]; 
+                    
                 case 5: // настройки
                 {
                     switch (GetButton())
                     {
                         case 1:
-                            if(++ConfigState > 2) ConfigState = 0;
-                            PutParameterText(ConfigState + State, PURPLE);
-                            delay_ms(100);
+                            if(old_confVal != ConfigValue[ConfigState])
+                            { 
+                                //Сохраняем значение
+                                Save_Eeprom(ConfigState);
+                            }
+                        
+                            if(++ConfigState > 11) ConfigState = 0;
+                            PutParameterText(ConfigState + State, PURPLE); 
                         break;
-                        case 2:
-                             if(Amplitude[ConfigState] < 200) 
+                        case 2: 
+                              if(ConfigValue[ConfigState] < ConfigParam[2][ConfigState])
                               {
-                                  Amplitude[ConfigState] += 10;
-                                  PutParameterText(ConfigState + State, PURPLE);
-                                  delay_ms(20);
-                              }
+                                  ConfigValue[ConfigState] += ConfigParam[0][ConfigState];
+                                  PutParameterText(ConfigState + State, PURPLE);   
+                              } 
                         break;
                         case 3:
-                              if(Amplitude[ConfigState] > 20) 
+                              if(ConfigValue[ConfigState] > ConfigParam[1][ConfigState])
                               {
-                                  Amplitude[ConfigState] -= 10;
-                                  PutParameterText(ConfigState + State, PURPLE);
-                                  delay_ms(20);
+                                  ConfigValue[ConfigState] -= ConfigParam[0][ConfigState]; 
+                                  PutParameterText(ConfigState + State, PURPLE);  
                               }
                         break;
                         case 4:
-                            State = 0;
-                            Repaint_Button("ПАУЗА", 4, BLACK, WHITE);
-                            PutParameterText(ParameterState, BLUE);
-                            delay_ms(200);
+                            State = 1;
                         break;
                     }
                 }
@@ -888,15 +915,35 @@ inline void main_loop()  // основной рабочий режим
             }      
 }
 
-// Timer 0 overflow interrupt 1 ms
-interrupt [TIM0_OVF] void timer0_ovf_isr(void)
+
+void Load_Config(void)
 {
-// Reinitialize Timer 0 value
-TCNT0=0x06;
-// Place your code here
-WaitADC_mSec++;
-ValueUpd_mSec++;
-GraphUpd_mSec++;
+    char i;
+    //Читаем настройки  
+    putchar2('G');
+    ValueUpd_mSec = 0;
+    ValueState = 5;
+    while(rx_counter2 < (9*2) && ValueUpd_mSec < 100); //ждем
+
+    for(i=0; i<12; i++)
+    {
+        if(i<3)
+        {
+            ConfigValue[i] = ConfigValue_mem[i];
+        }
+        else if(rx_counter2 > 1)
+        {
+            ConfigValue[i] = getchar2() & 0xFF; 
+            ConfigValue[i] |= (unsigned int)getchar2() << 8;
+        }
+         
+        if(ConfigValue[i] < ConfigParam[1][i] || ConfigValue[i] > ConfigParam[2][i])
+        {
+            ConfigValue[i] = ConfigParam[3][i];
+        }
+    }
+    
+    ValueState = 0;
 }
 
 // Declare your global variables here
@@ -1108,19 +1155,20 @@ SSD1963_ClearScreen(BLACK);
   SSD1963_PutString16("      ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2) + FONT_HEIGHT, BLACK, BLACK);
 
 Prepare_Screen();
+State = 1;
+Load_Config();
 
 // Watchdog Timer initialization
 // Watchdog Timer Prescaler: OSC/2048k
 #pragma optsize-
 #asm("wdr")
-//WDTCR=0x1F;
-//WDTCR=0x0F;
+WDTCR=0x1F;
+WDTCR=0x0F;
 #ifdef _OPTIMIZE_SIZE_
 #pragma optsize+
 #endif
 }
 
-PutParameterText(ParameterState, BLUE);
 while (1)
       {
       #asm("wdr") 

@@ -1,43 +1,45 @@
 RAM Allocation
 Variable                                                          Address   Size
 --------------------------------------------------------------------------------
-tempX                                                             0x0612       4
-tempY                                                             0x0616       4
-rx_buffer2                                                        0x061A      20
-rx_counter2                                                       0x062E       1
-uart_swap                                                         0x062F       1
-rx_buffer0                                                        0x0630     256
-rx_wr_index0                                                      0x0730       1
-rx_rd_index0                                                      0x0731       1
-rx_counter0                                                       0x0732       1
-tx_buffer0                                                        0x0733       8
-tx_wr_index0                                                      0x073B       1
-tx_rd_index0                                                      0x073C       1
-tx_counter0                                                       0x073D       1
-rx_buffer1                                                        0x073E      32
-rx_wr_index1                                                      0x075E       1
-rx_rd_index1                                                      0x075F       1
-rx_counter1                                                       0x0760       1
-tx_buffer1                                                        0x0761      64
-tx_wr_index1                                                      0x07A1       1
-tx_rd_index1                                                      0x07A2       1
-tx_counter1                                                       0x07A3       1
-State                                                             0x07A4       1
-ParameterState                                                    0x07A5       1
-ValueState                                                        0x07A6       1
-GraphState                                                        0x07A7       1
-ConfigState                                                       0x07A8       1
-WaitADC_mSec                                                      0x07A9       2
-ValueUpd_mSec                                                     0x07AB       2
-GraphUpd_mSec                                                     0x07AD       2
-GraphUpdTime                                                      0x07AF       2
-Graph_X                                                           0x07B1       2
-Amplitude                                                         0x07B3       6
-ValueLast                                                         0x07B9       6
+tempX                                                             0x05F9       4
+tempY                                                             0x05FD       4
+rx_buffer2                                                        0x0601      20
+rx_counter2                                                       0x0615       1
+uart_swap                                                         0x0616       1
+rx_buffer0                                                        0x0617     256
+rx_wr_index0                                                      0x0717       1
+rx_rd_index0                                                      0x0718       1
+rx_counter0                                                       0x0719       1
+tx_buffer0                                                        0x071A       8
+tx_wr_index0                                                      0x0722       1
+tx_rd_index0                                                      0x0723       1
+tx_counter0                                                       0x0724       1
+rx_buffer1                                                        0x0725      32
+rx_wr_index1                                                      0x0745       1
+rx_rd_index1                                                      0x0746       1
+rx_counter1                                                       0x0747       1
+tx_buffer1                                                        0x0748      64
+tx_wr_index1                                                      0x0788       1
+tx_rd_index1                                                      0x0789       1
+tx_counter1                                                       0x078A       1
+State                                                             0x078B       1
+ParameterState                                                    0x078C       1
+ValueState                                                        0x078D       1
+GraphState                                                        0x078E       1
+ConfigState                                                       0x078F       1
+Touch_mSec                                                        0x0790       2
+ValueUpd_mSec                                                     0x0792       2
+GraphUpd_mSec                                                     0x0794       2
+GraphUpdTime                                                      0x0796       2
+Graph_X                                                           0x0798       2
+ValueLast                                                         0x079A       6
+ConfigValue                                                       0x07A0      24
+old_confVal                                                       0x07B8       2
 
 EEPROM Allocation
 Variable                                                          Address   Size
 --------------------------------------------------------------------------------
+ConfigValue_mem                                                   0x0000       6
 
 Register Allocation
 Variable                                                          Register  Size

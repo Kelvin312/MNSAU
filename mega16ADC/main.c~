@@ -253,7 +253,7 @@ interrupt [ADC_INT] void adc_isr(void)
     {
       TCNT0=0xEC;  //10us
       TCCR0=0x02;
-      MIGMIG ^= adc_coef[8]; 
+      if(adc_rd_input == 0) MIGMIG ^= 1; 
     }
 // Save ADC point
 adc_temp = adc_sqr>>2;
@@ -330,7 +330,7 @@ unsigned char isqrt( unsigned int from) //Корняизвлекатель
 
 inline void main_loop()
 {
-    char i, j;
+    signed char i, j;
     unsigned int s_tval;
     for(i=0; i<8; i++)
     {
@@ -344,7 +344,7 @@ inline void main_loop()
         if(isUpdate[i])
         {
             // sqrt( сумма(X^2) * coef / (count * 255) )
-            s_tval = (adc_real[i]*adc_coef[i])/((unsigned int)isUpdate[i]*255);
+            s_tval = (adc_real[i]*adc_coef[i])/((unsigned long)isUpdate[i]*400);
             isUpdate[i] = 0; 
             s_val[i] = isqrt(s_tval);
         }
@@ -361,11 +361,10 @@ inline void main_loop()
     {
         switch(getchar())
         {
-            case 'U':  
-                j = FIRST_U_ADC_INPUT + 3; 
+            case 'U':   
                 while(adc_rd_index != adc_wr_index)
                 {
-                        for(i=FIRST_U_ADC_INPUT; i<j; i++)
+                        for(i=FIRST_U_ADC_INPUT+2; i >= FIRST_U_ADC_INPUT; i--)
                         {
                             putchar(adc_data[i][adc_rd_index]); 
                         }
@@ -377,7 +376,7 @@ inline void main_loop()
                 j = FIRST_I_ADC_INPUT + 3; 
                 while(adc_rd_index != adc_wr_index)
                 {
-                        for(i=FIRST_I_ADC_INPUT; i<j; i++)
+                        for(i=FIRST_I_ADC_INPUT+2; i >= FIRST_I_ADC_INPUT; i--)
                         {
                             putchar(adc_data[i][adc_rd_index]);
                         } 
@@ -398,14 +397,12 @@ inline void main_loop()
                 // Частота Гц
                 putchar(freg & 0xFF); 
                 // Среднеквадратичные U
-				        j = FIRST_U_ADC_INPUT + 3;
-                for(i=FIRST_U_ADC_INPUT; i<j; i++)
+				        for(i=FIRST_U_ADC_INPUT+2; i >= FIRST_U_ADC_INPUT; i--)
                 {
                     putchar(s_val[i]);
                 }
                 // Среднеквадратичные I
-				        j = FIRST_I_ADC_INPUT + 3; 
-                for(i=FIRST_I_ADC_INPUT; i<j; i++)
+				        for(i=FIRST_I_ADC_INPUT+2; i >= FIRST_I_ADC_INPUT; i--)
 				        {
 					          putchar(s_val[i]);
 				        }
@@ -414,18 +411,45 @@ inline void main_loop()
                 putchar(s_val[ZI_ADC_INPUT]);
             break;
             case 'G': //Настройки
-                for(i=0; i<9; i++)
+                for(i=FIRST_U_ADC_INPUT+2; i >= FIRST_U_ADC_INPUT; i--)
                 {
                     putchar(adc_coef[i] & 0xFF);
                     putchar(adc_coef[i] >> 8);
                 }
+                for(i=FIRST_I_ADC_INPUT+2; i >= FIRST_I_ADC_INPUT; i--)
+                {
+                    putchar(adc_coef[i] & 0xFF);
+                    putchar(adc_coef[i] >> 8);
+                }
+                i = ZU_ADC_INPUT;
+                    putchar(adc_coef[i] & 0xFF);
+                    putchar(adc_coef[i] >> 8);
+                i = ZI_ADC_INPUT;
+                    putchar(adc_coef[i] & 0xFF);
+                    putchar(adc_coef[i] >> 8);
             break;
             case 'K': //Изменить настройки
                 if(rx_counter > 2)
                 {
-                    i = getchar();
+                    i = getchar() & 0x0F;
                     s_tval = getchar();
                     s_tval |= (unsigned int)getchar()<<8;
+                    switch(i)
+                    {
+                        case 0:
+                        case 1:
+                        case 2: i = FIRST_U_ADC_INPUT + 2 - i;
+                        break;
+                        case 3:
+                        case 4:
+                        case 5: i = FIRST_I_ADC_INPUT + 2 + 3 - i;
+                        break;
+                        case 6: i = ZU_ADC_INPUT;
+                        break;
+                        case 7: i = ZI_ADC_INPUT;
+                        break;
+                    }
+
                     if(i<8) adc_coef[i] = s_tval; 
                     #asm("wdr")
                     if(i<9) adc_coef_mem[i] = s_tval;
@@ -445,7 +469,7 @@ char i; //Загружаем настройки
 for(i=0; i<9; i++)
 {
     adc_coef[i] =  adc_coef_mem[i];
-    if(adc_coef[i] > 999 || adc_coef[i] == 0) 
+    if(adc_coef[i] > 600 || adc_coef[i] == 0) 
         adc_coef[i] = adc_coef_def[i];
 }
 adc_coef[8] &= 1;
