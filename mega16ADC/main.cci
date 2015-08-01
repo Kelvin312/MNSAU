@@ -1,4 +1,4 @@
-VERSION:3 SOURCE_TIMESTAMP:47016E28
+VERSION:3 SOURCE_TIMESTAMP:470179E3
 NODE:I LEVEL:0 LINE:28 "C:\cvavreval\inc\mega16.h"
 NODE:I LEVEL:0 LINE:30 "C:\cvavreval\inc\delay.h"
 NODE:M LEVEL:0 LINE:60 "FRAMING_ERROR"
@@ -51,4 +51,4 @@ NODE:F LEVEL:0 LINE:216 "timer2_ovf_isr(void)"
 NODE:F LEVEL:0 LINE:243 "adc_isr(void)"
 NODE:F LEVEL:0 LINE:314 "isqrt(unsigned int from)"
 NODE:F LEVEL:0 LINE:331 "main_loop(void)"
-NODE:F LEVEL:0 LINE:464 "main(void)"
+NODE:F LEVEL:0 LINE:468 "main(void)"

@@ -2,19 +2,19 @@ RAM Allocation
 Variable                                                          Address   Size
 --------------------------------------------------------------------------------
 rx_buffer                                                         0x0160       8
-adc_data                                                          0x0168     496
-adc_current                                                       0x0358      32
-adc_real                                                          0x0378      32
-adc_count                                                         0x0398       8
-isUpdate                                                          0x03A0       8
-s_val                                                             0x03A8       8
-isRising                                                          0x03B0       8
-valClear                                                          0x03B8       8
-freg                                                              0x03C0       2
-last_time                                                         0x03C2       2
-freg_count                                                        0x03C4       1
-isFregUpd                                                         0x03C5       1
-adc_coef                                                          0x03C6      18
+adc_data                                                          0x0168     528
+adc_current                                                       0x0378      32
+adc_real                                                          0x0398      32
+adc_count                                                         0x03B8       8
+isUpdate                                                          0x03C0       8
+s_val                                                             0x03C8       8
+isRising                                                          0x03D0       8
+valClear                                                          0x03D8       8
+freg                                                              0x03E0       2
+last_time                                                         0x03E2       2
+freg_count                                                        0x03E4       1
+isFregUpd                                                         0x03E5       1
+adc_coef                                                          0x03E6      18
 
 EEPROM Allocation
 Variable                                                          Address   Size

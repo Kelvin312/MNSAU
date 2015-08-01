@@ -194,7 +194,7 @@ TCNT0=0x00;
 #define ZU_ADC_INPUT 4
 #define ZI_ADC_INPUT 0   
 #define FREQUENCY_ADC_INPUT 6
-#define ADC_BUF_SIZE 62 //На 64 глючит   
+#define ADC_BUF_SIZE 66 //На 64 глючит   
 #define ADC_VREF_TYPE 0x00
 
 unsigned char adc_data[8][ADC_BUF_SIZE];
@@ -426,8 +426,12 @@ inline void main_loop()
                 i = ZI_ADC_INPUT;
                     putchar(adc_coef[i] & 0xFF);
                     putchar(adc_coef[i] >> 8);
+                i = 8;    
+                    putchar(adc_coef[i] & 0xFF);
+                    putchar(adc_coef[i] >> 8);
             break;
-            case 'K': //Изменить настройки
+            case 'K': //Изменить настройки 
+                delay_us(333); //Ждем 3 байта
                 if(rx_counter > 2)
                 {
                     i = getchar() & 0x0F;
@@ -503,8 +507,8 @@ DDRD=0x00;
 // Clock value: 2000,000 kHz
 // Mode: Normal top=0xFF
 // OC0 output: Disconnected
-//TCCR0=0x02;
-TCNT0=0xE2;
+TCCR0=0x02;
+TCNT0=0x00;
 OCR0=0x00;
 
 // Timer/Counter 1 initialization

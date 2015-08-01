@@ -101,7 +101,7 @@ if ((status & (FRAMING_ERROR | PARITY_ERROR | DATA_OVERRUN))==0)
       if (rx_wr_index2 == RX_BUFFER_SIZE2) rx_wr_index2=0; 
       ++rx_counter2;
    }
-   else //Юарт 0
+   else if(!rx_buffer_overflow0) //Юарт 0
    {
    rx_buffer0[rx_wr_index0++]=data;
 #if RX_BUFFER_SIZE0 == 256
@@ -325,8 +325,9 @@ else
 #define Graph_Y_Min 42
 #define Graph_Y_Max 232
 #define Graph_Step_N 2 //1..3
+#define Graph_PointCount 80
 
-flash unsigned int Graph_X_Step = (Graph_X_Max-Graph_X_Min)/72;
+flash unsigned int Graph_X_Step = (Graph_X_Max-Graph_X_Min+2)/Graph_PointCount;
 flash unsigned int Graph_Y_Mid = (Graph_Y_Max-Graph_Y_Min)/2 + Graph_Y_Min;
 
 #define Text_StartX 16 
@@ -751,7 +752,6 @@ inline void main_loop()  // основной рабочий режим
                   }
                   if(GraphState == 0 && State == 0 && ValueState == 0) //Надо обновить график
                   {
-                      StartPaint();
                       while(rx_counter0) getchar0(); 
                       switch(ParameterState) 
                       {
@@ -761,7 +761,10 @@ inline void main_loop()  // основной рабочий режим
                       }
                       ValueState = 2;
                       GraphState = 1; 
-                      GraphUpd_mSec = 0;    
+                      
+                      StartPaint(); 
+                      GraphUpd_mSec = 0;
+                      rx_buffer_overflow0 = 0;    
                   }
                 break;
                 case 1:
@@ -802,6 +805,10 @@ inline void main_loop()  // основной рабочий режим
                   }
                 break;
                 case 2:
+                    if(ParameterState == 2 && GraphUpd_mSec < 80 && GraphUpd_mSec > 30)
+                    {
+                        if(tx_counter0 == 0 && rx_buffer_overflow0 == 0) putchar0('Z'); //Вытягиваем недостающие точки    
+                    } 
                     if(GraphUpd_mSec > 200)
                     {
                         ValueState = 0;
@@ -863,7 +870,9 @@ inline void main_loop()  // основной рабочий режим
                             }
                         
                             if(++ConfigState > 11) ConfigState = 0;
-                            PutParameterText(ConfigState + State, PURPLE); 
+                            PutParameterText(ConfigState + State, PURPLE);
+                            
+                            old_confVal = ConfigValue[ConfigState];  
                         break;
                         case 2: 
                               if(ConfigValue[ConfigState] < ConfigParam[2][ConfigState])
@@ -942,7 +951,7 @@ void Load_Config(void)
             ConfigValue[i] = ConfigParam[3][i];
         }
     }
-    
+
     ValueState = 0;
 }
 
