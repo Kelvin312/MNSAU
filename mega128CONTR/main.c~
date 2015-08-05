@@ -934,7 +934,7 @@ void Load_Config(void)
     ValueState = 5;
     while(rx_counter2 < (9*2) && ValueUpd_mSec < 100); //ждем
 
-    for(i=0; i<11; i++)
+    for(i=0; i<12; i++)
     {
         if(i<3)
         {
@@ -951,10 +951,7 @@ void Load_Config(void)
             ConfigValue[i] = ConfigParam[3][i];
         }
     }
-    
-    ConfigValue[11] = 0; //Какой-то баг
-    if(rx_counter2 > 0) ConfigValue[11] = getchar2();
-    
+
     ValueState = 0;
 }
 
