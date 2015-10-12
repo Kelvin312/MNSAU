@@ -421,27 +421,20 @@ void SSD1963_PutString16(unsigned char* string, unsigned int X, unsigned int Y, 
 
 void SSD1963_PutValue16(unsigned int Value, unsigned int X, unsigned int Y, char N, unsigned int Color, unsigned int BackColor)
 {
-  switch(N)
+  char strVal[5] = {'0', '0', ' ', ' ', ' '}; 
+  char i=0; 
+  while(Value)
   {
-    case 5 :
-      SSD1963_PutChar16(Value / 10000 + 48, X, Y, Color, BackColor);
-      Value %= 10000;
+      strVal[i] = (Value%10) + 48;
+      Value /= 10;
+      i++;
+  }
+  
+  while(N)
+  {
+      --N;
+      SSD1963_PutChar16(strVal[N], X, Y, Color, BackColor);
       X += FONT_WIDTH;
-    case 4 :                                                      
-      SSD1963_PutChar16(Value / 1000 + 48, X, Y, Color, BackColor);
-      Value %= 1000;
-      X += FONT_WIDTH;
-    case 3 :
-      SSD1963_PutChar16(Value / 100 + 48, X, Y, Color, BackColor);
-      Value %= 100;
-      X += FONT_WIDTH;
-    case 2 :
-      SSD1963_PutChar16(Value / 10 + 48, X, Y, Color, BackColor);
-      Value %= 10;
-      X += FONT_WIDTH;
-    case 1 :
-      SSD1963_PutChar16(Value + 48, X, Y, Color, BackColor);
-    break;
   }
 }
 

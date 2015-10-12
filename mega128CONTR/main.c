@@ -26,7 +26,8 @@ Data Stack size         : 1024
 #include "Font16x16.c"
 #include "SSD1963.c"
 #include "TSC2046.c"
-
+#include "UART1.c"
+/*
 #ifndef RXB8
 #define RXB8 1
 #endif
@@ -60,7 +61,7 @@ Data Stack size         : 1024
 #define DATA_OVERRUN (1<<DOR)
 #define DATA_REGISTER_EMPTY (1<<UDRE)
 #define RX_COMPLETE (1<<RXC)
-
+*/
 // USART2 Receiver buffer
 #define RX_BUFFER_SIZE2 20
 char rx_buffer2[RX_BUFFER_SIZE2];
@@ -85,7 +86,7 @@ unsigned int rx_wr_index0,rx_rd_index0,rx_counter0;
 #endif
 
 // This flag is set on USART0 Receiver buffer overflow
-bit rx_buffer_overflow0;
+char rx_buffer_overflow0;
 
 // USART0 Receiver interrupt service routine
 interrupt [USART0_RXC] void usart0_rx_isr(void)
@@ -215,109 +216,13 @@ inline void putchar2(char c)
 #pragma used-
 #endif
 
-// USART1 Receiver buffer
-#define RX_BUFFER_SIZE1 32
-char rx_buffer1[RX_BUFFER_SIZE1];
-
-#if RX_BUFFER_SIZE1 <= 256
-unsigned char rx_wr_index1,rx_rd_index1,rx_counter1;
-#else
-unsigned int rx_wr_index1,rx_rd_index1,rx_counter1;
-#endif
-
-// This flag is set on USART1 Receiver buffer overflow
-bit rx_buffer_overflow1;
-
-// USART1 Receiver interrupt service routine
-interrupt [USART1_RXC] void usart1_rx_isr(void)
-{
-char status,data;
-status=UCSR1A;
-data=UDR1;
-if ((status & (FRAMING_ERROR | PARITY_ERROR | DATA_OVERRUN))==0)
-   {
-   rx_buffer1[rx_wr_index1++]=data;
-#if RX_BUFFER_SIZE1 == 256
-   // special case for receiver buffer size=256
-   if (++rx_counter1 == 0)
-      {
-#else
-   if (rx_wr_index1 == RX_BUFFER_SIZE1) rx_wr_index1=0;
-   if (++rx_counter1 == RX_BUFFER_SIZE1)
-      {
-      rx_counter1=0;
-#endif
-      rx_buffer_overflow1=1;
-      }
-   }
-}
-
-// Get a character from the USART1 Receiver buffer
-#pragma used+
-char getchar(void)
-{
-char data;
-while (rx_counter1==0);
-data=rx_buffer1[rx_rd_index1++];
-#if RX_BUFFER_SIZE1 != 256
-if (rx_rd_index1 == RX_BUFFER_SIZE1) rx_rd_index1=0;
-#endif
-#asm("cli")
---rx_counter1;
-#asm("sei")
-return data;
-}
-#pragma used-
-// USART1 Transmitter buffer
-#define TX_BUFFER_SIZE1 64
-char tx_buffer1[TX_BUFFER_SIZE1];
-
-#if TX_BUFFER_SIZE1 <= 256
-unsigned char tx_wr_index1,tx_rd_index1,tx_counter1;
-#else
-unsigned int tx_wr_index1,tx_rd_index1,tx_counter1;
-#endif
-
-// USART1 Transmitter interrupt service routine
-interrupt [USART1_TXC] void usart1_tx_isr(void)
-{
-if (tx_counter1)
-   {
-   --tx_counter1;
-   UDR1=tx_buffer1[tx_rd_index1++];
-#if TX_BUFFER_SIZE1 != 256
-   if (tx_rd_index1 == TX_BUFFER_SIZE1) tx_rd_index1=0;
-#endif
-   }
-}
-
-// Write a character to the USART1 Transmitter buffer
-#pragma used+
-void putchar(char c)
-{
-while (tx_counter1 == TX_BUFFER_SIZE1);
-#asm("cli")
-if (tx_counter1 || ((UCSR1A & DATA_REGISTER_EMPTY)==0))
-   {
-   tx_buffer1[tx_wr_index1++]=c;
-#if TX_BUFFER_SIZE1 != 256
-   if (tx_wr_index1 == TX_BUFFER_SIZE1) tx_wr_index1=0;
-#endif
-   ++tx_counter1;
-   }
-else
-   UDR1=c;
-#asm("sei")
-}
-#pragma used-
-
 // Standard Input/Output functions
-#include <stdio.h>
+//#include <stdio.h>
 
 
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
-#define RS485 PORTD.4
+//#define RS485 PORTD.4
 #define BACKLIGHT PORTB.7
 
 #define Graph_X_Min 0
@@ -406,6 +311,7 @@ void Prepare_Screen(void)
 }
 
 ///////////////////////////////////////////////
+char transmitDelayMs;
 char State=0, ParameterState=0, ValueState=0, GraphState=0, ConfigState=0;
 unsigned int Touch_mSec = 0, ValueUpd_mSec = 0, GraphUpd_mSec = 0;
 
@@ -431,9 +337,15 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 // Reinitialize Timer 0 value
 TCNT0=0x06;
 // Place your code here
+
 if(Touch_mSec < 0xFF) Touch_mSec++;
 ValueUpd_mSec++;
 GraphUpd_mSec++;
+if(transmitDelayMs<0xFF) transmitDelayMs++;
+
+
+TransmitRound();
+
 }
 
 char GetButton(void)
@@ -473,15 +385,29 @@ void PutParameterText(char Number, unsigned int Color)
   {
     case 0 :
       SSD1963_PutString16("НАПРЯЖЕНИЕ", X, Y, Color, BLACK);
-      SSD1963_PutString16("ФАЗ", X, Y + FONT_HEIGHT, Color, BLACK);
+      SSD1963_PutString16("ФАЗ", X, Y + FONT_HEIGHT, Color, BLACK); 
+      
+      SSD1963_PutString16("            ", Value_StartX, Value_StartY, Color, BLACK);
+      SSD1963_PutString16("            ", Value_StartX, Value_StartY + FONT_HEIGHT, Color, BLACK); 
+      SSD1963_PutString16("ГЦ", Value_StartX + (Value_Lenght<<1), Value_StartY + FONT_HEIGHT, Color, BLACK);
+        
     break;
     case 1 :
       SSD1963_PutString16("ТОК", X, Y, Color, BLACK);
-      SSD1963_PutString16("ФАЗ", X, Y + FONT_HEIGHT, Color, BLACK);
+      SSD1963_PutString16("ФАЗ", X, Y + FONT_HEIGHT, Color, BLACK); 
+      
+      SSD1963_PutString16("            ", Value_StartX, Value_StartY, Color, BLACK);
+      SSD1963_PutString16("            ", Value_StartX, Value_StartY + FONT_HEIGHT, Color, BLACK); 
+      SSD1963_PutString16("ГЦ", Value_StartX + (Value_Lenght<<1), Value_StartY + FONT_HEIGHT, Color, BLACK);
+      
     break;
     case 2 :
       SSD1963_PutString16("НАПРЯЖЕНИЕ И ТОК", X, Y, Color, BLACK);
-      SSD1963_PutString16("ВОЗБУЖДЕНИЯ", X, Y + FONT_HEIGHT, Color, BLACK);
+      SSD1963_PutString16("ВОЗБУЖДЕНИЯ", X, Y + FONT_HEIGHT, Color, BLACK);  
+      
+      SSD1963_PutString16("            ", Value_StartX, Value_StartY, Color, BLACK);
+      SSD1963_PutString16("            ", Value_StartX, Value_StartY + FONT_HEIGHT, Color, BLACK); 
+      
     break;
     /*
     case 3 :
@@ -561,8 +487,8 @@ void PutParameterValue(char v1, char v2, char v3, char fHz)
     int Y = Value_StartY ;
     unsigned int Color = BLUE;
    
-    SSD1963_PutString16("            ", X, Y, Color, BLACK);
-    SSD1963_PutString16("            ", X, Y + FONT_HEIGHT, Color, BLACK); 
+    //SSD1963_PutString16("            ", X, Y, Color, BLACK);
+    //SSD1963_PutString16("            ", X, Y + FONT_HEIGHT, Color, BLACK); 
     
     if(ParameterState != 2) 
     {
@@ -575,7 +501,7 @@ void PutParameterValue(char v1, char v2, char v3, char fHz)
         Y += FONT_HEIGHT;
         SSD1963_PutValue16(fHz, X, Y, 3, Color, BLACK); 
         X += Value_Lenght; 
-        SSD1963_PutString16("ГЦ", X, Y, Color, BLACK);
+        //SSD1963_PutString16("ГЦ", X, Y, Color, BLACK);
     }
     else
     {
@@ -708,13 +634,29 @@ inline void Paint_Phase(void)
 }
 
 //Функция посылающаа управление куда подальше
-void TestParameterFun(char a, char b, char c, char fHz)
+inline void TestParameterFun(char aa, char bb, char cc, char fHz)
 {
-    RS485 = 1; //Передача
-    if(b > 110) printf("Напругу убавь \n");
-    if(b < 90)  printf("Напруги прибавь \n");
-    if(fHz < 50)printf("Поддай оборотов \n"); 
-    if(fHz > 50)printf("Не гони, помедленнее \n"); 
+    if(aa>101 || aa<99 || bb>101 || bb<99 || cc>101 || cc<99)
+    {
+        AddTxData(0x66);
+        AddTxData(0x06);
+        AddTxData(0x60);
+        AddTxData(aa);
+        AddTxData(bb);
+        AddTxData(cc);
+        StartTransmit();
+    }   
+    
+    if(fHz < 49 || fHz > 50)
+    {
+        AddTxData(0x01);
+        AddTxData(0x06);
+        AddTxData(0x20);
+        AddTxData(0x01); // установка скорости
+        AddTxData(50);  //Скорость Lo
+        AddTxData(0);   //Скорость Hi
+        StartTransmit();   
+    }
 }
 
 void Save_Eeprom(char Number)
@@ -740,7 +682,7 @@ inline void main_loop()  // основной рабочий режим
             switch(ValueState)
             {
                 case 0: 
-                  if(ValueUpd_mSec > 300) //Надо обновить значения, но как?
+                  if(ValueUpd_mSec > 200) //Надо обновить значения, но как?
                   {
                       if(ValueState < 2) 
                       {
