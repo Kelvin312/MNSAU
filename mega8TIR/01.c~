@@ -212,18 +212,18 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 // Reinitialize Timer 0 value
 TCNT0=0x06;
 
-if(++uart_timeout>15) //&& uart_timeout < 17)
+if(++uart_timeout>15 && uart_timeout < 17)
 {
-   // RS485 = 1;
-   // delay_ms(5);
-    //putchar(0xEE);
-   // putchar(test);
+    RS485 = 1;
+    delay_ms(5);
+    putchar(0xEE);
+    putchar(test);
      
     while (rx_counter) getchar(); 
     uart_firstByte = 1;
 }   
 
-//if(uart_timeout > 50) RS485 = 0;
+if(uart_timeout > 50) RS485 = 0;
 
 if(uart_timeout>250) LEDBLUE = 1;
 
