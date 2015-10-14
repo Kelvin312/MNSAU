@@ -173,6 +173,10 @@ else
 
 
 char rdata;
+unsigned int reg[3];
+
+
+
 
 
 

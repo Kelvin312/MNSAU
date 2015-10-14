@@ -76,7 +76,7 @@ unsigned int rx_wr_index2,rx_rd_index2,rx_counter2;
 char uart_swap = 0;
 
 // USART0 Receiver buffer
-#define RX_BUFFER_SIZE0 256
+#define RX_BUFFER_SIZE0 255
 char rx_buffer0[RX_BUFFER_SIZE0];
 
 #if RX_BUFFER_SIZE0 <= 256
@@ -104,20 +104,15 @@ if ((status & (FRAMING_ERROR | PARITY_ERROR | DATA_OVERRUN))==0)
    }
    else if(!rx_buffer_overflow0) //Юарт 0
    {
-   rx_buffer0[rx_wr_index0++]=data;
-#if RX_BUFFER_SIZE0 == 256
-   // special case for receiver buffer size=256
-   if (++rx_counter0 == 0)
+      if (++rx_counter0 == RX_BUFFER_SIZE0)
       {
-#else
-   if (rx_wr_index0 == RX_BUFFER_SIZE0) rx_wr_index0=0;
-   if (++rx_counter0 == RX_BUFFER_SIZE0)
+          rx_buffer_overflow0=1;  //Ааааа переполнение
+          rx_counter0 = RX_BUFFER_SIZE0-1;
+      }
+      else 
       {
-      //rx_counter0=0;
-#endif
-      rx_buffer_overflow0=1;  //Ааааа переполнение
-      rx_counter0=RX_BUFFER_SIZE0-1; 
-      if(rx_wr_index0) rx_wr_index0--; else rx_wr_index0=rx_counter0;
+          rx_buffer0[rx_wr_index0]=data;
+          if (++rx_wr_index0 == RX_BUFFER_SIZE0) rx_wr_index0=0;  
       }
    }
 }
@@ -131,11 +126,11 @@ char getchar0(void)
 {
 char data;
 while (rx_counter0==0);
+#asm("cli")
 data=rx_buffer0[rx_rd_index0++];
 #if RX_BUFFER_SIZE0 != 256
 if (rx_rd_index0 == RX_BUFFER_SIZE0) rx_rd_index0=0;
 #endif
-#asm("cli")
 --rx_counter0;
 #asm("sei")
 return data;
@@ -146,9 +141,9 @@ char getchar2(void) //Юарт 2
 {
 char data;
 while (rx_counter2==0);
+#asm("cli")
 data=rx_buffer2[rx_rd_index2++];
 if (rx_rd_index2 == RX_BUFFER_SIZE2) rx_rd_index2=0;
-#asm("cli")
 --rx_counter2;
 #asm("sei")
 return data;
@@ -634,16 +629,16 @@ inline void Paint_Phase(void)
 }
 
 //Функция посылающаа управление куда подальше
-inline void TestParameterFun(char aa, char bb, char cc, char fHz)
+inline void TestParameterFun(char a, char b, char c, char fHz)
 {
-    if(aa>101 || aa<99 || bb>101 || bb<99 || cc>101 || cc<99)
+    if(a>101 || a<99 || b>101 || b<99 || c>101 || c<99)
     {
         AddTxData(0x66);
         AddTxData(0x06);
         AddTxData(0x60);
-        AddTxData(aa);
-        AddTxData(bb);
-        AddTxData(cc);
+        AddTxData(a);
+        AddTxData(b);
+        AddTxData(c);
         StartTransmit();
     }   
     
@@ -751,7 +746,7 @@ inline void main_loop()  // основной рабочий режим
                     {
                         if(tx_counter0 == 0 && rx_buffer_overflow0 == 0) putchar0('Z'); //Вытягиваем недостающие точки    
                     } 
-                    if(GraphUpd_mSec > 200)
+                    if(GraphUpd_mSec > 230)
                     {
                         ValueState = 0;
                     }

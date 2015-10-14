@@ -4734,77 +4734,98 @@
 ;PCODE: $000009B9 VOL: 0
 ;PCODE: $000009BA VOL: 0
 ;PCODE: $000009BB VOL: 0
-;    ++tx_counter1;
+;    if (tx_wr_index1 == TX_BUFFER_SIZE1) tx_wr_index1=0;
 ;PCODE: $000009BC VOL: 0
 ;PCODE: $000009BD VOL: 0
 ;PCODE: $000009BE VOL: 0
-;    tx_buffer1[tx_wr_index1++] = uchCRCLo;
 ;PCODE: $000009BF VOL: 0
 ;PCODE: $000009C0 VOL: 0
+;    ++tx_counter1;
 ;PCODE: $000009C1 VOL: 0
 ;PCODE: $000009C2 VOL: 0
 ;PCODE: $000009C3 VOL: 0
 ;PCODE: $000009C4 VOL: 0
+;    tx_buffer1[tx_wr_index1++] = uchCRCLo;
 ;PCODE: $000009C5 VOL: 0
 ;PCODE: $000009C6 VOL: 0
-;    ++tx_counter1;
 ;PCODE: $000009C7 VOL: 0
 ;PCODE: $000009C8 VOL: 0
 ;PCODE: $000009C9 VOL: 0
-;}
 ;PCODE: $000009CA VOL: 0
 ;PCODE: $000009CB VOL: 0
+;PCODE: $000009CC VOL: 0
+;    if (tx_wr_index1 == TX_BUFFER_SIZE1) tx_wr_index1=0;
+;PCODE: $000009CD VOL: 0
+;PCODE: $000009CE VOL: 0
+;PCODE: $000009CF VOL: 0
+;PCODE: $000009D0 VOL: 0
+;PCODE: $000009D1 VOL: 0
+;    ++tx_counter1;
+;PCODE: $000009D2 VOL: 0
+;PCODE: $000009D3 VOL: 0
+;PCODE: $000009D4 VOL: 0
+;PCODE: $000009D5 VOL: 0
+;}
+;PCODE: $000009D6 VOL: 0
+;PCODE: $000009D7 VOL: 0
 ;
 ;
 ;void StartTransmit()
 ;{
-;PCODE: $000009CC VOL: 0
-;PCODE: $000009CD VOL: 0
+;PCODE: $000009D8 VOL: 0
+;PCODE: $000009D9 VOL: 0
 ;     AddCRC16();
-;PCODE: $000009CE VOL: 0
+;PCODE: $000009DA VOL: 0
 ;     isNewData = 1;
-;PCODE: $000009CF VOL: 0
-;PCODE: $000009D0 VOL: 0
+;PCODE: $000009DB VOL: 0
+;PCODE: $000009DC VOL: 0
 ;}
-;PCODE: $000009D1 VOL: 0
-;PCODE: $000009D2 VOL: 0
+;PCODE: $000009DD VOL: 0
+;PCODE: $000009DE VOL: 0
 ;
 ;
 ;void AddTxData(char data)
 ;{
-;PCODE: $000009D3 VOL: 0
-;PCODE: $000009D4 VOL: 0
-;    if(isNewData) CRC16_Clear();
-;	data -> Y+0
-;PCODE: $000009D5 VOL: 0
-;PCODE: $000009D6 VOL: 0
-;PCODE: $000009D7 VOL: 0
-;PCODE: $000009D8 VOL: 0
-;    isNewData = 0;
-;PCODE: $000009D9 VOL: 0
-;PCODE: $000009DA VOL: 0
-;PCODE: $000009DB VOL: 0
-;    tx_buffer1[tx_wr_index1++] = data;
-;PCODE: $000009DC VOL: 0
-;PCODE: $000009DD VOL: 0
-;PCODE: $000009DE VOL: 0
 ;PCODE: $000009DF VOL: 0
 ;PCODE: $000009E0 VOL: 0
+;    if(isNewData) CRC16_Clear();
+;	data -> Y+0
 ;PCODE: $000009E1 VOL: 0
 ;PCODE: $000009E2 VOL: 0
 ;PCODE: $000009E3 VOL: 0
-;    ++tx_counter1;
 ;PCODE: $000009E4 VOL: 0
+;    isNewData = 0;
 ;PCODE: $000009E5 VOL: 0
 ;PCODE: $000009E6 VOL: 0
-;    CRC16_Add(data);
 ;PCODE: $000009E7 VOL: 0
+;    tx_buffer1[tx_wr_index1++] = data;
 ;PCODE: $000009E8 VOL: 0
 ;PCODE: $000009E9 VOL: 0
-;}
 ;PCODE: $000009EA VOL: 0
 ;PCODE: $000009EB VOL: 0
 ;PCODE: $000009EC VOL: 0
+;PCODE: $000009ED VOL: 0
+;PCODE: $000009EE VOL: 0
+;PCODE: $000009EF VOL: 0
+;    if (tx_wr_index1 == TX_BUFFER_SIZE1) tx_wr_index1=0;
+;PCODE: $000009F0 VOL: 0
+;PCODE: $000009F1 VOL: 0
+;PCODE: $000009F2 VOL: 0
+;PCODE: $000009F3 VOL: 0
+;PCODE: $000009F4 VOL: 0
+;    ++tx_counter1;
+;PCODE: $000009F5 VOL: 0
+;PCODE: $000009F6 VOL: 0
+;PCODE: $000009F7 VOL: 0
+;PCODE: $000009F8 VOL: 0
+;    CRC16_Add(data);
+;PCODE: $000009F9 VOL: 0
+;PCODE: $000009FA VOL: 0
+;PCODE: $000009FB VOL: 0
+;}
+;PCODE: $000009FC VOL: 0
+;PCODE: $000009FD VOL: 0
+;PCODE: $000009FE VOL: 0
 ;/*
 ;#ifndef RXB8
 ;#define RXB8 1
@@ -4854,7 +4875,7 @@
 ;char uart_swap = 0;
 ;
 ;// USART0 Receiver buffer
-;#define RX_BUFFER_SIZE0 256
+;#define RX_BUFFER_SIZE0 255
 ;char rx_buffer0[RX_BUFFER_SIZE0];
 ;
 ;#if RX_BUFFER_SIZE0 <= 256
@@ -4869,206 +4890,203 @@
 ;// USART0 Receiver interrupt service routine
 ;interrupt [USART0_RXC] void usart0_rx_isr(void)
 ; 0000 005D {
-;PCODE: $000009ED VOL: 0
-;PCODE: $000009EE VOL: 0
-; 0000 005E char status,data;
-; 0000 005F status=UCSR0A;
-;PCODE: $000009EF VOL: 0
-;PCODE: $000009F0 VOL: 0
-;	status -> R17
-;	data -> R16
-;PCODE: $000009F1 VOL: 0
-;PCODE: $000009F2 VOL: 0
-; 0000 0060 data=UDR0;
-;PCODE: $000009F3 VOL: 0
-;PCODE: $000009F4 VOL: 0
-; 0000 0061 if ((status & (FRAMING_ERROR | PARITY_ERROR | DATA_OVERRUN))==0)
-;PCODE: $000009F5 VOL: 0
-;PCODE: $000009F6 VOL: 0
-;PCODE: $000009F7 VOL: 0
-; 0000 0062 {
-; 0000 0063    if(uart_swap) //Юарт 2
-;PCODE: $000009F8 VOL: 0
-;PCODE: $000009F9 VOL: 0
-;PCODE: $000009FA VOL: 0
-; 0000 0064    {
-; 0000 0065       rx_buffer2[rx_wr_index2++]=data;
-;PCODE: $000009FB VOL: 0
-;PCODE: $000009FC VOL: 0
-;PCODE: $000009FD VOL: 0
-;PCODE: $000009FE VOL: 0
 ;PCODE: $000009FF VOL: 0
 ;PCODE: $00000A00 VOL: 0
+; 0000 005E char status,data;
+; 0000 005F status=UCSR0A;
 ;PCODE: $00000A01 VOL: 0
-; 0000 0066       if (rx_wr_index2 == RX_BUFFER_SIZE2) rx_wr_index2=0;
 ;PCODE: $00000A02 VOL: 0
+;	status -> R17
+;	data -> R16
 ;PCODE: $00000A03 VOL: 0
 ;PCODE: $00000A04 VOL: 0
+; 0000 0060 data=UDR0;
 ;PCODE: $00000A05 VOL: 0
 ;PCODE: $00000A06 VOL: 0
-; 0000 0067       ++rx_counter2;
+; 0000 0061 if ((status & (FRAMING_ERROR | PARITY_ERROR | DATA_OVERRUN))==0)
 ;PCODE: $00000A07 VOL: 0
 ;PCODE: $00000A08 VOL: 0
 ;PCODE: $00000A09 VOL: 0
+; 0000 0062 {
+; 0000 0063    if(uart_swap) //Юарт 2
 ;PCODE: $00000A0A VOL: 0
-; 0000 0068    }
-; 0000 0069    else if(!rx_buffer_overflow0) //Юарт 0
 ;PCODE: $00000A0B VOL: 0
 ;PCODE: $00000A0C VOL: 0
+; 0000 0064    {
+; 0000 0065       rx_buffer2[rx_wr_index2++]=data;
 ;PCODE: $00000A0D VOL: 0
 ;PCODE: $00000A0E VOL: 0
 ;PCODE: $00000A0F VOL: 0
-; 0000 006A    {
-; 0000 006B    rx_buffer0[rx_wr_index0++]=data;
 ;PCODE: $00000A10 VOL: 0
 ;PCODE: $00000A11 VOL: 0
 ;PCODE: $00000A12 VOL: 0
 ;PCODE: $00000A13 VOL: 0
+; 0000 0066       if (rx_wr_index2 == RX_BUFFER_SIZE2) rx_wr_index2=0;
 ;PCODE: $00000A14 VOL: 0
 ;PCODE: $00000A15 VOL: 0
 ;PCODE: $00000A16 VOL: 0
-; 0000 006C #if RX_BUFFER_SIZE0 == 256
-; 0000 006D    // special case for receiver buffer size=256
-; 0000 006E    if (++rx_counter0 == 0)
 ;PCODE: $00000A17 VOL: 0
 ;PCODE: $00000A18 VOL: 0
+; 0000 0067       ++rx_counter2;
 ;PCODE: $00000A19 VOL: 0
 ;PCODE: $00000A1A VOL: 0
 ;PCODE: $00000A1B VOL: 0
-; 0000 006F       {
-; 0000 0070 #else
-; 0000 0071    if (rx_wr_index0 == RX_BUFFER_SIZE0) rx_wr_index0=0;
-; 0000 0072    if (++rx_counter0 == RX_BUFFER_SIZE0)
-; 0000 0073       {
-; 0000 0074       //rx_counter0=0;
-; 0000 0075 #endif
-; 0000 0076       rx_buffer_overflow0=1;  //Ааааа переполнение
 ;PCODE: $00000A1C VOL: 0
+; 0000 0068    }
+; 0000 0069    else if(!rx_buffer_overflow0) //Юарт 0
 ;PCODE: $00000A1D VOL: 0
-; 0000 0077       rx_counter0=RX_BUFFER_SIZE0-1;
 ;PCODE: $00000A1E VOL: 0
 ;PCODE: $00000A1F VOL: 0
-; 0000 0078       if(rx_wr_index0) rx_wr_index0--; else rx_wr_index0=rx_counter0;
 ;PCODE: $00000A20 VOL: 0
 ;PCODE: $00000A21 VOL: 0
+; 0000 006A    {
+; 0000 006B       if (++rx_counter0 == RX_BUFFER_SIZE0)
 ;PCODE: $00000A22 VOL: 0
 ;PCODE: $00000A23 VOL: 0
 ;PCODE: $00000A24 VOL: 0
 ;PCODE: $00000A25 VOL: 0
 ;PCODE: $00000A26 VOL: 0
+; 0000 006C       {
+; 0000 006D           rx_buffer_overflow0=1;  //Ааааа переполнение
 ;PCODE: $00000A27 VOL: 0
 ;PCODE: $00000A28 VOL: 0
+; 0000 006E           rx_counter0 = RX_BUFFER_SIZE0-1;
 ;PCODE: $00000A29 VOL: 0
-; 0000 0079       }
 ;PCODE: $00000A2A VOL: 0
-; 0000 007A    }
+; 0000 006F       }
+; 0000 0070       else
 ;PCODE: $00000A2B VOL: 0
-; 0000 007B }
 ;PCODE: $00000A2C VOL: 0
+; 0000 0071       {
+; 0000 0072           rx_buffer0[rx_wr_index0]=data;
 ;PCODE: $00000A2D VOL: 0
-; 0000 007C }
 ;PCODE: $00000A2E VOL: 0
 ;PCODE: $00000A2F VOL: 0
 ;PCODE: $00000A30 VOL: 0
+; 0000 0073           if (++rx_wr_index0 == RX_BUFFER_SIZE0) rx_wr_index0=0;
 ;PCODE: $00000A31 VOL: 0
 ;PCODE: $00000A32 VOL: 0
+;PCODE: $00000A33 VOL: 0
+;PCODE: $00000A34 VOL: 0
+;PCODE: $00000A35 VOL: 0
+;PCODE: $00000A36 VOL: 0
+;PCODE: $00000A37 VOL: 0
+; 0000 0074       }
+;PCODE: $00000A38 VOL: 0
+;PCODE: $00000A39 VOL: 0
+; 0000 0075    }
+; 0000 0076 }
+;PCODE: $00000A3A VOL: 0
+;PCODE: $00000A3B VOL: 0
+; 0000 0077 }
+;PCODE: $00000A3C VOL: 0
+;PCODE: $00000A3D VOL: 0
+;PCODE: $00000A3E VOL: 0
+;PCODE: $00000A3F VOL: 0
+;PCODE: $00000A40 VOL: 0
 ;
 ;#ifndef _DEBUG_TERMINAL_IO_
 ;// Get a character from the USART0 Receiver buffer
 ;#define _ALTERNATE_GETCHAR_
 ;#pragma used+
 ;char getchar0(void)
-; 0000 0083 {
-;PCODE: $00000A33 VOL: 0
-;PCODE: $00000A34 VOL: 0
-; 0000 0084 char data;
-; 0000 0085 while (rx_counter0==0);
-;PCODE: $00000A35 VOL: 0
-;	data -> R17
-;PCODE: $00000A36 VOL: 0
-;PCODE: $00000A37 VOL: 0
-;PCODE: $00000A38 VOL: 0
-;PCODE: $00000A39 VOL: 0
-;PCODE: $00000A3A VOL: 0
-;PCODE: $00000A3B VOL: 0
-; 0000 0086 data=rx_buffer0[rx_rd_index0++];
-;PCODE: $00000A3C VOL: 0
-;PCODE: $00000A3D VOL: 0
-;PCODE: $00000A3E VOL: 0
-;PCODE: $00000A3F VOL: 0
-;PCODE: $00000A40 VOL: 0
+; 0000 007E {
 ;PCODE: $00000A41 VOL: 0
 ;PCODE: $00000A42 VOL: 0
-; 0000 0087 #if RX_BUFFER_SIZE0 != 256
-; 0000 0088 if (rx_rd_index0 == RX_BUFFER_SIZE0) rx_rd_index0=0;
-; 0000 0089 #endif
-; 0000 008A #asm("cli")
+; 0000 007F char data;
+; 0000 0080 while (rx_counter0==0);
 ;PCODE: $00000A43 VOL: 0
-	cli
+;	data -> R17
 ;PCODE: $00000A44 VOL: 0
-; 0000 008B --rx_counter0;
 ;PCODE: $00000A45 VOL: 0
 ;PCODE: $00000A46 VOL: 0
 ;PCODE: $00000A47 VOL: 0
-; 0000 008C #asm("sei")
 ;PCODE: $00000A48 VOL: 0
-	sei
 ;PCODE: $00000A49 VOL: 0
-; 0000 008D return data;
+; 0000 0081 #asm("cli")
 ;PCODE: $00000A4A VOL: 0
+	cli
 ;PCODE: $00000A4B VOL: 0
+; 0000 0082 data=rx_buffer0[rx_rd_index0++];
 ;PCODE: $00000A4C VOL: 0
-; 0000 008E }
 ;PCODE: $00000A4D VOL: 0
-;
-;
-;char getchar2(void) //Юарт 2
-; 0000 0092 {
 ;PCODE: $00000A4E VOL: 0
 ;PCODE: $00000A4F VOL: 0
-; 0000 0093 char data;
-; 0000 0094 while (rx_counter2==0);
 ;PCODE: $00000A50 VOL: 0
-;	data -> R17
 ;PCODE: $00000A51 VOL: 0
 ;PCODE: $00000A52 VOL: 0
+; 0000 0083 #if RX_BUFFER_SIZE0 != 256
+; 0000 0084 if (rx_rd_index0 == RX_BUFFER_SIZE0) rx_rd_index0=0;
 ;PCODE: $00000A53 VOL: 0
 ;PCODE: $00000A54 VOL: 0
 ;PCODE: $00000A55 VOL: 0
 ;PCODE: $00000A56 VOL: 0
-; 0000 0095 data=rx_buffer2[rx_rd_index2++];
 ;PCODE: $00000A57 VOL: 0
+; 0000 0085 #endif
+; 0000 0086 --rx_counter0;
 ;PCODE: $00000A58 VOL: 0
 ;PCODE: $00000A59 VOL: 0
 ;PCODE: $00000A5A VOL: 0
 ;PCODE: $00000A5B VOL: 0
+; 0000 0087 #asm("sei")
 ;PCODE: $00000A5C VOL: 0
+	sei
 ;PCODE: $00000A5D VOL: 0
-; 0000 0096 if (rx_rd_index2 == RX_BUFFER_SIZE2) rx_rd_index2=0;
+; 0000 0088 return data;
 ;PCODE: $00000A5E VOL: 0
 ;PCODE: $00000A5F VOL: 0
 ;PCODE: $00000A60 VOL: 0
+; 0000 0089 }
 ;PCODE: $00000A61 VOL: 0
+;
+;
+;char getchar2(void) //Юарт 2
+; 0000 008D {
 ;PCODE: $00000A62 VOL: 0
-; 0000 0097 #asm("cli")
 ;PCODE: $00000A63 VOL: 0
+; 0000 008E char data;
+; 0000 008F while (rx_counter2==0);
 ;PCODE: $00000A64 VOL: 0
-	cli
+;	data -> R17
 ;PCODE: $00000A65 VOL: 0
-; 0000 0098 --rx_counter2;
 ;PCODE: $00000A66 VOL: 0
 ;PCODE: $00000A67 VOL: 0
 ;PCODE: $00000A68 VOL: 0
-; 0000 0099 #asm("sei")
 ;PCODE: $00000A69 VOL: 0
-	sei
 ;PCODE: $00000A6A VOL: 0
-; 0000 009A return data;
+; 0000 0090 #asm("cli")
 ;PCODE: $00000A6B VOL: 0
+	cli
 ;PCODE: $00000A6C VOL: 0
+; 0000 0091 data=rx_buffer2[rx_rd_index2++];
 ;PCODE: $00000A6D VOL: 0
-; 0000 009B }
 ;PCODE: $00000A6E VOL: 0
+;PCODE: $00000A6F VOL: 0
+;PCODE: $00000A70 VOL: 0
+;PCODE: $00000A71 VOL: 0
+;PCODE: $00000A72 VOL: 0
+;PCODE: $00000A73 VOL: 0
+; 0000 0092 if (rx_rd_index2 == RX_BUFFER_SIZE2) rx_rd_index2=0;
+;PCODE: $00000A74 VOL: 0
+;PCODE: $00000A75 VOL: 0
+;PCODE: $00000A76 VOL: 0
+;PCODE: $00000A77 VOL: 0
+;PCODE: $00000A78 VOL: 0
+; 0000 0093 --rx_counter2;
+;PCODE: $00000A79 VOL: 0
+;PCODE: $00000A7A VOL: 0
+;PCODE: $00000A7B VOL: 0
+;PCODE: $00000A7C VOL: 0
+; 0000 0094 #asm("sei")
+;PCODE: $00000A7D VOL: 0
+	sei
+;PCODE: $00000A7E VOL: 0
+; 0000 0095 return data;
+;PCODE: $00000A7F VOL: 0
+;PCODE: $00000A80 VOL: 0
+;PCODE: $00000A81 VOL: 0
+; 0000 0096 }
+;PCODE: $00000A82 VOL: 0
 ;
 ;#pragma used-
 ;#endif
@@ -5085,145 +5103,145 @@
 ;
 ;// USART0 Transmitter interrupt service routine
 ;interrupt [USART0_TXC] void usart0_tx_isr(void)
-; 0000 00AC {
-;PCODE: $00000A6F VOL: 0
-;PCODE: $00000A70 VOL: 0
-; 0000 00AD if (tx_counter0)
-;PCODE: $00000A71 VOL: 0
-;PCODE: $00000A72 VOL: 0
-;PCODE: $00000A73 VOL: 0
-; 0000 00AE    {
-; 0000 00AF    --tx_counter0;
-;PCODE: $00000A74 VOL: 0
-;PCODE: $00000A75 VOL: 0
-;PCODE: $00000A76 VOL: 0
-; 0000 00B0    UDR0=tx_buffer0[tx_rd_index0++];
-;PCODE: $00000A77 VOL: 0
-;PCODE: $00000A78 VOL: 0
-;PCODE: $00000A79 VOL: 0
-;PCODE: $00000A7A VOL: 0
-;PCODE: $00000A7B VOL: 0
-;PCODE: $00000A7C VOL: 0
-;PCODE: $00000A7D VOL: 0
-;PCODE: $00000A7E VOL: 0
-; 0000 00B1 #if TX_BUFFER_SIZE0 != 256
-; 0000 00B2    if (tx_rd_index0 == TX_BUFFER_SIZE0) tx_rd_index0=0;
-;PCODE: $00000A7F VOL: 0
-;PCODE: $00000A80 VOL: 0
-;PCODE: $00000A81 VOL: 0
-;PCODE: $00000A82 VOL: 0
+; 0000 00A7 {
 ;PCODE: $00000A83 VOL: 0
-; 0000 00B3 #endif
-; 0000 00B4    }
 ;PCODE: $00000A84 VOL: 0
-; 0000 00B5 }
+; 0000 00A8 if (tx_counter0)
 ;PCODE: $00000A85 VOL: 0
 ;PCODE: $00000A86 VOL: 0
 ;PCODE: $00000A87 VOL: 0
+; 0000 00A9    {
+; 0000 00AA    --tx_counter0;
 ;PCODE: $00000A88 VOL: 0
-;
-;#ifndef _DEBUG_TERMINAL_IO_
-;// Write a character to the USART0 Transmitter buffer
-;#define _ALTERNATE_PUTCHAR_
-;#pragma used+
-;void putchar0_i(char c)
-; 0000 00BC {
 ;PCODE: $00000A89 VOL: 0
 ;PCODE: $00000A8A VOL: 0
-; 0000 00BD while (tx_counter0 == TX_BUFFER_SIZE0);
-;	c -> Y+0
+; 0000 00AB    UDR0=tx_buffer0[tx_rd_index0++];
 ;PCODE: $00000A8B VOL: 0
 ;PCODE: $00000A8C VOL: 0
 ;PCODE: $00000A8D VOL: 0
 ;PCODE: $00000A8E VOL: 0
 ;PCODE: $00000A8F VOL: 0
 ;PCODE: $00000A90 VOL: 0
-; 0000 00BE #asm("cli")
 ;PCODE: $00000A91 VOL: 0
-	cli
 ;PCODE: $00000A92 VOL: 0
-; 0000 00BF if (tx_counter0 || ((UCSR0A & DATA_REGISTER_EMPTY)==0))
+; 0000 00AC #if TX_BUFFER_SIZE0 != 256
+; 0000 00AD    if (tx_rd_index0 == TX_BUFFER_SIZE0) tx_rd_index0=0;
 ;PCODE: $00000A93 VOL: 0
 ;PCODE: $00000A94 VOL: 0
 ;PCODE: $00000A95 VOL: 0
 ;PCODE: $00000A96 VOL: 0
 ;PCODE: $00000A97 VOL: 0
+; 0000 00AE #endif
+; 0000 00AF    }
 ;PCODE: $00000A98 VOL: 0
+; 0000 00B0 }
 ;PCODE: $00000A99 VOL: 0
 ;PCODE: $00000A9A VOL: 0
-; 0000 00C0    {
-; 0000 00C1    tx_buffer0[tx_wr_index0++]=c;
 ;PCODE: $00000A9B VOL: 0
 ;PCODE: $00000A9C VOL: 0
+;
+;#ifndef _DEBUG_TERMINAL_IO_
+;// Write a character to the USART0 Transmitter buffer
+;#define _ALTERNATE_PUTCHAR_
+;#pragma used+
+;void putchar0_i(char c)
+; 0000 00B7 {
 ;PCODE: $00000A9D VOL: 0
 ;PCODE: $00000A9E VOL: 0
+; 0000 00B8 while (tx_counter0 == TX_BUFFER_SIZE0);
+;	c -> Y+0
 ;PCODE: $00000A9F VOL: 0
 ;PCODE: $00000AA0 VOL: 0
 ;PCODE: $00000AA1 VOL: 0
 ;PCODE: $00000AA2 VOL: 0
-; 0000 00C2 #if TX_BUFFER_SIZE0 != 256
-; 0000 00C3    if (tx_wr_index0 == TX_BUFFER_SIZE0) tx_wr_index0=0;
 ;PCODE: $00000AA3 VOL: 0
 ;PCODE: $00000AA4 VOL: 0
+; 0000 00B9 #asm("cli")
 ;PCODE: $00000AA5 VOL: 0
+	cli
 ;PCODE: $00000AA6 VOL: 0
+; 0000 00BA if (tx_counter0 || ((UCSR0A & DATA_REGISTER_EMPTY)==0))
 ;PCODE: $00000AA7 VOL: 0
-; 0000 00C4 #endif
-; 0000 00C5    ++tx_counter0;
 ;PCODE: $00000AA8 VOL: 0
 ;PCODE: $00000AA9 VOL: 0
 ;PCODE: $00000AAA VOL: 0
 ;PCODE: $00000AAB VOL: 0
-; 0000 00C6    }
-; 0000 00C7 else
 ;PCODE: $00000AAC VOL: 0
 ;PCODE: $00000AAD VOL: 0
-; 0000 00C8    UDR0=c;
 ;PCODE: $00000AAE VOL: 0
+; 0000 00BB    {
+; 0000 00BC    tx_buffer0[tx_wr_index0++]=c;
 ;PCODE: $00000AAF VOL: 0
-; 0000 00C9 #asm("sei")
 ;PCODE: $00000AB0 VOL: 0
 ;PCODE: $00000AB1 VOL: 0
-	sei
 ;PCODE: $00000AB2 VOL: 0
-; 0000 00CA }
 ;PCODE: $00000AB3 VOL: 0
 ;PCODE: $00000AB4 VOL: 0
 ;PCODE: $00000AB5 VOL: 0
-;
-;inline void putchar0(char c)
-; 0000 00CD {
 ;PCODE: $00000AB6 VOL: 0
+; 0000 00BD #if TX_BUFFER_SIZE0 != 256
+; 0000 00BE    if (tx_wr_index0 == TX_BUFFER_SIZE0) tx_wr_index0=0;
 ;PCODE: $00000AB7 VOL: 0
-; 0000 00CE     uart_swap = 0;
-;	c -> Y+0
 ;PCODE: $00000AB8 VOL: 0
 ;PCODE: $00000AB9 VOL: 0
-; 0000 00CF     putchar0_i(c);
 ;PCODE: $00000ABA VOL: 0
 ;PCODE: $00000ABB VOL: 0
+; 0000 00BF #endif
+; 0000 00C0    ++tx_counter0;
 ;PCODE: $00000ABC VOL: 0
-; 0000 00D0 }
 ;PCODE: $00000ABD VOL: 0
 ;PCODE: $00000ABE VOL: 0
 ;PCODE: $00000ABF VOL: 0
-;
-;inline void putchar2(char c)
-; 0000 00D3 {
+; 0000 00C1    }
+; 0000 00C2 else
 ;PCODE: $00000AC0 VOL: 0
 ;PCODE: $00000AC1 VOL: 0
-; 0000 00D4     uart_swap = 2;
-;	c -> Y+0
+; 0000 00C3    UDR0=c;
 ;PCODE: $00000AC2 VOL: 0
 ;PCODE: $00000AC3 VOL: 0
-; 0000 00D5     putchar0_i(c);
+; 0000 00C4 #asm("sei")
 ;PCODE: $00000AC4 VOL: 0
 ;PCODE: $00000AC5 VOL: 0
+	sei
 ;PCODE: $00000AC6 VOL: 0
-; 0000 00D6 }
+; 0000 00C5 }
 ;PCODE: $00000AC7 VOL: 0
 ;PCODE: $00000AC8 VOL: 0
 ;PCODE: $00000AC9 VOL: 0
+;
+;inline void putchar0(char c)
+; 0000 00C8 {
+;PCODE: $00000ACA VOL: 0
+;PCODE: $00000ACB VOL: 0
+; 0000 00C9     uart_swap = 0;
+;	c -> Y+0
+;PCODE: $00000ACC VOL: 0
+;PCODE: $00000ACD VOL: 0
+; 0000 00CA     putchar0_i(c);
+;PCODE: $00000ACE VOL: 0
+;PCODE: $00000ACF VOL: 0
+;PCODE: $00000AD0 VOL: 0
+; 0000 00CB }
+;PCODE: $00000AD1 VOL: 0
+;PCODE: $00000AD2 VOL: 0
+;PCODE: $00000AD3 VOL: 0
+;
+;inline void putchar2(char c)
+; 0000 00CE {
+;PCODE: $00000AD4 VOL: 0
+;PCODE: $00000AD5 VOL: 0
+; 0000 00CF     uart_swap = 2;
+;	c -> Y+0
+;PCODE: $00000AD6 VOL: 0
+;PCODE: $00000AD7 VOL: 0
+; 0000 00D0     putchar0_i(c);
+;PCODE: $00000AD8 VOL: 0
+;PCODE: $00000AD9 VOL: 0
+;PCODE: $00000ADA VOL: 0
+; 0000 00D1 }
+;PCODE: $00000ADB VOL: 0
+;PCODE: $00000ADC VOL: 0
+;PCODE: $00000ADD VOL: 0
 ;
 ;#pragma used-
 ;#endif
@@ -5281,57 +5299,34 @@
 ;flash unsigned int BTN4_X_End = BTN_StartX + (BTN_Width * 4) + (BTN_Between * 3);
 ;
 ;void Repaint_Button(unsigned char* String, char Number, unsigned int Color, unsigned int BackColor)
-; 0000 0110 {
-;PCODE: $00000ACA VOL: 0
-;PCODE: $00000ACB VOL: 0
-; 0000 0111   switch(Number)
+; 0000 010B {
+;PCODE: $00000ADE VOL: 0
+;PCODE: $00000ADF VOL: 0
+; 0000 010C   switch(Number)
 ;	*String -> Y+5
 ;	Number -> Y+4
 ;	Color -> Y+2
 ;	BackColor -> Y+0
-;PCODE: $00000ACC VOL: 0
-;PCODE: $00000ACD VOL: 0
-; 0000 0112   {
-; 0000 0113     case 1 :
-;PCODE: $00000ACE VOL: 0
-;PCODE: $00000ACF VOL: 0
-; 0000 0114       SSD1963_PutString16("     ", BTN1_X_Begin + 10, BTN1_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
-;PCODE: $00000AD0 VOL: 0
-;PCODE: $00000AD1 VOL: 0
-;PCODE: $00000AD2 VOL: 0
-;PCODE: $00000AD3 VOL: 0
-;PCODE: $00000AD4 VOL: 0
-;PCODE: $00000AD5 VOL: 0
-;PCODE: $00000AD6 VOL: 0
-;PCODE: $00000AD7 VOL: 0
-;PCODE: $00000AD8 VOL: 0
-;PCODE: $00000AD9 VOL: 0
-;PCODE: $00000ADA VOL: 0
-;PCODE: $00000ADB VOL: 0
-; 0000 0115       SSD1963_PutString16(String, BTN1_X_Begin + 10, BTN1_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
-;PCODE: $00000ADC VOL: 0
-;PCODE: $00000ADD VOL: 0
-;PCODE: $00000ADE VOL: 0
-;PCODE: $00000ADF VOL: 0
 ;PCODE: $00000AE0 VOL: 0
 ;PCODE: $00000AE1 VOL: 0
+; 0000 010D   {
+; 0000 010E     case 1 :
 ;PCODE: $00000AE2 VOL: 0
 ;PCODE: $00000AE3 VOL: 0
+; 0000 010F       SSD1963_PutString16("     ", BTN1_X_Begin + 10, BTN1_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
 ;PCODE: $00000AE4 VOL: 0
 ;PCODE: $00000AE5 VOL: 0
 ;PCODE: $00000AE6 VOL: 0
-; 0000 0116     break;
 ;PCODE: $00000AE7 VOL: 0
-; 0000 0117     case 2 :
 ;PCODE: $00000AE8 VOL: 0
 ;PCODE: $00000AE9 VOL: 0
 ;PCODE: $00000AEA VOL: 0
-; 0000 0118       SSD1963_PutString16("     ", BTN2_X_Begin + 10, BTN2_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
 ;PCODE: $00000AEB VOL: 0
 ;PCODE: $00000AEC VOL: 0
 ;PCODE: $00000AED VOL: 0
 ;PCODE: $00000AEE VOL: 0
 ;PCODE: $00000AEF VOL: 0
+; 0000 0110       SSD1963_PutString16(String, BTN1_X_Begin + 10, BTN1_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
 ;PCODE: $00000AF0 VOL: 0
 ;PCODE: $00000AF1 VOL: 0
 ;PCODE: $00000AF2 VOL: 0
@@ -5339,30 +5334,30 @@
 ;PCODE: $00000AF4 VOL: 0
 ;PCODE: $00000AF5 VOL: 0
 ;PCODE: $00000AF6 VOL: 0
-; 0000 0119       SSD1963_PutString16(String, BTN2_X_Begin + 10, BTN2_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
 ;PCODE: $00000AF7 VOL: 0
 ;PCODE: $00000AF8 VOL: 0
 ;PCODE: $00000AF9 VOL: 0
 ;PCODE: $00000AFA VOL: 0
+; 0000 0111     break;
 ;PCODE: $00000AFB VOL: 0
+; 0000 0112     case 2 :
 ;PCODE: $00000AFC VOL: 0
 ;PCODE: $00000AFD VOL: 0
 ;PCODE: $00000AFE VOL: 0
+; 0000 0113       SSD1963_PutString16("     ", BTN2_X_Begin + 10, BTN2_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
 ;PCODE: $00000AFF VOL: 0
 ;PCODE: $00000B00 VOL: 0
 ;PCODE: $00000B01 VOL: 0
-; 0000 011A     break;
 ;PCODE: $00000B02 VOL: 0
-; 0000 011B     case 3 :
 ;PCODE: $00000B03 VOL: 0
 ;PCODE: $00000B04 VOL: 0
 ;PCODE: $00000B05 VOL: 0
-; 0000 011C       SSD1963_PutString16("     ", BTN3_X_Begin + 10, BTN3_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
 ;PCODE: $00000B06 VOL: 0
 ;PCODE: $00000B07 VOL: 0
 ;PCODE: $00000B08 VOL: 0
 ;PCODE: $00000B09 VOL: 0
 ;PCODE: $00000B0A VOL: 0
+; 0000 0114       SSD1963_PutString16(String, BTN2_X_Begin + 10, BTN2_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
 ;PCODE: $00000B0B VOL: 0
 ;PCODE: $00000B0C VOL: 0
 ;PCODE: $00000B0D VOL: 0
@@ -5370,30 +5365,30 @@
 ;PCODE: $00000B0F VOL: 0
 ;PCODE: $00000B10 VOL: 0
 ;PCODE: $00000B11 VOL: 0
-; 0000 011D       SSD1963_PutString16(String, BTN3_X_Begin + 10, BTN3_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
 ;PCODE: $00000B12 VOL: 0
 ;PCODE: $00000B13 VOL: 0
 ;PCODE: $00000B14 VOL: 0
 ;PCODE: $00000B15 VOL: 0
+; 0000 0115     break;
 ;PCODE: $00000B16 VOL: 0
+; 0000 0116     case 3 :
 ;PCODE: $00000B17 VOL: 0
 ;PCODE: $00000B18 VOL: 0
 ;PCODE: $00000B19 VOL: 0
+; 0000 0117       SSD1963_PutString16("     ", BTN3_X_Begin + 10, BTN3_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
 ;PCODE: $00000B1A VOL: 0
 ;PCODE: $00000B1B VOL: 0
 ;PCODE: $00000B1C VOL: 0
-; 0000 011E     break;
 ;PCODE: $00000B1D VOL: 0
-; 0000 011F     case 4 :
 ;PCODE: $00000B1E VOL: 0
 ;PCODE: $00000B1F VOL: 0
 ;PCODE: $00000B20 VOL: 0
-; 0000 0120       SSD1963_PutString16("     ", BTN4_X_Begin + 10, BTN4_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
 ;PCODE: $00000B21 VOL: 0
 ;PCODE: $00000B22 VOL: 0
 ;PCODE: $00000B23 VOL: 0
 ;PCODE: $00000B24 VOL: 0
 ;PCODE: $00000B25 VOL: 0
+; 0000 0118       SSD1963_PutString16(String, BTN3_X_Begin + 10, BTN3_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
 ;PCODE: $00000B26 VOL: 0
 ;PCODE: $00000B27 VOL: 0
 ;PCODE: $00000B28 VOL: 0
@@ -5401,41 +5396,30 @@
 ;PCODE: $00000B2A VOL: 0
 ;PCODE: $00000B2B VOL: 0
 ;PCODE: $00000B2C VOL: 0
-; 0000 0121       SSD1963_PutString16(String, BTN4_X_Begin + 10, BTN4_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
 ;PCODE: $00000B2D VOL: 0
 ;PCODE: $00000B2E VOL: 0
 ;PCODE: $00000B2F VOL: 0
 ;PCODE: $00000B30 VOL: 0
+; 0000 0119     break;
 ;PCODE: $00000B31 VOL: 0
+; 0000 011A     case 4 :
 ;PCODE: $00000B32 VOL: 0
 ;PCODE: $00000B33 VOL: 0
 ;PCODE: $00000B34 VOL: 0
+; 0000 011B       SSD1963_PutString16("     ", BTN4_X_Begin + 10, BTN4_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
 ;PCODE: $00000B35 VOL: 0
 ;PCODE: $00000B36 VOL: 0
 ;PCODE: $00000B37 VOL: 0
-; 0000 0122     break;
 ;PCODE: $00000B38 VOL: 0
-; 0000 0123   }
 ;PCODE: $00000B39 VOL: 0
-; 0000 0124 }
 ;PCODE: $00000B3A VOL: 0
 ;PCODE: $00000B3B VOL: 0
 ;PCODE: $00000B3C VOL: 0
-
-	.DSEG
-_0x100:
-	.BYTE 0x18
-;
-;void Prepare_Screen(void)
-; 0000 0127 {
-
-	.CSEG
 ;PCODE: $00000B3D VOL: 0
 ;PCODE: $00000B3E VOL: 0
-; 0000 0128   // рисуем кнопки
-; 0000 0129   SSD1963_DrawFillRect(BTN1_X_Begin, BTN1_X_End, BTN1_Y_Begin, BTN1_Y_End, WHITE);
 ;PCODE: $00000B3F VOL: 0
 ;PCODE: $00000B40 VOL: 0
+; 0000 011C       SSD1963_PutString16(String, BTN4_X_Begin + 10, BTN4_Y_Begin + (BTN_Height / 2) - (FONT_HEIGHT / 2), Color, BackColor);
 ;PCODE: $00000B41 VOL: 0
 ;PCODE: $00000B42 VOL: 0
 ;PCODE: $00000B43 VOL: 0
@@ -5445,19 +5429,31 @@ _0x100:
 ;PCODE: $00000B47 VOL: 0
 ;PCODE: $00000B48 VOL: 0
 ;PCODE: $00000B49 VOL: 0
-; 0000 012A   SSD1963_DrawFillRect(BTN2_X_Begin, BTN2_X_End, BTN2_Y_Begin, BTN2_Y_End, WHITE);
 ;PCODE: $00000B4A VOL: 0
 ;PCODE: $00000B4B VOL: 0
+; 0000 011D     break;
 ;PCODE: $00000B4C VOL: 0
+; 0000 011E   }
 ;PCODE: $00000B4D VOL: 0
+; 0000 011F }
 ;PCODE: $00000B4E VOL: 0
 ;PCODE: $00000B4F VOL: 0
 ;PCODE: $00000B50 VOL: 0
+
+	.DSEG
+_0x104:
+	.BYTE 0x18
+;
+;void Prepare_Screen(void)
+; 0000 0122 {
+
+	.CSEG
 ;PCODE: $00000B51 VOL: 0
 ;PCODE: $00000B52 VOL: 0
+; 0000 0123   // рисуем кнопки
+; 0000 0124   SSD1963_DrawFillRect(BTN1_X_Begin, BTN1_X_End, BTN1_Y_Begin, BTN1_Y_End, WHITE);
 ;PCODE: $00000B53 VOL: 0
 ;PCODE: $00000B54 VOL: 0
-; 0000 012B   SSD1963_DrawFillRect(BTN3_X_Begin, BTN3_X_End, BTN3_Y_Begin, BTN3_Y_End, WHITE);
 ;PCODE: $00000B55 VOL: 0
 ;PCODE: $00000B56 VOL: 0
 ;PCODE: $00000B57 VOL: 0
@@ -5467,9 +5463,9 @@ _0x100:
 ;PCODE: $00000B5B VOL: 0
 ;PCODE: $00000B5C VOL: 0
 ;PCODE: $00000B5D VOL: 0
+; 0000 0125   SSD1963_DrawFillRect(BTN2_X_Begin, BTN2_X_End, BTN2_Y_Begin, BTN2_Y_End, WHITE);
 ;PCODE: $00000B5E VOL: 0
 ;PCODE: $00000B5F VOL: 0
-; 0000 012C   SSD1963_DrawFillRect(BTN4_X_Begin, BTN4_X_End, BTN4_Y_Begin, BTN4_Y_End, WHITE);
 ;PCODE: $00000B60 VOL: 0
 ;PCODE: $00000B61 VOL: 0
 ;PCODE: $00000B62 VOL: 0
@@ -5479,10 +5475,9 @@ _0x100:
 ;PCODE: $00000B66 VOL: 0
 ;PCODE: $00000B67 VOL: 0
 ;PCODE: $00000B68 VOL: 0
+; 0000 0126   SSD1963_DrawFillRect(BTN3_X_Begin, BTN3_X_End, BTN3_Y_Begin, BTN3_Y_End, WHITE);
 ;PCODE: $00000B69 VOL: 0
 ;PCODE: $00000B6A VOL: 0
-; 0000 012D   // рисуем окантовку
-; 0000 012E   SSD1963_DrawRect(BTN1_X_Begin + 1, BTN1_X_End - 1, BTN1_Y_Begin + 1, BTN1_Y_End - 1, 1, BLACK);
 ;PCODE: $00000B6B VOL: 0
 ;PCODE: $00000B6C VOL: 0
 ;PCODE: $00000B6D VOL: 0
@@ -5492,11 +5487,11 @@ _0x100:
 ;PCODE: $00000B71 VOL: 0
 ;PCODE: $00000B72 VOL: 0
 ;PCODE: $00000B73 VOL: 0
+; 0000 0127   SSD1963_DrawFillRect(BTN4_X_Begin, BTN4_X_End, BTN4_Y_Begin, BTN4_Y_End, WHITE);
 ;PCODE: $00000B74 VOL: 0
 ;PCODE: $00000B75 VOL: 0
 ;PCODE: $00000B76 VOL: 0
 ;PCODE: $00000B77 VOL: 0
-; 0000 012F   SSD1963_DrawRect(BTN2_X_Begin + 1, BTN2_X_End - 1, BTN2_Y_Begin + 1, BTN2_Y_End - 1, 1, BLACK);
 ;PCODE: $00000B78 VOL: 0
 ;PCODE: $00000B79 VOL: 0
 ;PCODE: $00000B7A VOL: 0
@@ -5504,13 +5499,14 @@ _0x100:
 ;PCODE: $00000B7C VOL: 0
 ;PCODE: $00000B7D VOL: 0
 ;PCODE: $00000B7E VOL: 0
+; 0000 0128   // рисуем окантовку
+; 0000 0129   SSD1963_DrawRect(BTN1_X_Begin + 1, BTN1_X_End - 1, BTN1_Y_Begin + 1, BTN1_Y_End - 1, 1, BLACK);
 ;PCODE: $00000B7F VOL: 0
 ;PCODE: $00000B80 VOL: 0
 ;PCODE: $00000B81 VOL: 0
 ;PCODE: $00000B82 VOL: 0
 ;PCODE: $00000B83 VOL: 0
 ;PCODE: $00000B84 VOL: 0
-; 0000 0130   SSD1963_DrawRect(BTN3_X_Begin + 1, BTN3_X_End - 1, BTN3_Y_Begin + 1, BTN3_Y_End - 1, 1, BLACK);
 ;PCODE: $00000B85 VOL: 0
 ;PCODE: $00000B86 VOL: 0
 ;PCODE: $00000B87 VOL: 0
@@ -5518,13 +5514,13 @@ _0x100:
 ;PCODE: $00000B89 VOL: 0
 ;PCODE: $00000B8A VOL: 0
 ;PCODE: $00000B8B VOL: 0
+; 0000 012A   SSD1963_DrawRect(BTN2_X_Begin + 1, BTN2_X_End - 1, BTN2_Y_Begin + 1, BTN2_Y_End - 1, 1, BLACK);
 ;PCODE: $00000B8C VOL: 0
 ;PCODE: $00000B8D VOL: 0
 ;PCODE: $00000B8E VOL: 0
 ;PCODE: $00000B8F VOL: 0
 ;PCODE: $00000B90 VOL: 0
 ;PCODE: $00000B91 VOL: 0
-; 0000 0131   SSD1963_DrawRect(BTN4_X_Begin + 1, BTN4_X_End - 1, BTN4_Y_Begin + 1, BTN4_Y_End - 1, 1, BLACK);
 ;PCODE: $00000B92 VOL: 0
 ;PCODE: $00000B93 VOL: 0
 ;PCODE: $00000B94 VOL: 0
@@ -5532,14 +5528,13 @@ _0x100:
 ;PCODE: $00000B96 VOL: 0
 ;PCODE: $00000B97 VOL: 0
 ;PCODE: $00000B98 VOL: 0
+; 0000 012B   SSD1963_DrawRect(BTN3_X_Begin + 1, BTN3_X_End - 1, BTN3_Y_Begin + 1, BTN3_Y_End - 1, 1, BLACK);
 ;PCODE: $00000B99 VOL: 0
 ;PCODE: $00000B9A VOL: 0
 ;PCODE: $00000B9B VOL: 0
 ;PCODE: $00000B9C VOL: 0
 ;PCODE: $00000B9D VOL: 0
 ;PCODE: $00000B9E VOL: 0
-; 0000 0132 
-; 0000 0133   Repaint_Button("СЛЕД", 1, BLACK, WHITE);
 ;PCODE: $00000B9F VOL: 0
 ;PCODE: $00000BA0 VOL: 0
 ;PCODE: $00000BA1 VOL: 0
@@ -5547,10 +5542,10 @@ _0x100:
 ;PCODE: $00000BA3 VOL: 0
 ;PCODE: $00000BA4 VOL: 0
 ;PCODE: $00000BA5 VOL: 0
+; 0000 012C   SSD1963_DrawRect(BTN4_X_Begin + 1, BTN4_X_End - 1, BTN4_Y_Begin + 1, BTN4_Y_End - 1, 1, BLACK);
 ;PCODE: $00000BA6 VOL: 0
 ;PCODE: $00000BA7 VOL: 0
 ;PCODE: $00000BA8 VOL: 0
-; 0000 0134   Repaint_Button("  +", 2, BLACK, WHITE);
 ;PCODE: $00000BA9 VOL: 0
 ;PCODE: $00000BAA VOL: 0
 ;PCODE: $00000BAB VOL: 0
@@ -5561,7 +5556,8 @@ _0x100:
 ;PCODE: $00000BB0 VOL: 0
 ;PCODE: $00000BB1 VOL: 0
 ;PCODE: $00000BB2 VOL: 0
-; 0000 0135   Repaint_Button("  -", 3, BLACK, WHITE);
+; 0000 012D 
+; 0000 012E   Repaint_Button("СЛЕД", 1, BLACK, WHITE);
 ;PCODE: $00000BB3 VOL: 0
 ;PCODE: $00000BB4 VOL: 0
 ;PCODE: $00000BB5 VOL: 0
@@ -5572,7 +5568,7 @@ _0x100:
 ;PCODE: $00000BBA VOL: 0
 ;PCODE: $00000BBB VOL: 0
 ;PCODE: $00000BBC VOL: 0
-; 0000 0136   Repaint_Button("ПАУЗА", 4, BLACK, WHITE);
+; 0000 012F   Repaint_Button("  +", 2, BLACK, WHITE);
 ;PCODE: $00000BBD VOL: 0
 ;PCODE: $00000BBE VOL: 0
 ;PCODE: $00000BBF VOL: 0
@@ -5583,12 +5579,34 @@ _0x100:
 ;PCODE: $00000BC4 VOL: 0
 ;PCODE: $00000BC5 VOL: 0
 ;PCODE: $00000BC6 VOL: 0
-; 0000 0137 }
+; 0000 0130   Repaint_Button("  -", 3, BLACK, WHITE);
 ;PCODE: $00000BC7 VOL: 0
 ;PCODE: $00000BC8 VOL: 0
+;PCODE: $00000BC9 VOL: 0
+;PCODE: $00000BCA VOL: 0
+;PCODE: $00000BCB VOL: 0
+;PCODE: $00000BCC VOL: 0
+;PCODE: $00000BCD VOL: 0
+;PCODE: $00000BCE VOL: 0
+;PCODE: $00000BCF VOL: 0
+;PCODE: $00000BD0 VOL: 0
+; 0000 0131   Repaint_Button("ПАУЗА", 4, BLACK, WHITE);
+;PCODE: $00000BD1 VOL: 0
+;PCODE: $00000BD2 VOL: 0
+;PCODE: $00000BD3 VOL: 0
+;PCODE: $00000BD4 VOL: 0
+;PCODE: $00000BD5 VOL: 0
+;PCODE: $00000BD6 VOL: 0
+;PCODE: $00000BD7 VOL: 0
+;PCODE: $00000BD8 VOL: 0
+;PCODE: $00000BD9 VOL: 0
+;PCODE: $00000BDA VOL: 0
+; 0000 0132 }
+;PCODE: $00000BDB VOL: 0
+;PCODE: $00000BDC VOL: 0
 
 	.DSEG
-_0x104:
+_0x108:
 	.BYTE 0x13
 ;
 ;///////////////////////////////////////////////
@@ -5614,88 +5632,64 @@ _0x104:
 ;
 ;// Timer 0 overflow interrupt 1 ms
 ;interrupt [TIM0_OVF] void timer0_ovf_isr(void)
-; 0000 0150 {
+; 0000 014B {
 
 	.CSEG
-;PCODE: $00000BC9 VOL: 0
-;PCODE: $00000BCA VOL: 0
-; 0000 0151 // Reinitialize Timer 0 value
-; 0000 0152 TCNT0=0x06;
-;PCODE: $00000BCB VOL: 0
-;PCODE: $00000BCC VOL: 0
-; 0000 0153 // Place your code here
-; 0000 0154 
-; 0000 0155 if(Touch_mSec < 0xFF) Touch_mSec++;
-;PCODE: $00000BCD VOL: 0
-;PCODE: $00000BCE VOL: 0
-;PCODE: $00000BCF VOL: 0
-;PCODE: $00000BD0 VOL: 0
-;PCODE: $00000BD1 VOL: 0
-;PCODE: $00000BD2 VOL: 0
-;PCODE: $00000BD3 VOL: 0
-; 0000 0156 ValueUpd_mSec++;
-;PCODE: $00000BD4 VOL: 0
-;PCODE: $00000BD5 VOL: 0
-;PCODE: $00000BD6 VOL: 0
-;PCODE: $00000BD7 VOL: 0
-;PCODE: $00000BD8 VOL: 0
-; 0000 0157 GraphUpd_mSec++;
-;PCODE: $00000BD9 VOL: 0
-;PCODE: $00000BDA VOL: 0
-;PCODE: $00000BDB VOL: 0
-;PCODE: $00000BDC VOL: 0
-; 0000 0158 if(transmitDelayMs<0xFF) transmitDelayMs++;
 ;PCODE: $00000BDD VOL: 0
 ;PCODE: $00000BDE VOL: 0
+; 0000 014C // Reinitialize Timer 0 value
+; 0000 014D TCNT0=0x06;
 ;PCODE: $00000BDF VOL: 0
 ;PCODE: $00000BE0 VOL: 0
+; 0000 014E // Place your code here
+; 0000 014F 
+; 0000 0150 if(Touch_mSec < 0xFF) Touch_mSec++;
 ;PCODE: $00000BE1 VOL: 0
 ;PCODE: $00000BE2 VOL: 0
-; 0000 0159 
-; 0000 015A 
-; 0000 015B TransmitRound();
 ;PCODE: $00000BE3 VOL: 0
 ;PCODE: $00000BE4 VOL: 0
-; 0000 015C 
-; 0000 015D }
 ;PCODE: $00000BE5 VOL: 0
 ;PCODE: $00000BE6 VOL: 0
 ;PCODE: $00000BE7 VOL: 0
-;
-;char GetButton(void)
-; 0000 0160 {
+; 0000 0151 ValueUpd_mSec++;
 ;PCODE: $00000BE8 VOL: 0
 ;PCODE: $00000BE9 VOL: 0
-; 0000 0161   char res = 0;
-; 0000 0162   if (Touch_mSec > 50 && TSC2046_GetCoordinates())
 ;PCODE: $00000BEA VOL: 0
-;	res -> R17
 ;PCODE: $00000BEB VOL: 0
 ;PCODE: $00000BEC VOL: 0
+; 0000 0152 GraphUpd_mSec++;
 ;PCODE: $00000BED VOL: 0
 ;PCODE: $00000BEE VOL: 0
 ;PCODE: $00000BEF VOL: 0
 ;PCODE: $00000BF0 VOL: 0
+; 0000 0153 if(transmitDelayMs<0xFF) transmitDelayMs++;
 ;PCODE: $00000BF1 VOL: 0
 ;PCODE: $00000BF2 VOL: 0
 ;PCODE: $00000BF3 VOL: 0
 ;PCODE: $00000BF4 VOL: 0
 ;PCODE: $00000BF5 VOL: 0
 ;PCODE: $00000BF6 VOL: 0
-; 0000 0163   {
-; 0000 0164     if ((TOUCH_X > BTN1_X_Begin) && (TOUCH_X < BTN1_X_End)) // если X внутри заданного диапазона
+; 0000 0154 
+; 0000 0155 
+; 0000 0156 TransmitRound();
 ;PCODE: $00000BF7 VOL: 0
 ;PCODE: $00000BF8 VOL: 0
+; 0000 0157 
+; 0000 0158 }
 ;PCODE: $00000BF9 VOL: 0
 ;PCODE: $00000BFA VOL: 0
 ;PCODE: $00000BFB VOL: 0
+;
+;char GetButton(void)
+; 0000 015B {
 ;PCODE: $00000BFC VOL: 0
 ;PCODE: $00000BFD VOL: 0
+; 0000 015C   char res = 0;
+; 0000 015D   if (Touch_mSec > 50 && TSC2046_GetCoordinates())
 ;PCODE: $00000BFE VOL: 0
+;	res -> R17
 ;PCODE: $00000BFF VOL: 0
 ;PCODE: $00000C00 VOL: 0
-; 0000 0165     {
-; 0000 0166       if ((TOUCH_Y > BTN1_Y_Begin) && (TOUCH_Y < BTN1_Y_End) && (Touch_mSec > 150)) res = 1;
 ;PCODE: $00000C01 VOL: 0
 ;PCODE: $00000C02 VOL: 0
 ;PCODE: $00000C03 VOL: 0
@@ -5706,18 +5700,20 @@ _0x104:
 ;PCODE: $00000C08 VOL: 0
 ;PCODE: $00000C09 VOL: 0
 ;PCODE: $00000C0A VOL: 0
+; 0000 015E   {
+; 0000 015F     if ((TOUCH_X > BTN1_X_Begin) && (TOUCH_X < BTN1_X_End)) // если X внутри заданного диапазона
 ;PCODE: $00000C0B VOL: 0
 ;PCODE: $00000C0C VOL: 0
 ;PCODE: $00000C0D VOL: 0
 ;PCODE: $00000C0E VOL: 0
 ;PCODE: $00000C0F VOL: 0
-; 0000 0167     }
 ;PCODE: $00000C10 VOL: 0
-; 0000 0168     if ((TOUCH_X > BTN2_X_Begin) && (TOUCH_X < BTN2_X_End)) // если X внутри заданного диапазона
 ;PCODE: $00000C11 VOL: 0
 ;PCODE: $00000C12 VOL: 0
 ;PCODE: $00000C13 VOL: 0
 ;PCODE: $00000C14 VOL: 0
+; 0000 0160     {
+; 0000 0161       if ((TOUCH_Y > BTN1_Y_Begin) && (TOUCH_Y < BTN1_Y_End) && (Touch_mSec > 150)) res = 1;
 ;PCODE: $00000C15 VOL: 0
 ;PCODE: $00000C16 VOL: 0
 ;PCODE: $00000C17 VOL: 0
@@ -5725,8 +5721,6 @@ _0x104:
 ;PCODE: $00000C19 VOL: 0
 ;PCODE: $00000C1A VOL: 0
 ;PCODE: $00000C1B VOL: 0
-; 0000 0169     {
-; 0000 016A       if ((TOUCH_Y > BTN2_Y_Begin) && (TOUCH_Y < BTN2_Y_End)) res = 2;
 ;PCODE: $00000C1C VOL: 0
 ;PCODE: $00000C1D VOL: 0
 ;PCODE: $00000C1E VOL: 0
@@ -5735,13 +5729,13 @@ _0x104:
 ;PCODE: $00000C21 VOL: 0
 ;PCODE: $00000C22 VOL: 0
 ;PCODE: $00000C23 VOL: 0
+; 0000 0162     }
 ;PCODE: $00000C24 VOL: 0
+; 0000 0163     if ((TOUCH_X > BTN2_X_Begin) && (TOUCH_X < BTN2_X_End)) // если X внутри заданного диапазона
 ;PCODE: $00000C25 VOL: 0
 ;PCODE: $00000C26 VOL: 0
 ;PCODE: $00000C27 VOL: 0
-; 0000 016B     }
 ;PCODE: $00000C28 VOL: 0
-; 0000 016C     if ((TOUCH_X > BTN3_X_Begin) && (TOUCH_X < BTN3_X_End)) // если X внутри заданного диапазона
 ;PCODE: $00000C29 VOL: 0
 ;PCODE: $00000C2A VOL: 0
 ;PCODE: $00000C2B VOL: 0
@@ -5749,12 +5743,12 @@ _0x104:
 ;PCODE: $00000C2D VOL: 0
 ;PCODE: $00000C2E VOL: 0
 ;PCODE: $00000C2F VOL: 0
+; 0000 0164     {
+; 0000 0165       if ((TOUCH_Y > BTN2_Y_Begin) && (TOUCH_Y < BTN2_Y_End)) res = 2;
 ;PCODE: $00000C30 VOL: 0
 ;PCODE: $00000C31 VOL: 0
 ;PCODE: $00000C32 VOL: 0
 ;PCODE: $00000C33 VOL: 0
-; 0000 016D     {
-; 0000 016E       if ((TOUCH_Y > BTN3_Y_Begin) && (TOUCH_Y < BTN3_Y_End)) res = 3;
 ;PCODE: $00000C34 VOL: 0
 ;PCODE: $00000C35 VOL: 0
 ;PCODE: $00000C36 VOL: 0
@@ -5763,13 +5757,13 @@ _0x104:
 ;PCODE: $00000C39 VOL: 0
 ;PCODE: $00000C3A VOL: 0
 ;PCODE: $00000C3B VOL: 0
+; 0000 0166     }
 ;PCODE: $00000C3C VOL: 0
+; 0000 0167     if ((TOUCH_X > BTN3_X_Begin) && (TOUCH_X < BTN3_X_End)) // если X внутри заданного диапазона
 ;PCODE: $00000C3D VOL: 0
 ;PCODE: $00000C3E VOL: 0
 ;PCODE: $00000C3F VOL: 0
-; 0000 016F     }
 ;PCODE: $00000C40 VOL: 0
-; 0000 0170     if ((TOUCH_X > BTN4_X_Begin) && (TOUCH_X < BTN4_X_End)) // если X внутри заданного диапазона
 ;PCODE: $00000C41 VOL: 0
 ;PCODE: $00000C42 VOL: 0
 ;PCODE: $00000C43 VOL: 0
@@ -5777,12 +5771,12 @@ _0x104:
 ;PCODE: $00000C45 VOL: 0
 ;PCODE: $00000C46 VOL: 0
 ;PCODE: $00000C47 VOL: 0
+; 0000 0168     {
+; 0000 0169       if ((TOUCH_Y > BTN3_Y_Begin) && (TOUCH_Y < BTN3_Y_End)) res = 3;
 ;PCODE: $00000C48 VOL: 0
 ;PCODE: $00000C49 VOL: 0
 ;PCODE: $00000C4A VOL: 0
 ;PCODE: $00000C4B VOL: 0
-; 0000 0171     {
-; 0000 0172       if ((TOUCH_Y > BTN4_Y_Begin) && (TOUCH_Y < BTN4_Y_End) && (Touch_mSec > 150)) res = 4;
 ;PCODE: $00000C4C VOL: 0
 ;PCODE: $00000C4D VOL: 0
 ;PCODE: $00000C4E VOL: 0
@@ -5791,41 +5785,29 @@ _0x104:
 ;PCODE: $00000C51 VOL: 0
 ;PCODE: $00000C52 VOL: 0
 ;PCODE: $00000C53 VOL: 0
+; 0000 016A     }
 ;PCODE: $00000C54 VOL: 0
+; 0000 016B     if ((TOUCH_X > BTN4_X_Begin) && (TOUCH_X < BTN4_X_End)) // если X внутри заданного диапазона
 ;PCODE: $00000C55 VOL: 0
 ;PCODE: $00000C56 VOL: 0
 ;PCODE: $00000C57 VOL: 0
 ;PCODE: $00000C58 VOL: 0
 ;PCODE: $00000C59 VOL: 0
 ;PCODE: $00000C5A VOL: 0
-; 0000 0173     }
 ;PCODE: $00000C5B VOL: 0
-; 0000 0174       Touch_mSec = 0;
 ;PCODE: $00000C5C VOL: 0
 ;PCODE: $00000C5D VOL: 0
 ;PCODE: $00000C5E VOL: 0
-; 0000 0175   }
-; 0000 0176   return res;
 ;PCODE: $00000C5F VOL: 0
+; 0000 016C     {
+; 0000 016D       if ((TOUCH_Y > BTN4_Y_Begin) && (TOUCH_Y < BTN4_Y_End) && (Touch_mSec > 150)) res = 4;
 ;PCODE: $00000C60 VOL: 0
 ;PCODE: $00000C61 VOL: 0
 ;PCODE: $00000C62 VOL: 0
-; 0000 0177 }
 ;PCODE: $00000C63 VOL: 0
-;
-;void PutParameterText(char Number, unsigned int Color)
-; 0000 017A {
 ;PCODE: $00000C64 VOL: 0
 ;PCODE: $00000C65 VOL: 0
-; 0000 017B   int X = Text_StartX;
-; 0000 017C   int Y = Text_StartY;
-; 0000 017D 
-; 0000 017E   SSD1963_PutString16("                ", X, Y, Color, BLACK);
 ;PCODE: $00000C66 VOL: 0
-;	Number -> Y+6
-;	Color -> Y+4
-;	X -> R16,R17
-;	Y -> R18,R19
 ;PCODE: $00000C67 VOL: 0
 ;PCODE: $00000C68 VOL: 0
 ;PCODE: $00000C69 VOL: 0
@@ -5834,58 +5816,71 @@ _0x104:
 ;PCODE: $00000C6C VOL: 0
 ;PCODE: $00000C6D VOL: 0
 ;PCODE: $00000C6E VOL: 0
+; 0000 016E     }
 ;PCODE: $00000C6F VOL: 0
+; 0000 016F       Touch_mSec = 0;
 ;PCODE: $00000C70 VOL: 0
 ;PCODE: $00000C71 VOL: 0
 ;PCODE: $00000C72 VOL: 0
+; 0000 0170   }
+; 0000 0171   return res;
 ;PCODE: $00000C73 VOL: 0
 ;PCODE: $00000C74 VOL: 0
-; 0000 017F   SSD1963_PutString16("                ", X, Y + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000C75 VOL: 0
 ;PCODE: $00000C76 VOL: 0
+; 0000 0172 }
 ;PCODE: $00000C77 VOL: 0
+;
+;void PutParameterText(char Number, unsigned int Color)
+; 0000 0175 {
 ;PCODE: $00000C78 VOL: 0
 ;PCODE: $00000C79 VOL: 0
+; 0000 0176   int X = Text_StartX;
+; 0000 0177   int Y = Text_StartY;
+; 0000 0178 
+; 0000 0179   SSD1963_PutString16("                ", X, Y, Color, BLACK);
 ;PCODE: $00000C7A VOL: 0
+;	Number -> Y+6
+;	Color -> Y+4
+;	X -> R16,R17
+;	Y -> R18,R19
 ;PCODE: $00000C7B VOL: 0
 ;PCODE: $00000C7C VOL: 0
 ;PCODE: $00000C7D VOL: 0
 ;PCODE: $00000C7E VOL: 0
 ;PCODE: $00000C7F VOL: 0
 ;PCODE: $00000C80 VOL: 0
-; 0000 0180   switch (Number)
 ;PCODE: $00000C81 VOL: 0
 ;PCODE: $00000C82 VOL: 0
-; 0000 0181   {
-; 0000 0182     case 0 :
 ;PCODE: $00000C83 VOL: 0
 ;PCODE: $00000C84 VOL: 0
-; 0000 0183       SSD1963_PutString16("НАПРЯЖЕНИЕ", X, Y, Color, BLACK);
 ;PCODE: $00000C85 VOL: 0
 ;PCODE: $00000C86 VOL: 0
 ;PCODE: $00000C87 VOL: 0
 ;PCODE: $00000C88 VOL: 0
+; 0000 017A   SSD1963_PutString16("                ", X, Y + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000C89 VOL: 0
 ;PCODE: $00000C8A VOL: 0
 ;PCODE: $00000C8B VOL: 0
 ;PCODE: $00000C8C VOL: 0
 ;PCODE: $00000C8D VOL: 0
 ;PCODE: $00000C8E VOL: 0
-; 0000 0184       SSD1963_PutString16("ФАЗ", X, Y + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000C8F VOL: 0
 ;PCODE: $00000C90 VOL: 0
 ;PCODE: $00000C91 VOL: 0
 ;PCODE: $00000C92 VOL: 0
 ;PCODE: $00000C93 VOL: 0
 ;PCODE: $00000C94 VOL: 0
+; 0000 017B   switch (Number)
 ;PCODE: $00000C95 VOL: 0
 ;PCODE: $00000C96 VOL: 0
+; 0000 017C   {
+; 0000 017D     case 0 :
 ;PCODE: $00000C97 VOL: 0
 ;PCODE: $00000C98 VOL: 0
+; 0000 017E       SSD1963_PutString16("НАПРЯЖЕНИЕ", X, Y, Color, BLACK);
 ;PCODE: $00000C99 VOL: 0
 ;PCODE: $00000C9A VOL: 0
-; 0000 0185 
-; 0000 0186       SSD1963_PutString16("            ", Value_StartX, Value_StartY, Color, BLACK);
 ;PCODE: $00000C9B VOL: 0
 ;PCODE: $00000C9C VOL: 0
 ;PCODE: $00000C9D VOL: 0
@@ -5894,11 +5889,11 @@ _0x104:
 ;PCODE: $00000CA0 VOL: 0
 ;PCODE: $00000CA1 VOL: 0
 ;PCODE: $00000CA2 VOL: 0
+; 0000 017F       SSD1963_PutString16("ФАЗ", X, Y + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000CA3 VOL: 0
 ;PCODE: $00000CA4 VOL: 0
 ;PCODE: $00000CA5 VOL: 0
 ;PCODE: $00000CA6 VOL: 0
-; 0000 0187       SSD1963_PutString16("            ", Value_StartX, Value_StartY + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000CA7 VOL: 0
 ;PCODE: $00000CA8 VOL: 0
 ;PCODE: $00000CA9 VOL: 0
@@ -5907,11 +5902,12 @@ _0x104:
 ;PCODE: $00000CAC VOL: 0
 ;PCODE: $00000CAD VOL: 0
 ;PCODE: $00000CAE VOL: 0
+; 0000 0180 
+; 0000 0181       SSD1963_PutString16("            ", Value_StartX, Value_StartY, Color, BLACK);
 ;PCODE: $00000CAF VOL: 0
 ;PCODE: $00000CB0 VOL: 0
 ;PCODE: $00000CB1 VOL: 0
 ;PCODE: $00000CB2 VOL: 0
-; 0000 0188       SSD1963_PutString16("ГЦ", Value_StartX + (Value_Lenght<<1), Value_StartY + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000CB3 VOL: 0
 ;PCODE: $00000CB4 VOL: 0
 ;PCODE: $00000CB5 VOL: 0
@@ -5920,43 +5916,42 @@ _0x104:
 ;PCODE: $00000CB8 VOL: 0
 ;PCODE: $00000CB9 VOL: 0
 ;PCODE: $00000CBA VOL: 0
+; 0000 0182       SSD1963_PutString16("            ", Value_StartX, Value_StartY + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000CBB VOL: 0
 ;PCODE: $00000CBC VOL: 0
 ;PCODE: $00000CBD VOL: 0
 ;PCODE: $00000CBE VOL: 0
-; 0000 0189 
-; 0000 018A     break;
 ;PCODE: $00000CBF VOL: 0
-; 0000 018B     case 1 :
 ;PCODE: $00000CC0 VOL: 0
 ;PCODE: $00000CC1 VOL: 0
 ;PCODE: $00000CC2 VOL: 0
-; 0000 018C       SSD1963_PutString16("ТОК", X, Y, Color, BLACK);
 ;PCODE: $00000CC3 VOL: 0
 ;PCODE: $00000CC4 VOL: 0
 ;PCODE: $00000CC5 VOL: 0
 ;PCODE: $00000CC6 VOL: 0
+; 0000 0183       SSD1963_PutString16("ГЦ", Value_StartX + (Value_Lenght<<1), Value_StartY + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000CC7 VOL: 0
 ;PCODE: $00000CC8 VOL: 0
 ;PCODE: $00000CC9 VOL: 0
 ;PCODE: $00000CCA VOL: 0
 ;PCODE: $00000CCB VOL: 0
 ;PCODE: $00000CCC VOL: 0
-; 0000 018D       SSD1963_PutString16("ФАЗ", X, Y + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000CCD VOL: 0
 ;PCODE: $00000CCE VOL: 0
 ;PCODE: $00000CCF VOL: 0
 ;PCODE: $00000CD0 VOL: 0
 ;PCODE: $00000CD1 VOL: 0
 ;PCODE: $00000CD2 VOL: 0
+; 0000 0184 
+; 0000 0185     break;
 ;PCODE: $00000CD3 VOL: 0
+; 0000 0186     case 1 :
 ;PCODE: $00000CD4 VOL: 0
 ;PCODE: $00000CD5 VOL: 0
 ;PCODE: $00000CD6 VOL: 0
+; 0000 0187       SSD1963_PutString16("ТОК", X, Y, Color, BLACK);
 ;PCODE: $00000CD7 VOL: 0
 ;PCODE: $00000CD8 VOL: 0
-; 0000 018E 
-; 0000 018F       SSD1963_PutString16("            ", Value_StartX, Value_StartY, Color, BLACK);
 ;PCODE: $00000CD9 VOL: 0
 ;PCODE: $00000CDA VOL: 0
 ;PCODE: $00000CDB VOL: 0
@@ -5965,11 +5960,11 @@ _0x104:
 ;PCODE: $00000CDE VOL: 0
 ;PCODE: $00000CDF VOL: 0
 ;PCODE: $00000CE0 VOL: 0
+; 0000 0188       SSD1963_PutString16("ФАЗ", X, Y + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000CE1 VOL: 0
 ;PCODE: $00000CE2 VOL: 0
 ;PCODE: $00000CE3 VOL: 0
 ;PCODE: $00000CE4 VOL: 0
-; 0000 0190       SSD1963_PutString16("            ", Value_StartX, Value_StartY + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000CE5 VOL: 0
 ;PCODE: $00000CE6 VOL: 0
 ;PCODE: $00000CE7 VOL: 0
@@ -5978,11 +5973,12 @@ _0x104:
 ;PCODE: $00000CEA VOL: 0
 ;PCODE: $00000CEB VOL: 0
 ;PCODE: $00000CEC VOL: 0
+; 0000 0189 
+; 0000 018A       SSD1963_PutString16("            ", Value_StartX, Value_StartY, Color, BLACK);
 ;PCODE: $00000CED VOL: 0
 ;PCODE: $00000CEE VOL: 0
 ;PCODE: $00000CEF VOL: 0
 ;PCODE: $00000CF0 VOL: 0
-; 0000 0191       SSD1963_PutString16("ГЦ", Value_StartX + (Value_Lenght<<1), Value_StartY + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000CF1 VOL: 0
 ;PCODE: $00000CF2 VOL: 0
 ;PCODE: $00000CF3 VOL: 0
@@ -5991,43 +5987,42 @@ _0x104:
 ;PCODE: $00000CF6 VOL: 0
 ;PCODE: $00000CF7 VOL: 0
 ;PCODE: $00000CF8 VOL: 0
+; 0000 018B       SSD1963_PutString16("            ", Value_StartX, Value_StartY + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000CF9 VOL: 0
 ;PCODE: $00000CFA VOL: 0
 ;PCODE: $00000CFB VOL: 0
 ;PCODE: $00000CFC VOL: 0
-; 0000 0192 
-; 0000 0193     break;
 ;PCODE: $00000CFD VOL: 0
-; 0000 0194     case 2 :
 ;PCODE: $00000CFE VOL: 0
 ;PCODE: $00000CFF VOL: 0
 ;PCODE: $00000D00 VOL: 0
-; 0000 0195       SSD1963_PutString16("НАПРЯЖЕНИЕ И ТОК", X, Y, Color, BLACK);
 ;PCODE: $00000D01 VOL: 0
 ;PCODE: $00000D02 VOL: 0
 ;PCODE: $00000D03 VOL: 0
 ;PCODE: $00000D04 VOL: 0
+; 0000 018C       SSD1963_PutString16("ГЦ", Value_StartX + (Value_Lenght<<1), Value_StartY + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000D05 VOL: 0
 ;PCODE: $00000D06 VOL: 0
 ;PCODE: $00000D07 VOL: 0
 ;PCODE: $00000D08 VOL: 0
 ;PCODE: $00000D09 VOL: 0
 ;PCODE: $00000D0A VOL: 0
-; 0000 0196       SSD1963_PutString16("ВОЗБУЖДЕНИЯ", X, Y + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000D0B VOL: 0
 ;PCODE: $00000D0C VOL: 0
 ;PCODE: $00000D0D VOL: 0
 ;PCODE: $00000D0E VOL: 0
 ;PCODE: $00000D0F VOL: 0
 ;PCODE: $00000D10 VOL: 0
+; 0000 018D 
+; 0000 018E     break;
 ;PCODE: $00000D11 VOL: 0
+; 0000 018F     case 2 :
 ;PCODE: $00000D12 VOL: 0
 ;PCODE: $00000D13 VOL: 0
 ;PCODE: $00000D14 VOL: 0
+; 0000 0190       SSD1963_PutString16("НАПРЯЖЕНИЕ И ТОК", X, Y, Color, BLACK);
 ;PCODE: $00000D15 VOL: 0
 ;PCODE: $00000D16 VOL: 0
-; 0000 0197 
-; 0000 0198       SSD1963_PutString16("            ", Value_StartX, Value_StartY, Color, BLACK);
 ;PCODE: $00000D17 VOL: 0
 ;PCODE: $00000D18 VOL: 0
 ;PCODE: $00000D19 VOL: 0
@@ -6036,11 +6031,11 @@ _0x104:
 ;PCODE: $00000D1C VOL: 0
 ;PCODE: $00000D1D VOL: 0
 ;PCODE: $00000D1E VOL: 0
+; 0000 0191       SSD1963_PutString16("ВОЗБУЖДЕНИЯ", X, Y + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000D1F VOL: 0
 ;PCODE: $00000D20 VOL: 0
 ;PCODE: $00000D21 VOL: 0
 ;PCODE: $00000D22 VOL: 0
-; 0000 0199       SSD1963_PutString16("            ", Value_StartX, Value_StartY + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000D23 VOL: 0
 ;PCODE: $00000D24 VOL: 0
 ;PCODE: $00000D25 VOL: 0
@@ -6049,122 +6044,121 @@ _0x104:
 ;PCODE: $00000D28 VOL: 0
 ;PCODE: $00000D29 VOL: 0
 ;PCODE: $00000D2A VOL: 0
+; 0000 0192 
+; 0000 0193       SSD1963_PutString16("            ", Value_StartX, Value_StartY, Color, BLACK);
 ;PCODE: $00000D2B VOL: 0
 ;PCODE: $00000D2C VOL: 0
 ;PCODE: $00000D2D VOL: 0
 ;PCODE: $00000D2E VOL: 0
-; 0000 019A 
-; 0000 019B     break;
 ;PCODE: $00000D2F VOL: 0
-; 0000 019C     /*
-; 0000 019D     case 3 :
-; 0000 019E       SSD1963_PutString16("ВРЕМЯ ОБРАБОТКИ", X, Y, Color, BLACK);
-; 0000 019F       SSD1963_PutString16("СКОРОСТИ", X, Y + FONT_HEIGHT, Color, BLACK);
-; 0000 01A0     break;
-; 0000 01A1     case 4 :
-; 0000 01A2       SSD1963_PutString16("СКОРОСТЬ ТПЧ", X, Y, Color, BLACK);
-; 0000 01A3       SSD1963_PutString16("МАКСИМАЛЬНАЯ", X, Y + FONT_HEIGHT, Color, BLACK);
-; 0000 01A4     break;
-; 0000 01A5    */
-; 0000 01A6 
-; 0000 01A7     case 5:
 ;PCODE: $00000D30 VOL: 0
 ;PCODE: $00000D31 VOL: 0
 ;PCODE: $00000D32 VOL: 0
-; 0000 01A8     case 6:
 ;PCODE: $00000D33 VOL: 0
 ;PCODE: $00000D34 VOL: 0
 ;PCODE: $00000D35 VOL: 0
 ;PCODE: $00000D36 VOL: 0
+; 0000 0194       SSD1963_PutString16("            ", Value_StartX, Value_StartY + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000D37 VOL: 0
-; 0000 01A9     case 7:
 ;PCODE: $00000D38 VOL: 0
 ;PCODE: $00000D39 VOL: 0
 ;PCODE: $00000D3A VOL: 0
 ;PCODE: $00000D3B VOL: 0
 ;PCODE: $00000D3C VOL: 0
-; 0000 01AA       SSD1963_PutString16("ОБН", X, Y, Color, BLACK);
 ;PCODE: $00000D3D VOL: 0
 ;PCODE: $00000D3E VOL: 0
 ;PCODE: $00000D3F VOL: 0
 ;PCODE: $00000D40 VOL: 0
 ;PCODE: $00000D41 VOL: 0
 ;PCODE: $00000D42 VOL: 0
+; 0000 0195 
+; 0000 0196     break;
 ;PCODE: $00000D43 VOL: 0
+; 0000 0197     /*
+; 0000 0198     case 3 :
+; 0000 0199       SSD1963_PutString16("ВРЕМЯ ОБРАБОТКИ", X, Y, Color, BLACK);
+; 0000 019A       SSD1963_PutString16("СКОРОСТИ", X, Y + FONT_HEIGHT, Color, BLACK);
+; 0000 019B     break;
+; 0000 019C     case 4 :
+; 0000 019D       SSD1963_PutString16("СКОРОСТЬ ТПЧ", X, Y, Color, BLACK);
+; 0000 019E       SSD1963_PutString16("МАКСИМАЛЬНАЯ", X, Y + FONT_HEIGHT, Color, BLACK);
+; 0000 019F     break;
+; 0000 01A0    */
+; 0000 01A1 
+; 0000 01A2     case 5:
 ;PCODE: $00000D44 VOL: 0
 ;PCODE: $00000D45 VOL: 0
 ;PCODE: $00000D46 VOL: 0
-; 0000 01AB       SSD1963_PutString16("АМП", X, Y + FONT_HEIGHT, Color, BLACK);
+; 0000 01A3     case 6:
 ;PCODE: $00000D47 VOL: 0
 ;PCODE: $00000D48 VOL: 0
 ;PCODE: $00000D49 VOL: 0
 ;PCODE: $00000D4A VOL: 0
 ;PCODE: $00000D4B VOL: 0
+; 0000 01A4     case 7:
 ;PCODE: $00000D4C VOL: 0
 ;PCODE: $00000D4D VOL: 0
 ;PCODE: $00000D4E VOL: 0
 ;PCODE: $00000D4F VOL: 0
 ;PCODE: $00000D50 VOL: 0
+; 0000 01A5       SSD1963_PutString16("ОБН", X, Y, Color, BLACK);
 ;PCODE: $00000D51 VOL: 0
 ;PCODE: $00000D52 VOL: 0
-; 0000 01AC 
-; 0000 01AD       X = Text_StartX + Value_Lenght;
 ;PCODE: $00000D53 VOL: 0
 ;PCODE: $00000D54 VOL: 0
-; 0000 01AE       SSD1963_PutValue16(GraphUpdTime, X, Y, 4, Color, BLACK);
 ;PCODE: $00000D55 VOL: 0
 ;PCODE: $00000D56 VOL: 0
 ;PCODE: $00000D57 VOL: 0
 ;PCODE: $00000D58 VOL: 0
 ;PCODE: $00000D59 VOL: 0
 ;PCODE: $00000D5A VOL: 0
+; 0000 01A6       SSD1963_PutString16("АМП", X, Y + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000D5B VOL: 0
 ;PCODE: $00000D5C VOL: 0
 ;PCODE: $00000D5D VOL: 0
 ;PCODE: $00000D5E VOL: 0
 ;PCODE: $00000D5F VOL: 0
-; 0000 01AF       X += Value_Lenght + FONT_HEIGHT + FONT_HEIGHT;
 ;PCODE: $00000D60 VOL: 0
 ;PCODE: $00000D61 VOL: 0
-; 0000 01B0       SSD1963_PutString16("ПЕР", X, Y, Color, BLACK);
 ;PCODE: $00000D62 VOL: 0
 ;PCODE: $00000D63 VOL: 0
 ;PCODE: $00000D64 VOL: 0
 ;PCODE: $00000D65 VOL: 0
 ;PCODE: $00000D66 VOL: 0
+; 0000 01A7 
+; 0000 01A8       X = Text_StartX + Value_Lenght;
 ;PCODE: $00000D67 VOL: 0
 ;PCODE: $00000D68 VOL: 0
+; 0000 01A9       SSD1963_PutValue16(GraphUpdTime, X, Y, 4, Color, BLACK);
 ;PCODE: $00000D69 VOL: 0
 ;PCODE: $00000D6A VOL: 0
 ;PCODE: $00000D6B VOL: 0
-; 0000 01B1       X += Value_Lenght;
 ;PCODE: $00000D6C VOL: 0
 ;PCODE: $00000D6D VOL: 0
-; 0000 01B2       SSD1963_PutValue16(rx_buffer_overflow0, X, Y, 1, Color, BLACK);
 ;PCODE: $00000D6E VOL: 0
 ;PCODE: $00000D6F VOL: 0
 ;PCODE: $00000D70 VOL: 0
 ;PCODE: $00000D71 VOL: 0
 ;PCODE: $00000D72 VOL: 0
 ;PCODE: $00000D73 VOL: 0
+; 0000 01AA       X += Value_Lenght + FONT_HEIGHT + FONT_HEIGHT;
 ;PCODE: $00000D74 VOL: 0
 ;PCODE: $00000D75 VOL: 0
+; 0000 01AB       SSD1963_PutString16("ПЕР", X, Y, Color, BLACK);
 ;PCODE: $00000D76 VOL: 0
 ;PCODE: $00000D77 VOL: 0
 ;PCODE: $00000D78 VOL: 0
 ;PCODE: $00000D79 VOL: 0
-; 0000 01B3 
-; 0000 01B4       X = Text_StartX + Value_Lenght;
 ;PCODE: $00000D7A VOL: 0
 ;PCODE: $00000D7B VOL: 0
-; 0000 01B5       Y = Text_StartY + FONT_HEIGHT;
 ;PCODE: $00000D7C VOL: 0
 ;PCODE: $00000D7D VOL: 0
-; 0000 01B6       SSD1963_PutValue16(ConfigValue[0], X, Y, 3, Color, (Number==5)?DGRAY:BLACK);
 ;PCODE: $00000D7E VOL: 0
 ;PCODE: $00000D7F VOL: 0
+; 0000 01AC       X += Value_Lenght;
 ;PCODE: $00000D80 VOL: 0
 ;PCODE: $00000D81 VOL: 0
+; 0000 01AD       SSD1963_PutValue16(rx_buffer_overflow0, X, Y, 1, Color, BLACK);
 ;PCODE: $00000D82 VOL: 0
 ;PCODE: $00000D83 VOL: 0
 ;PCODE: $00000D84 VOL: 0
@@ -6177,14 +6171,16 @@ _0x104:
 ;PCODE: $00000D8B VOL: 0
 ;PCODE: $00000D8C VOL: 0
 ;PCODE: $00000D8D VOL: 0
+; 0000 01AE 
+; 0000 01AF       X = Text_StartX + Value_Lenght;
 ;PCODE: $00000D8E VOL: 0
 ;PCODE: $00000D8F VOL: 0
+; 0000 01B0       Y = Text_StartY + FONT_HEIGHT;
 ;PCODE: $00000D90 VOL: 0
 ;PCODE: $00000D91 VOL: 0
-; 0000 01B7       X += Value_Lenght;
+; 0000 01B1       SSD1963_PutValue16(ConfigValue[0], X, Y, 3, Color, (Number==5)?DGRAY:BLACK);
 ;PCODE: $00000D92 VOL: 0
 ;PCODE: $00000D93 VOL: 0
-; 0000 01B8       SSD1963_PutValue16(ConfigValue[1], X, Y, 3, Color, (Number==6)?DGRAY:BLACK);
 ;PCODE: $00000D94 VOL: 0
 ;PCODE: $00000D95 VOL: 0
 ;PCODE: $00000D96 VOL: 0
@@ -6203,13 +6199,13 @@ _0x104:
 ;PCODE: $00000DA3 VOL: 0
 ;PCODE: $00000DA4 VOL: 0
 ;PCODE: $00000DA5 VOL: 0
+; 0000 01B2       X += Value_Lenght;
 ;PCODE: $00000DA6 VOL: 0
 ;PCODE: $00000DA7 VOL: 0
+; 0000 01B3       SSD1963_PutValue16(ConfigValue[1], X, Y, 3, Color, (Number==6)?DGRAY:BLACK);
 ;PCODE: $00000DA8 VOL: 0
-; 0000 01B9       X += Value_Lenght;
 ;PCODE: $00000DA9 VOL: 0
 ;PCODE: $00000DAA VOL: 0
-; 0000 01BA       SSD1963_PutValue16(ConfigValue[2], X, Y, 3, Color, (Number==7)?DGRAY:BLACK);
 ;PCODE: $00000DAB VOL: 0
 ;PCODE: $00000DAC VOL: 0
 ;PCODE: $00000DAD VOL: 0
@@ -6228,80 +6224,79 @@ _0x104:
 ;PCODE: $00000DBA VOL: 0
 ;PCODE: $00000DBB VOL: 0
 ;PCODE: $00000DBC VOL: 0
+; 0000 01B4       X += Value_Lenght;
 ;PCODE: $00000DBD VOL: 0
 ;PCODE: $00000DBE VOL: 0
+; 0000 01B5       SSD1963_PutValue16(ConfigValue[2], X, Y, 3, Color, (Number==7)?DGRAY:BLACK);
 ;PCODE: $00000DBF VOL: 0
-; 0000 01BB     break;
 ;PCODE: $00000DC0 VOL: 0
-; 0000 01BC     case 8:
 ;PCODE: $00000DC1 VOL: 0
 ;PCODE: $00000DC2 VOL: 0
 ;PCODE: $00000DC3 VOL: 0
-; 0000 01BD     case 9:
 ;PCODE: $00000DC4 VOL: 0
 ;PCODE: $00000DC5 VOL: 0
 ;PCODE: $00000DC6 VOL: 0
 ;PCODE: $00000DC7 VOL: 0
 ;PCODE: $00000DC8 VOL: 0
-; 0000 01BE     case 10:
 ;PCODE: $00000DC9 VOL: 0
 ;PCODE: $00000DCA VOL: 0
 ;PCODE: $00000DCB VOL: 0
 ;PCODE: $00000DCC VOL: 0
 ;PCODE: $00000DCD VOL: 0
-; 0000 01BF     case 11:
 ;PCODE: $00000DCE VOL: 0
 ;PCODE: $00000DCF VOL: 0
 ;PCODE: $00000DD0 VOL: 0
 ;PCODE: $00000DD1 VOL: 0
 ;PCODE: $00000DD2 VOL: 0
-; 0000 01C0     case 12:
 ;PCODE: $00000DD3 VOL: 0
+; 0000 01B6     break;
 ;PCODE: $00000DD4 VOL: 0
+; 0000 01B7     case 8:
 ;PCODE: $00000DD5 VOL: 0
 ;PCODE: $00000DD6 VOL: 0
 ;PCODE: $00000DD7 VOL: 0
-; 0000 01C1     case 13:
+; 0000 01B8     case 9:
 ;PCODE: $00000DD8 VOL: 0
 ;PCODE: $00000DD9 VOL: 0
 ;PCODE: $00000DDA VOL: 0
 ;PCODE: $00000DDB VOL: 0
 ;PCODE: $00000DDC VOL: 0
-; 0000 01C2       SSD1963_PutString16(" КН", X, Y, Color, BLACK);
+; 0000 01B9     case 10:
 ;PCODE: $00000DDD VOL: 0
 ;PCODE: $00000DDE VOL: 0
 ;PCODE: $00000DDF VOL: 0
 ;PCODE: $00000DE0 VOL: 0
 ;PCODE: $00000DE1 VOL: 0
+; 0000 01BA     case 11:
 ;PCODE: $00000DE2 VOL: 0
 ;PCODE: $00000DE3 VOL: 0
 ;PCODE: $00000DE4 VOL: 0
 ;PCODE: $00000DE5 VOL: 0
 ;PCODE: $00000DE6 VOL: 0
-; 0000 01C3       SSD1963_PutString16(" КТ", X, Y + FONT_HEIGHT, Color, BLACK);
+; 0000 01BB     case 12:
 ;PCODE: $00000DE7 VOL: 0
 ;PCODE: $00000DE8 VOL: 0
 ;PCODE: $00000DE9 VOL: 0
 ;PCODE: $00000DEA VOL: 0
 ;PCODE: $00000DEB VOL: 0
+; 0000 01BC     case 13:
 ;PCODE: $00000DEC VOL: 0
 ;PCODE: $00000DED VOL: 0
 ;PCODE: $00000DEE VOL: 0
 ;PCODE: $00000DEF VOL: 0
 ;PCODE: $00000DF0 VOL: 0
+; 0000 01BD       SSD1963_PutString16(" КН", X, Y, Color, BLACK);
 ;PCODE: $00000DF1 VOL: 0
 ;PCODE: $00000DF2 VOL: 0
-; 0000 01C4 
-; 0000 01C5       X = Text_StartX + Value_Lenght;
 ;PCODE: $00000DF3 VOL: 0
 ;PCODE: $00000DF4 VOL: 0
-; 0000 01C6       SSD1963_PutValue16(ConfigValue[3], X, Y, 3, Color, (Number==8)?DGRAY:BLACK);
 ;PCODE: $00000DF5 VOL: 0
 ;PCODE: $00000DF6 VOL: 0
 ;PCODE: $00000DF7 VOL: 0
 ;PCODE: $00000DF8 VOL: 0
 ;PCODE: $00000DF9 VOL: 0
 ;PCODE: $00000DFA VOL: 0
+; 0000 01BE       SSD1963_PutString16(" КТ", X, Y + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000DFB VOL: 0
 ;PCODE: $00000DFC VOL: 0
 ;PCODE: $00000DFD VOL: 0
@@ -6314,13 +6309,14 @@ _0x104:
 ;PCODE: $00000E04 VOL: 0
 ;PCODE: $00000E05 VOL: 0
 ;PCODE: $00000E06 VOL: 0
+; 0000 01BF 
+; 0000 01C0       X = Text_StartX + Value_Lenght;
 ;PCODE: $00000E07 VOL: 0
 ;PCODE: $00000E08 VOL: 0
+; 0000 01C1       SSD1963_PutValue16(ConfigValue[3], X, Y, 3, Color, (Number==8)?DGRAY:BLACK);
 ;PCODE: $00000E09 VOL: 0
-; 0000 01C7       X += Value_Lenght;
 ;PCODE: $00000E0A VOL: 0
 ;PCODE: $00000E0B VOL: 0
-; 0000 01C8       SSD1963_PutValue16(ConfigValue[4], X, Y, 3, Color, (Number==9)?DGRAY:BLACK);
 ;PCODE: $00000E0C VOL: 0
 ;PCODE: $00000E0D VOL: 0
 ;PCODE: $00000E0E VOL: 0
@@ -6339,13 +6335,13 @@ _0x104:
 ;PCODE: $00000E1B VOL: 0
 ;PCODE: $00000E1C VOL: 0
 ;PCODE: $00000E1D VOL: 0
+; 0000 01C2       X += Value_Lenght;
 ;PCODE: $00000E1E VOL: 0
 ;PCODE: $00000E1F VOL: 0
+; 0000 01C3       SSD1963_PutValue16(ConfigValue[4], X, Y, 3, Color, (Number==9)?DGRAY:BLACK);
 ;PCODE: $00000E20 VOL: 0
-; 0000 01C9       X += Value_Lenght;
 ;PCODE: $00000E21 VOL: 0
 ;PCODE: $00000E22 VOL: 0
-; 0000 01CA       SSD1963_PutValue16(ConfigValue[5], X, Y, 3, Color, (Number==10)?DGRAY:BLACK);
 ;PCODE: $00000E23 VOL: 0
 ;PCODE: $00000E24 VOL: 0
 ;PCODE: $00000E25 VOL: 0
@@ -6364,17 +6360,15 @@ _0x104:
 ;PCODE: $00000E32 VOL: 0
 ;PCODE: $00000E33 VOL: 0
 ;PCODE: $00000E34 VOL: 0
+; 0000 01C4       X += Value_Lenght;
 ;PCODE: $00000E35 VOL: 0
 ;PCODE: $00000E36 VOL: 0
+; 0000 01C5       SSD1963_PutValue16(ConfigValue[5], X, Y, 3, Color, (Number==10)?DGRAY:BLACK);
 ;PCODE: $00000E37 VOL: 0
-; 0000 01CB 
-; 0000 01CC       X = Text_StartX + Value_Lenght;
 ;PCODE: $00000E38 VOL: 0
 ;PCODE: $00000E39 VOL: 0
-; 0000 01CD       Y = Text_StartY + FONT_HEIGHT;
 ;PCODE: $00000E3A VOL: 0
 ;PCODE: $00000E3B VOL: 0
-; 0000 01CE       SSD1963_PutValue16(ConfigValue[6], X, Y, 3, Color, (Number==11)?DGRAY:BLACK);
 ;PCODE: $00000E3C VOL: 0
 ;PCODE: $00000E3D VOL: 0
 ;PCODE: $00000E3E VOL: 0
@@ -6391,15 +6385,17 @@ _0x104:
 ;PCODE: $00000E49 VOL: 0
 ;PCODE: $00000E4A VOL: 0
 ;PCODE: $00000E4B VOL: 0
+; 0000 01C6 
+; 0000 01C7       X = Text_StartX + Value_Lenght;
 ;PCODE: $00000E4C VOL: 0
 ;PCODE: $00000E4D VOL: 0
+; 0000 01C8       Y = Text_StartY + FONT_HEIGHT;
 ;PCODE: $00000E4E VOL: 0
 ;PCODE: $00000E4F VOL: 0
+; 0000 01C9       SSD1963_PutValue16(ConfigValue[6], X, Y, 3, Color, (Number==11)?DGRAY:BLACK);
 ;PCODE: $00000E50 VOL: 0
-; 0000 01CF       X += Value_Lenght;
 ;PCODE: $00000E51 VOL: 0
 ;PCODE: $00000E52 VOL: 0
-; 0000 01D0       SSD1963_PutValue16(ConfigValue[7], X, Y, 3, Color, (Number==12)?DGRAY:BLACK);
 ;PCODE: $00000E53 VOL: 0
 ;PCODE: $00000E54 VOL: 0
 ;PCODE: $00000E55 VOL: 0
@@ -6418,13 +6414,13 @@ _0x104:
 ;PCODE: $00000E62 VOL: 0
 ;PCODE: $00000E63 VOL: 0
 ;PCODE: $00000E64 VOL: 0
+; 0000 01CA       X += Value_Lenght;
 ;PCODE: $00000E65 VOL: 0
 ;PCODE: $00000E66 VOL: 0
+; 0000 01CB       SSD1963_PutValue16(ConfigValue[7], X, Y, 3, Color, (Number==12)?DGRAY:BLACK);
 ;PCODE: $00000E67 VOL: 0
-; 0000 01D1       X += Value_Lenght;
 ;PCODE: $00000E68 VOL: 0
 ;PCODE: $00000E69 VOL: 0
-; 0000 01D2       SSD1963_PutValue16(ConfigValue[8], X, Y, 3, Color, (Number==13)?DGRAY:BLACK);
 ;PCODE: $00000E6A VOL: 0
 ;PCODE: $00000E6B VOL: 0
 ;PCODE: $00000E6C VOL: 0
@@ -6443,61 +6439,61 @@ _0x104:
 ;PCODE: $00000E79 VOL: 0
 ;PCODE: $00000E7A VOL: 0
 ;PCODE: $00000E7B VOL: 0
+; 0000 01CC       X += Value_Lenght;
 ;PCODE: $00000E7C VOL: 0
 ;PCODE: $00000E7D VOL: 0
+; 0000 01CD       SSD1963_PutValue16(ConfigValue[8], X, Y, 3, Color, (Number==13)?DGRAY:BLACK);
 ;PCODE: $00000E7E VOL: 0
-; 0000 01D3     break;
 ;PCODE: $00000E7F VOL: 0
-; 0000 01D4     case 14:
 ;PCODE: $00000E80 VOL: 0
 ;PCODE: $00000E81 VOL: 0
 ;PCODE: $00000E82 VOL: 0
-; 0000 01D5     case 15:
 ;PCODE: $00000E83 VOL: 0
 ;PCODE: $00000E84 VOL: 0
 ;PCODE: $00000E85 VOL: 0
 ;PCODE: $00000E86 VOL: 0
 ;PCODE: $00000E87 VOL: 0
-; 0000 01D6     case 16:
 ;PCODE: $00000E88 VOL: 0
 ;PCODE: $00000E89 VOL: 0
 ;PCODE: $00000E8A VOL: 0
 ;PCODE: $00000E8B VOL: 0
 ;PCODE: $00000E8C VOL: 0
-; 0000 01D7       SSD1963_PutString16("КНТ", X, Y, Color, BLACK);
 ;PCODE: $00000E8D VOL: 0
 ;PCODE: $00000E8E VOL: 0
 ;PCODE: $00000E8F VOL: 0
 ;PCODE: $00000E90 VOL: 0
 ;PCODE: $00000E91 VOL: 0
 ;PCODE: $00000E92 VOL: 0
+; 0000 01CE     break;
 ;PCODE: $00000E93 VOL: 0
+; 0000 01CF     case 14:
 ;PCODE: $00000E94 VOL: 0
 ;PCODE: $00000E95 VOL: 0
 ;PCODE: $00000E96 VOL: 0
-; 0000 01D8       SSD1963_PutString16("БЫСТАЦП", X, Y + FONT_HEIGHT, Color, BLACK);
+; 0000 01D0     case 15:
 ;PCODE: $00000E97 VOL: 0
 ;PCODE: $00000E98 VOL: 0
 ;PCODE: $00000E99 VOL: 0
 ;PCODE: $00000E9A VOL: 0
 ;PCODE: $00000E9B VOL: 0
+; 0000 01D1     case 16:
 ;PCODE: $00000E9C VOL: 0
 ;PCODE: $00000E9D VOL: 0
 ;PCODE: $00000E9E VOL: 0
 ;PCODE: $00000E9F VOL: 0
 ;PCODE: $00000EA0 VOL: 0
+; 0000 01D2       SSD1963_PutString16("КНТ", X, Y, Color, BLACK);
 ;PCODE: $00000EA1 VOL: 0
 ;PCODE: $00000EA2 VOL: 0
-; 0000 01D9       X += Value_Lenght;
 ;PCODE: $00000EA3 VOL: 0
 ;PCODE: $00000EA4 VOL: 0
-; 0000 01DA       SSD1963_PutValue16(ConfigValue[9], X, Y, 3, Color, (Number==14)?DGRAY:BLACK);
 ;PCODE: $00000EA5 VOL: 0
 ;PCODE: $00000EA6 VOL: 0
 ;PCODE: $00000EA7 VOL: 0
 ;PCODE: $00000EA8 VOL: 0
 ;PCODE: $00000EA9 VOL: 0
 ;PCODE: $00000EAA VOL: 0
+; 0000 01D3       SSD1963_PutString16("БЫСТАЦП", X, Y + FONT_HEIGHT, Color, BLACK);
 ;PCODE: $00000EAB VOL: 0
 ;PCODE: $00000EAC VOL: 0
 ;PCODE: $00000EAD VOL: 0
@@ -6510,13 +6506,13 @@ _0x104:
 ;PCODE: $00000EB4 VOL: 0
 ;PCODE: $00000EB5 VOL: 0
 ;PCODE: $00000EB6 VOL: 0
+; 0000 01D4       X += Value_Lenght;
 ;PCODE: $00000EB7 VOL: 0
 ;PCODE: $00000EB8 VOL: 0
+; 0000 01D5       SSD1963_PutValue16(ConfigValue[9], X, Y, 3, Color, (Number==14)?DGRAY:BLACK);
 ;PCODE: $00000EB9 VOL: 0
-; 0000 01DB       X += Value_Lenght;
 ;PCODE: $00000EBA VOL: 0
 ;PCODE: $00000EBB VOL: 0
-; 0000 01DC       SSD1963_PutValue16(ConfigValue[10], X, Y, 3, Color, (Number==15)?DGRAY:BLACK);
 ;PCODE: $00000EBC VOL: 0
 ;PCODE: $00000EBD VOL: 0
 ;PCODE: $00000EBE VOL: 0
@@ -6535,13 +6531,13 @@ _0x104:
 ;PCODE: $00000ECB VOL: 0
 ;PCODE: $00000ECC VOL: 0
 ;PCODE: $00000ECD VOL: 0
+; 0000 01D6       X += Value_Lenght;
 ;PCODE: $00000ECE VOL: 0
 ;PCODE: $00000ECF VOL: 0
+; 0000 01D7       SSD1963_PutValue16(ConfigValue[10], X, Y, 3, Color, (Number==15)?DGRAY:BLACK);
 ;PCODE: $00000ED0 VOL: 0
-; 0000 01DD       Y += FONT_HEIGHT;
 ;PCODE: $00000ED1 VOL: 0
 ;PCODE: $00000ED2 VOL: 0
-; 0000 01DE       SSD1963_PutValue16(ConfigValue[11], X, Y, 1, Color, (Number==16)?DGRAY:BLACK);
 ;PCODE: $00000ED3 VOL: 0
 ;PCODE: $00000ED4 VOL: 0
 ;PCODE: $00000ED5 VOL: 0
@@ -6560,46 +6556,20 @@ _0x104:
 ;PCODE: $00000EE2 VOL: 0
 ;PCODE: $00000EE3 VOL: 0
 ;PCODE: $00000EE4 VOL: 0
+; 0000 01D8       Y += FONT_HEIGHT;
 ;PCODE: $00000EE5 VOL: 0
 ;PCODE: $00000EE6 VOL: 0
+; 0000 01D9       SSD1963_PutValue16(ConfigValue[11], X, Y, 1, Color, (Number==16)?DGRAY:BLACK);
 ;PCODE: $00000EE7 VOL: 0
-; 0000 01DF     break;
 ;PCODE: $00000EE8 VOL: 0
-; 0000 01E0   }
 ;PCODE: $00000EE9 VOL: 0
-; 0000 01E1 }
 ;PCODE: $00000EEA VOL: 0
 ;PCODE: $00000EEB VOL: 0
 ;PCODE: $00000EEC VOL: 0
 ;PCODE: $00000EED VOL: 0
-
-	.DSEG
-_0x123:
-	.BYTE 0xCA
-;
-;//Функция вывода напряжения(тока) и частоты
-;void PutParameterValue(char v1, char v2, char v3, char fHz)
-; 0000 01E5 {
-
-	.CSEG
 ;PCODE: $00000EEE VOL: 0
 ;PCODE: $00000EEF VOL: 0
-; 0000 01E6     int X = Value_StartX;
-; 0000 01E7     int Y = Value_StartY ;
-; 0000 01E8     unsigned int Color = BLUE;
-; 0000 01E9 
-; 0000 01EA     //SSD1963_PutString16("            ", X, Y, Color, BLACK);
-; 0000 01EB     //SSD1963_PutString16("            ", X, Y + FONT_HEIGHT, Color, BLACK);
-; 0000 01EC 
-; 0000 01ED     if(ParameterState != 2)
 ;PCODE: $00000EF0 VOL: 0
-;	v1 -> Y+9
-;	v2 -> Y+8
-;	v3 -> Y+7
-;	fHz -> Y+6
-;	X -> R16,R17
-;	Y -> R18,R19
-;	Color -> R20,R21
 ;PCODE: $00000EF1 VOL: 0
 ;PCODE: $00000EF2 VOL: 0
 ;PCODE: $00000EF3 VOL: 0
@@ -6609,23 +6579,47 @@ _0x123:
 ;PCODE: $00000EF7 VOL: 0
 ;PCODE: $00000EF8 VOL: 0
 ;PCODE: $00000EF9 VOL: 0
-; 0000 01EE     {
-; 0000 01EF         SSD1963_PutValue16(v1, X, Y, 3, Color, BLACK);
 ;PCODE: $00000EFA VOL: 0
 ;PCODE: $00000EFB VOL: 0
+; 0000 01DA     break;
 ;PCODE: $00000EFC VOL: 0
+; 0000 01DB   }
 ;PCODE: $00000EFD VOL: 0
+; 0000 01DC }
 ;PCODE: $00000EFE VOL: 0
 ;PCODE: $00000EFF VOL: 0
 ;PCODE: $00000F00 VOL: 0
 ;PCODE: $00000F01 VOL: 0
+
+	.DSEG
+_0x127:
+	.BYTE 0xCA
+;
+;//Функция вывода напряжения(тока) и частоты
+;void PutParameterValue(char v1, char v2, char v3, char fHz)
+; 0000 01E0 {
+
+	.CSEG
 ;PCODE: $00000F02 VOL: 0
 ;PCODE: $00000F03 VOL: 0
+; 0000 01E1     int X = Value_StartX;
+; 0000 01E2     int Y = Value_StartY ;
+; 0000 01E3     unsigned int Color = BLUE;
+; 0000 01E4 
+; 0000 01E5     //SSD1963_PutString16("            ", X, Y, Color, BLACK);
+; 0000 01E6     //SSD1963_PutString16("            ", X, Y + FONT_HEIGHT, Color, BLACK);
+; 0000 01E7 
+; 0000 01E8     if(ParameterState != 2)
 ;PCODE: $00000F04 VOL: 0
-; 0000 01F0         X += Value_Lenght;
+;	v1 -> Y+9
+;	v2 -> Y+8
+;	v3 -> Y+7
+;	fHz -> Y+6
+;	X -> R16,R17
+;	Y -> R18,R19
+;	Color -> R20,R21
 ;PCODE: $00000F05 VOL: 0
 ;PCODE: $00000F06 VOL: 0
-; 0000 01F1         SSD1963_PutValue16(v2, X, Y, 3, Color, BLACK);
 ;PCODE: $00000F07 VOL: 0
 ;PCODE: $00000F08 VOL: 0
 ;PCODE: $00000F09 VOL: 0
@@ -6633,59 +6627,56 @@ _0x123:
 ;PCODE: $00000F0B VOL: 0
 ;PCODE: $00000F0C VOL: 0
 ;PCODE: $00000F0D VOL: 0
+; 0000 01E9     {
+; 0000 01EA         SSD1963_PutValue16(v1, X, Y, 3, Color, BLACK);
 ;PCODE: $00000F0E VOL: 0
 ;PCODE: $00000F0F VOL: 0
 ;PCODE: $00000F10 VOL: 0
 ;PCODE: $00000F11 VOL: 0
-; 0000 01F2         X += Value_Lenght;
 ;PCODE: $00000F12 VOL: 0
 ;PCODE: $00000F13 VOL: 0
-; 0000 01F3         SSD1963_PutValue16(v3, X, Y, 3, Color, BLACK);
 ;PCODE: $00000F14 VOL: 0
 ;PCODE: $00000F15 VOL: 0
 ;PCODE: $00000F16 VOL: 0
 ;PCODE: $00000F17 VOL: 0
 ;PCODE: $00000F18 VOL: 0
+; 0000 01EB         X += Value_Lenght;
 ;PCODE: $00000F19 VOL: 0
 ;PCODE: $00000F1A VOL: 0
+; 0000 01EC         SSD1963_PutValue16(v2, X, Y, 3, Color, BLACK);
 ;PCODE: $00000F1B VOL: 0
 ;PCODE: $00000F1C VOL: 0
 ;PCODE: $00000F1D VOL: 0
 ;PCODE: $00000F1E VOL: 0
-; 0000 01F4         X = Value_StartX + Value_Lenght;
 ;PCODE: $00000F1F VOL: 0
 ;PCODE: $00000F20 VOL: 0
-; 0000 01F5         Y += FONT_HEIGHT;
 ;PCODE: $00000F21 VOL: 0
 ;PCODE: $00000F22 VOL: 0
-; 0000 01F6         SSD1963_PutValue16(fHz, X, Y, 3, Color, BLACK);
 ;PCODE: $00000F23 VOL: 0
 ;PCODE: $00000F24 VOL: 0
 ;PCODE: $00000F25 VOL: 0
+; 0000 01ED         X += Value_Lenght;
 ;PCODE: $00000F26 VOL: 0
 ;PCODE: $00000F27 VOL: 0
+; 0000 01EE         SSD1963_PutValue16(v3, X, Y, 3, Color, BLACK);
 ;PCODE: $00000F28 VOL: 0
 ;PCODE: $00000F29 VOL: 0
 ;PCODE: $00000F2A VOL: 0
 ;PCODE: $00000F2B VOL: 0
 ;PCODE: $00000F2C VOL: 0
 ;PCODE: $00000F2D VOL: 0
-; 0000 01F7         X += Value_Lenght;
 ;PCODE: $00000F2E VOL: 0
 ;PCODE: $00000F2F VOL: 0
-; 0000 01F8         //SSD1963_PutString16("ГЦ", X, Y, Color, BLACK);
-; 0000 01F9     }
-; 0000 01FA     else
 ;PCODE: $00000F30 VOL: 0
 ;PCODE: $00000F31 VOL: 0
-; 0000 01FB     {
-; 0000 01FC         X += Value_Lenght;
 ;PCODE: $00000F32 VOL: 0
+; 0000 01EF         X = Value_StartX + Value_Lenght;
 ;PCODE: $00000F33 VOL: 0
-; 0000 01FD         SSD1963_PutValue16(v1, X, Y, 3, Color, BLACK);
 ;PCODE: $00000F34 VOL: 0
+; 0000 01F0         Y += FONT_HEIGHT;
 ;PCODE: $00000F35 VOL: 0
 ;PCODE: $00000F36 VOL: 0
+; 0000 01F1         SSD1963_PutValue16(fHz, X, Y, 3, Color, BLACK);
 ;PCODE: $00000F37 VOL: 0
 ;PCODE: $00000F38 VOL: 0
 ;PCODE: $00000F39 VOL: 0
@@ -6694,52 +6685,41 @@ _0x123:
 ;PCODE: $00000F3C VOL: 0
 ;PCODE: $00000F3D VOL: 0
 ;PCODE: $00000F3E VOL: 0
-; 0000 01FE         Y += FONT_HEIGHT;
 ;PCODE: $00000F3F VOL: 0
 ;PCODE: $00000F40 VOL: 0
-; 0000 01FF         SSD1963_PutValue16(v2, X, Y, 3, Color, BLACK);
 ;PCODE: $00000F41 VOL: 0
+; 0000 01F2         X += Value_Lenght;
 ;PCODE: $00000F42 VOL: 0
 ;PCODE: $00000F43 VOL: 0
+; 0000 01F3         //SSD1963_PutString16("ГЦ", X, Y, Color, BLACK);
+; 0000 01F4     }
+; 0000 01F5     else
 ;PCODE: $00000F44 VOL: 0
 ;PCODE: $00000F45 VOL: 0
+; 0000 01F6     {
+; 0000 01F7         X += Value_Lenght;
 ;PCODE: $00000F46 VOL: 0
 ;PCODE: $00000F47 VOL: 0
+; 0000 01F8         SSD1963_PutValue16(v1, X, Y, 3, Color, BLACK);
 ;PCODE: $00000F48 VOL: 0
 ;PCODE: $00000F49 VOL: 0
 ;PCODE: $00000F4A VOL: 0
 ;PCODE: $00000F4B VOL: 0
-; 0000 0200     }
 ;PCODE: $00000F4C VOL: 0
-; 0000 0201 }
 ;PCODE: $00000F4D VOL: 0
 ;PCODE: $00000F4E VOL: 0
 ;PCODE: $00000F4F VOL: 0
 ;PCODE: $00000F50 VOL: 0
-;
-;void StartPaint()
-; 0000 0204 {
 ;PCODE: $00000F51 VOL: 0
 ;PCODE: $00000F52 VOL: 0
-; 0000 0205     //Чтоб первая точка легла
-; 0000 0206     Graph_X = -Graph_X_Step;
+; 0000 01F9         Y += FONT_HEIGHT;
 ;PCODE: $00000F53 VOL: 0
 ;PCODE: $00000F54 VOL: 0
-; 0000 0207 }
+; 0000 01FA         SSD1963_PutValue16(v2, X, Y, 3, Color, BLACK);
 ;PCODE: $00000F55 VOL: 0
 ;PCODE: $00000F56 VOL: 0
-;
-;inline void Paint_Phase(void)
-; 0000 020A {
 ;PCODE: $00000F57 VOL: 0
 ;PCODE: $00000F58 VOL: 0
-; 0000 020B     signed int Value[3];
-; 0000 020C     unsigned int Color[] = {RED, YELLOW, GREEN};
-; 0000 020D     signed int Lenght = Graph_X + (Graph_X_Step * Graph_Step_N);
-; 0000 020E     signed int mid = Graph_Y_Mid;
-; 0000 020F     char i, j;
-; 0000 0210 
-; 0000 0211     if(Graph_X > Graph_X_Max)  //Некуда дальше
 ;PCODE: $00000F59 VOL: 0
 ;PCODE: $00000F5A VOL: 0
 ;PCODE: $00000F5B VOL: 0
@@ -6747,32 +6727,41 @@ _0x123:
 ;PCODE: $00000F5D VOL: 0
 ;PCODE: $00000F5E VOL: 0
 ;PCODE: $00000F5F VOL: 0
+; 0000 01FB     }
 ;PCODE: $00000F60 VOL: 0
+; 0000 01FC }
 ;PCODE: $00000F61 VOL: 0
 ;PCODE: $00000F62 VOL: 0
 ;PCODE: $00000F63 VOL: 0
 ;PCODE: $00000F64 VOL: 0
+;
+;void StartPaint()
+; 0000 01FF {
 ;PCODE: $00000F65 VOL: 0
 ;PCODE: $00000F66 VOL: 0
-;	Value -> Y+12
-;	Color -> Y+6
-;	Lenght -> R16,R17
-;	mid -> R18,R19
-;	i -> R21
-;	j -> R20
+; 0000 0200     //Чтоб первая точка легла
+; 0000 0201     Graph_X = -Graph_X_Step;
 ;PCODE: $00000F67 VOL: 0
 ;PCODE: $00000F68 VOL: 0
+; 0000 0202 }
 ;PCODE: $00000F69 VOL: 0
 ;PCODE: $00000F6A VOL: 0
+;
+;inline void Paint_Phase(void)
+; 0000 0205 {
 ;PCODE: $00000F6B VOL: 0
 ;PCODE: $00000F6C VOL: 0
+; 0000 0206     signed int Value[3];
+; 0000 0207     unsigned int Color[] = {RED, YELLOW, GREEN};
+; 0000 0208     signed int Lenght = Graph_X + (Graph_X_Step * Graph_Step_N);
+; 0000 0209     signed int mid = Graph_Y_Mid;
+; 0000 020A     char i, j;
+; 0000 020B 
+; 0000 020C     if(Graph_X > Graph_X_Max)  //Некуда дальше
 ;PCODE: $00000F6D VOL: 0
 ;PCODE: $00000F6E VOL: 0
-; 0000 0212     {
-; 0000 0213         GraphUpdTime = GraphUpd_mSec;
 ;PCODE: $00000F6F VOL: 0
 ;PCODE: $00000F70 VOL: 0
-; 0000 0214         while(rx_counter0) getchar0();
 ;PCODE: $00000F71 VOL: 0
 ;PCODE: $00000F72 VOL: 0
 ;PCODE: $00000F73 VOL: 0
@@ -6780,13 +6769,15 @@ _0x123:
 ;PCODE: $00000F75 VOL: 0
 ;PCODE: $00000F76 VOL: 0
 ;PCODE: $00000F77 VOL: 0
-; 0000 0215 GraphState = 0;
 ;PCODE: $00000F78 VOL: 0
 ;PCODE: $00000F79 VOL: 0
-; 0000 0216     }
-; 0000 0217 
-; 0000 0218     if( rx_counter0 < 2 || (rx_counter0 < 3 && ParameterState != 2))
 ;PCODE: $00000F7A VOL: 0
+;	Value -> Y+12
+;	Color -> Y+6
+;	Lenght -> R16,R17
+;	mid -> R18,R19
+;	i -> R21
+;	j -> R20
 ;PCODE: $00000F7B VOL: 0
 ;PCODE: $00000F7C VOL: 0
 ;PCODE: $00000F7D VOL: 0
@@ -6795,69 +6786,69 @@ _0x123:
 ;PCODE: $00000F80 VOL: 0
 ;PCODE: $00000F81 VOL: 0
 ;PCODE: $00000F82 VOL: 0
+; 0000 020D     {
+; 0000 020E         GraphUpdTime = GraphUpd_mSec;
 ;PCODE: $00000F83 VOL: 0
 ;PCODE: $00000F84 VOL: 0
+; 0000 020F         while(rx_counter0) getchar0();
 ;PCODE: $00000F85 VOL: 0
 ;PCODE: $00000F86 VOL: 0
 ;PCODE: $00000F87 VOL: 0
-; 0000 0219     {
-; 0000 021A         if(GraphUpd_mSec > 100)
 ;PCODE: $00000F88 VOL: 0
 ;PCODE: $00000F89 VOL: 0
 ;PCODE: $00000F8A VOL: 0
-; 0000 021B         {
-; 0000 021C             GraphUpdTime = GraphUpd_mSec;
 ;PCODE: $00000F8B VOL: 0
+; 0000 0210 GraphState = 0;
 ;PCODE: $00000F8C VOL: 0
-; 0000 021D             while(rx_counter0) getchar0();
 ;PCODE: $00000F8D VOL: 0
+; 0000 0211     }
+; 0000 0212 
+; 0000 0213     if( rx_counter0 < 2 || (rx_counter0 < 3 && ParameterState != 2))
 ;PCODE: $00000F8E VOL: 0
 ;PCODE: $00000F8F VOL: 0
 ;PCODE: $00000F90 VOL: 0
 ;PCODE: $00000F91 VOL: 0
 ;PCODE: $00000F92 VOL: 0
 ;PCODE: $00000F93 VOL: 0
-; 0000 021E GraphState = 0;
 ;PCODE: $00000F94 VOL: 0
 ;PCODE: $00000F95 VOL: 0
-; 0000 021F         }
-; 0000 0220     }
 ;PCODE: $00000F96 VOL: 0
-; 0000 0221 
-; 0000 0222     if(GraphState == 0 || (TOUCH_IRQ < 1 && Touch_mSec > 50)) goto _return; //Увеличиваем
 ;PCODE: $00000F97 VOL: 0
 ;PCODE: $00000F98 VOL: 0
 ;PCODE: $00000F99 VOL: 0
 ;PCODE: $00000F9A VOL: 0
 ;PCODE: $00000F9B VOL: 0
+; 0000 0214     {
+; 0000 0215         if(GraphUpd_mSec > 100)
 ;PCODE: $00000F9C VOL: 0
 ;PCODE: $00000F9D VOL: 0
 ;PCODE: $00000F9E VOL: 0
+; 0000 0216         {
+; 0000 0217             GraphUpdTime = GraphUpd_mSec;
 ;PCODE: $00000F9F VOL: 0
 ;PCODE: $00000FA0 VOL: 0
+; 0000 0218             while(rx_counter0) getchar0();
 ;PCODE: $00000FA1 VOL: 0
 ;PCODE: $00000FA2 VOL: 0
 ;PCODE: $00000FA3 VOL: 0
 ;PCODE: $00000FA4 VOL: 0
 ;PCODE: $00000FA5 VOL: 0
 ;PCODE: $00000FA6 VOL: 0
-; 0000 0223 
-; 0000 0224     if(Lenght > Graph_X_Max) Lenght = Graph_X_Max;
 ;PCODE: $00000FA7 VOL: 0
+; 0000 0219 GraphState = 0;
 ;PCODE: $00000FA8 VOL: 0
 ;PCODE: $00000FA9 VOL: 0
+; 0000 021A         }
+; 0000 021B     }
 ;PCODE: $00000FAA VOL: 0
+; 0000 021C 
+; 0000 021D     if(GraphState == 0 || (TOUCH_IRQ < 1 && Touch_mSec > 50)) goto _return; //Увеличиваем
 ;PCODE: $00000FAB VOL: 0
 ;PCODE: $00000FAC VOL: 0
-; 0000 0225 
-; 0000 0226     if(Graph_X >= Graph_X_Min)
 ;PCODE: $00000FAD VOL: 0
 ;PCODE: $00000FAE VOL: 0
 ;PCODE: $00000FAF VOL: 0
 ;PCODE: $00000FB0 VOL: 0
-; 0000 0227     {
-; 0000 0228         // очищаем перед собой столбец пикселей
-; 0000 0229         SSD1963_DrawFillRect(Graph_X, Lenght+2, Graph_Y_Min, Graph_Y_Max+1, BLACK);
 ;PCODE: $00000FB1 VOL: 0
 ;PCODE: $00000FB2 VOL: 0
 ;PCODE: $00000FB3 VOL: 0
@@ -6868,19 +6859,23 @@ _0x123:
 ;PCODE: $00000FB8 VOL: 0
 ;PCODE: $00000FB9 VOL: 0
 ;PCODE: $00000FBA VOL: 0
+; 0000 021E 
+; 0000 021F     if(Lenght > Graph_X_Max) Lenght = Graph_X_Max;
 ;PCODE: $00000FBB VOL: 0
 ;PCODE: $00000FBC VOL: 0
-; 0000 022A         //Линия нуля
-; 0000 022B         SSD1963_DrawFastLine(Graph_X, Lenght, mid, mid, DGRAY);
 ;PCODE: $00000FBD VOL: 0
 ;PCODE: $00000FBE VOL: 0
 ;PCODE: $00000FBF VOL: 0
 ;PCODE: $00000FC0 VOL: 0
+; 0000 0220 
+; 0000 0221     if(Graph_X >= Graph_X_Min)
 ;PCODE: $00000FC1 VOL: 0
 ;PCODE: $00000FC2 VOL: 0
 ;PCODE: $00000FC3 VOL: 0
 ;PCODE: $00000FC4 VOL: 0
-; 0000 022C         SSD1963_DrawFastLine(Graph_X, Lenght, mid+45, mid+45, DGRAY);
+; 0000 0222     {
+; 0000 0223         // очищаем перед собой столбец пикселей
+; 0000 0224         SSD1963_DrawFillRect(Graph_X, Lenght+2, Graph_Y_Min, Graph_Y_Max+1, BLACK);
 ;PCODE: $00000FC5 VOL: 0
 ;PCODE: $00000FC6 VOL: 0
 ;PCODE: $00000FC7 VOL: 0
@@ -6893,7 +6888,8 @@ _0x123:
 ;PCODE: $00000FCE VOL: 0
 ;PCODE: $00000FCF VOL: 0
 ;PCODE: $00000FD0 VOL: 0
-; 0000 022D         SSD1963_DrawFastLine(Graph_X, Lenght, mid-45, mid-45, DGRAY);
+; 0000 0225         //Линия нуля
+; 0000 0226         SSD1963_DrawFastLine(Graph_X, Lenght, mid, mid, DGRAY);
 ;PCODE: $00000FD1 VOL: 0
 ;PCODE: $00000FD2 VOL: 0
 ;PCODE: $00000FD3 VOL: 0
@@ -6902,11 +6898,11 @@ _0x123:
 ;PCODE: $00000FD6 VOL: 0
 ;PCODE: $00000FD7 VOL: 0
 ;PCODE: $00000FD8 VOL: 0
+; 0000 0227         SSD1963_DrawFastLine(Graph_X, Lenght, mid+45, mid+45, DGRAY);
 ;PCODE: $00000FD9 VOL: 0
 ;PCODE: $00000FDA VOL: 0
 ;PCODE: $00000FDB VOL: 0
 ;PCODE: $00000FDC VOL: 0
-; 0000 022E         SSD1963_DrawFastLine(Graph_X, Lenght, mid+90, mid+90, DGRAY);
 ;PCODE: $00000FDD VOL: 0
 ;PCODE: $00000FDE VOL: 0
 ;PCODE: $00000FDF VOL: 0
@@ -6915,11 +6911,11 @@ _0x123:
 ;PCODE: $00000FE2 VOL: 0
 ;PCODE: $00000FE3 VOL: 0
 ;PCODE: $00000FE4 VOL: 0
+; 0000 0228         SSD1963_DrawFastLine(Graph_X, Lenght, mid-45, mid-45, DGRAY);
 ;PCODE: $00000FE5 VOL: 0
 ;PCODE: $00000FE6 VOL: 0
 ;PCODE: $00000FE7 VOL: 0
 ;PCODE: $00000FE8 VOL: 0
-; 0000 022F         SSD1963_DrawFastLine(Graph_X, Lenght, mid-90, mid-90, DGRAY);
 ;PCODE: $00000FE9 VOL: 0
 ;PCODE: $00000FEA VOL: 0
 ;PCODE: $00000FEB VOL: 0
@@ -6928,13 +6924,11 @@ _0x123:
 ;PCODE: $00000FEE VOL: 0
 ;PCODE: $00000FEF VOL: 0
 ;PCODE: $00000FF0 VOL: 0
+; 0000 0229         SSD1963_DrawFastLine(Graph_X, Lenght, mid+90, mid+90, DGRAY);
 ;PCODE: $00000FF1 VOL: 0
 ;PCODE: $00000FF2 VOL: 0
 ;PCODE: $00000FF3 VOL: 0
 ;PCODE: $00000FF4 VOL: 0
-; 0000 0230     }
-; 0000 0231 
-; 0000 0232     if(TOUCH_IRQ < 1 && Touch_mSec > 60) goto _return; //Отзывчивость
 ;PCODE: $00000FF5 VOL: 0
 ;PCODE: $00000FF6 VOL: 0
 ;PCODE: $00000FF7 VOL: 0
@@ -6943,47 +6937,45 @@ _0x123:
 ;PCODE: $00000FFA VOL: 0
 ;PCODE: $00000FFB VOL: 0
 ;PCODE: $00000FFC VOL: 0
+; 0000 022A         SSD1963_DrawFastLine(Graph_X, Lenght, mid-90, mid-90, DGRAY);
 ;PCODE: $00000FFD VOL: 0
 ;PCODE: $00000FFE VOL: 0
 ;PCODE: $00000FFF VOL: 0
 ;PCODE: $00001000 VOL: 0
 ;PCODE: $00001001 VOL: 0
-; 0000 0233 
-; 0000 0234     if(ParameterState != 2)
 ;PCODE: $00001002 VOL: 0
 ;PCODE: $00001003 VOL: 0
 ;PCODE: $00001004 VOL: 0
 ;PCODE: $00001005 VOL: 0
-; 0000 0235     {
-; 0000 0236         for(j=0; j<Graph_Step_N; j++)
 ;PCODE: $00001006 VOL: 0
 ;PCODE: $00001007 VOL: 0
 ;PCODE: $00001008 VOL: 0
+; 0000 022B     }
+; 0000 022C 
+; 0000 022D     if(TOUCH_IRQ < 1 && Touch_mSec > 60) goto _return; //Отзывчивость
 ;PCODE: $00001009 VOL: 0
 ;PCODE: $0000100A VOL: 0
 ;PCODE: $0000100B VOL: 0
 ;PCODE: $0000100C VOL: 0
 ;PCODE: $0000100D VOL: 0
 ;PCODE: $0000100E VOL: 0
-; 0000 0237         {
-; 0000 0238             if(Graph_X > Graph_X_Max) break;
 ;PCODE: $0000100F VOL: 0
 ;PCODE: $00001010 VOL: 0
 ;PCODE: $00001011 VOL: 0
 ;PCODE: $00001012 VOL: 0
-; 0000 0239             Lenght = Graph_X + Graph_X_Step;
 ;PCODE: $00001013 VOL: 0
 ;PCODE: $00001014 VOL: 0
 ;PCODE: $00001015 VOL: 0
+; 0000 022E 
+; 0000 022F     if(ParameterState != 2)
 ;PCODE: $00001016 VOL: 0
-; 0000 023A             if(Lenght > Graph_X_Max) Lenght = Graph_X_Max;
 ;PCODE: $00001017 VOL: 0
 ;PCODE: $00001018 VOL: 0
 ;PCODE: $00001019 VOL: 0
+; 0000 0230     {
+; 0000 0231         for(j=0; j<Graph_Step_N; j++)
 ;PCODE: $0000101A VOL: 0
 ;PCODE: $0000101B VOL: 0
-; 0000 023B 
-; 0000 023C             if(rx_counter0 < 3 || (TOUCH_IRQ < 1 && Touch_mSec > 70)) goto _return; //Интерфейса
 ;PCODE: $0000101C VOL: 0
 ;PCODE: $0000101D VOL: 0
 ;PCODE: $0000101E VOL: 0
@@ -6991,31 +6983,31 @@ _0x123:
 ;PCODE: $00001020 VOL: 0
 ;PCODE: $00001021 VOL: 0
 ;PCODE: $00001022 VOL: 0
+; 0000 0232         {
+; 0000 0233             if(Graph_X > Graph_X_Max) break;
 ;PCODE: $00001023 VOL: 0
 ;PCODE: $00001024 VOL: 0
 ;PCODE: $00001025 VOL: 0
 ;PCODE: $00001026 VOL: 0
+; 0000 0234             Lenght = Graph_X + Graph_X_Step;
 ;PCODE: $00001027 VOL: 0
 ;PCODE: $00001028 VOL: 0
 ;PCODE: $00001029 VOL: 0
 ;PCODE: $0000102A VOL: 0
+; 0000 0235             if(Lenght > Graph_X_Max) Lenght = Graph_X_Max;
 ;PCODE: $0000102B VOL: 0
-; 0000 023D 
-; 0000 023E             Value[0] = getchar0();
 ;PCODE: $0000102C VOL: 0
 ;PCODE: $0000102D VOL: 0
 ;PCODE: $0000102E VOL: 0
 ;PCODE: $0000102F VOL: 0
-; 0000 023F             Value[1] = getchar0();
+; 0000 0236 
+; 0000 0237             if(rx_counter0 < 3 || (TOUCH_IRQ < 1 && Touch_mSec > 70)) goto _return; //Интерфейса
 ;PCODE: $00001030 VOL: 0
 ;PCODE: $00001031 VOL: 0
 ;PCODE: $00001032 VOL: 0
-; 0000 0240             Value[2] = getchar0();
 ;PCODE: $00001033 VOL: 0
 ;PCODE: $00001034 VOL: 0
 ;PCODE: $00001035 VOL: 0
-; 0000 0241 
-; 0000 0242             for(i=0; i<3; i++)
 ;PCODE: $00001036 VOL: 0
 ;PCODE: $00001037 VOL: 0
 ;PCODE: $00001038 VOL: 0
@@ -7025,29 +7017,34 @@ _0x123:
 ;PCODE: $0000103C VOL: 0
 ;PCODE: $0000103D VOL: 0
 ;PCODE: $0000103E VOL: 0
-; 0000 0243             {
-; 0000 0244                 Value[i] = 128 - Value[i];
 ;PCODE: $0000103F VOL: 0
+; 0000 0238 
+; 0000 0239             Value[0] = getchar0();
 ;PCODE: $00001040 VOL: 0
 ;PCODE: $00001041 VOL: 0
 ;PCODE: $00001042 VOL: 0
 ;PCODE: $00001043 VOL: 0
+; 0000 023A             Value[1] = getchar0();
 ;PCODE: $00001044 VOL: 0
 ;PCODE: $00001045 VOL: 0
 ;PCODE: $00001046 VOL: 0
+; 0000 023B             Value[2] = getchar0();
 ;PCODE: $00001047 VOL: 0
 ;PCODE: $00001048 VOL: 0
 ;PCODE: $00001049 VOL: 0
+; 0000 023C 
+; 0000 023D             for(i=0; i<3; i++)
 ;PCODE: $0000104A VOL: 0
 ;PCODE: $0000104B VOL: 0
 ;PCODE: $0000104C VOL: 0
 ;PCODE: $0000104D VOL: 0
 ;PCODE: $0000104E VOL: 0
 ;PCODE: $0000104F VOL: 0
-; 0000 0245                 Value[i] *= ConfigValue[ParameterState];
 ;PCODE: $00001050 VOL: 0
 ;PCODE: $00001051 VOL: 0
 ;PCODE: $00001052 VOL: 0
+; 0000 023E             {
+; 0000 023F                 Value[i] = 128 - Value[i];
 ;PCODE: $00001053 VOL: 0
 ;PCODE: $00001054 VOL: 0
 ;PCODE: $00001055 VOL: 0
@@ -7062,17 +7059,16 @@ _0x123:
 ;PCODE: $0000105E VOL: 0
 ;PCODE: $0000105F VOL: 0
 ;PCODE: $00001060 VOL: 0
-; 0000 0246                 Value[i] >>= 7;
 ;PCODE: $00001061 VOL: 0
 ;PCODE: $00001062 VOL: 0
 ;PCODE: $00001063 VOL: 0
+; 0000 0240                 Value[i] *= ConfigValue[ParameterState];
 ;PCODE: $00001064 VOL: 0
 ;PCODE: $00001065 VOL: 0
 ;PCODE: $00001066 VOL: 0
 ;PCODE: $00001067 VOL: 0
 ;PCODE: $00001068 VOL: 0
 ;PCODE: $00001069 VOL: 0
-; 0000 0247                 if(Value[i]&0x0100) Value[i] |= 0xFF00;
 ;PCODE: $0000106A VOL: 0
 ;PCODE: $0000106B VOL: 0
 ;PCODE: $0000106C VOL: 0
@@ -7084,23 +7080,22 @@ _0x123:
 ;PCODE: $00001072 VOL: 0
 ;PCODE: $00001073 VOL: 0
 ;PCODE: $00001074 VOL: 0
+; 0000 0241                 Value[i] >>= 7;
 ;PCODE: $00001075 VOL: 0
 ;PCODE: $00001076 VOL: 0
 ;PCODE: $00001077 VOL: 0
 ;PCODE: $00001078 VOL: 0
 ;PCODE: $00001079 VOL: 0
-; 0000 0248 
-; 0000 0249                 Value[i] += mid;
 ;PCODE: $0000107A VOL: 0
 ;PCODE: $0000107B VOL: 0
 ;PCODE: $0000107C VOL: 0
 ;PCODE: $0000107D VOL: 0
+; 0000 0242                 if(Value[i]&0x0100) Value[i] |= 0xFF00;
 ;PCODE: $0000107E VOL: 0
 ;PCODE: $0000107F VOL: 0
 ;PCODE: $00001080 VOL: 0
 ;PCODE: $00001081 VOL: 0
 ;PCODE: $00001082 VOL: 0
-; 0000 024A                 if(Value[i] > Graph_Y_Max) Value[i] = Graph_Y_Max;
 ;PCODE: $00001083 VOL: 0
 ;PCODE: $00001084 VOL: 0
 ;PCODE: $00001085 VOL: 0
@@ -7112,16 +7107,18 @@ _0x123:
 ;PCODE: $0000108B VOL: 0
 ;PCODE: $0000108C VOL: 0
 ;PCODE: $0000108D VOL: 0
+; 0000 0243 
+; 0000 0244                 Value[i] += mid;
 ;PCODE: $0000108E VOL: 0
 ;PCODE: $0000108F VOL: 0
 ;PCODE: $00001090 VOL: 0
 ;PCODE: $00001091 VOL: 0
-; 0000 024B                 if(Value[i] < Graph_Y_Min) Value[i] = Graph_Y_Min;
 ;PCODE: $00001092 VOL: 0
 ;PCODE: $00001093 VOL: 0
 ;PCODE: $00001094 VOL: 0
 ;PCODE: $00001095 VOL: 0
 ;PCODE: $00001096 VOL: 0
+; 0000 0245                 if(Value[i] > Graph_Y_Max) Value[i] = Graph_Y_Max;
 ;PCODE: $00001097 VOL: 0
 ;PCODE: $00001098 VOL: 0
 ;PCODE: $00001099 VOL: 0
@@ -7133,14 +7130,11 @@ _0x123:
 ;PCODE: $0000109F VOL: 0
 ;PCODE: $000010A0 VOL: 0
 ;PCODE: $000010A1 VOL: 0
-; 0000 024C 
-; 0000 024D                 if(Graph_X >= Graph_X_Min)
 ;PCODE: $000010A2 VOL: 0
 ;PCODE: $000010A3 VOL: 0
 ;PCODE: $000010A4 VOL: 0
 ;PCODE: $000010A5 VOL: 0
-; 0000 024E                 {   // пишем точку в столбце
-; 0000 024F                     SSD1963_DrawLine(Graph_X, Lenght, ValueLast[i], Value[i], Color[i], 2);
+; 0000 0246                 if(Value[i] < Graph_Y_Min) Value[i] = Graph_Y_Min;
 ;PCODE: $000010A6 VOL: 0
 ;PCODE: $000010A7 VOL: 0
 ;PCODE: $000010A8 VOL: 0
@@ -7157,10 +7151,14 @@ _0x123:
 ;PCODE: $000010B3 VOL: 0
 ;PCODE: $000010B4 VOL: 0
 ;PCODE: $000010B5 VOL: 0
+; 0000 0247 
+; 0000 0248                 if(Graph_X >= Graph_X_Min)
 ;PCODE: $000010B6 VOL: 0
 ;PCODE: $000010B7 VOL: 0
 ;PCODE: $000010B8 VOL: 0
 ;PCODE: $000010B9 VOL: 0
+; 0000 0249                 {   // пишем точку в столбце
+; 0000 024A                     SSD1963_DrawLine(Graph_X, Lenght, ValueLast[i], Value[i], Color[i], 2);
 ;PCODE: $000010BA VOL: 0
 ;PCODE: $000010BB VOL: 0
 ;PCODE: $000010BC VOL: 0
@@ -7168,9 +7166,6 @@ _0x123:
 ;PCODE: $000010BE VOL: 0
 ;PCODE: $000010BF VOL: 0
 ;PCODE: $000010C0 VOL: 0
-; 0000 0250                 }
-; 0000 0251                     // определяем предыдущую точку диограммы
-; 0000 0252                     ValueLast[i] = Value[i];
 ;PCODE: $000010C1 VOL: 0
 ;PCODE: $000010C2 VOL: 0
 ;PCODE: $000010C3 VOL: 0
@@ -7186,56 +7181,53 @@ _0x123:
 ;PCODE: $000010CD VOL: 0
 ;PCODE: $000010CE VOL: 0
 ;PCODE: $000010CF VOL: 0
-; 0000 0253             }
 ;PCODE: $000010D0 VOL: 0
 ;PCODE: $000010D1 VOL: 0
 ;PCODE: $000010D2 VOL: 0
 ;PCODE: $000010D3 VOL: 0
 ;PCODE: $000010D4 VOL: 0
-; 0000 0254             Graph_X += Graph_X_Step; // увеличеваем Х диограммы
+; 0000 024B                 }
+; 0000 024C                     // определяем предыдущую точку диограммы
+; 0000 024D                     ValueLast[i] = Value[i];
 ;PCODE: $000010D5 VOL: 0
 ;PCODE: $000010D6 VOL: 0
 ;PCODE: $000010D7 VOL: 0
-; 0000 0255         }
 ;PCODE: $000010D8 VOL: 0
 ;PCODE: $000010D9 VOL: 0
 ;PCODE: $000010DA VOL: 0
 ;PCODE: $000010DB VOL: 0
 ;PCODE: $000010DC VOL: 0
-; 0000 0256     }
-; 0000 0257     else
 ;PCODE: $000010DD VOL: 0
 ;PCODE: $000010DE VOL: 0
-; 0000 0258     {
-; 0000 0259         for(j=0; j<Graph_Step_N; j++)
 ;PCODE: $000010DF VOL: 0
 ;PCODE: $000010E0 VOL: 0
 ;PCODE: $000010E1 VOL: 0
 ;PCODE: $000010E2 VOL: 0
 ;PCODE: $000010E3 VOL: 0
+; 0000 024E             }
 ;PCODE: $000010E4 VOL: 0
 ;PCODE: $000010E5 VOL: 0
 ;PCODE: $000010E6 VOL: 0
 ;PCODE: $000010E7 VOL: 0
-; 0000 025A         {
-; 0000 025B             if(Graph_X > Graph_X_Max) break;
 ;PCODE: $000010E8 VOL: 0
+; 0000 024F             Graph_X += Graph_X_Step; // увеличеваем Х диограммы
 ;PCODE: $000010E9 VOL: 0
 ;PCODE: $000010EA VOL: 0
 ;PCODE: $000010EB VOL: 0
-; 0000 025C             Lenght = Graph_X + Graph_X_Step;
+; 0000 0250         }
 ;PCODE: $000010EC VOL: 0
 ;PCODE: $000010ED VOL: 0
 ;PCODE: $000010EE VOL: 0
 ;PCODE: $000010EF VOL: 0
-; 0000 025D             if(Lenght > Graph_X_Max) Lenght = Graph_X_Max;
 ;PCODE: $000010F0 VOL: 0
+; 0000 0251     }
+; 0000 0252     else
 ;PCODE: $000010F1 VOL: 0
 ;PCODE: $000010F2 VOL: 0
+; 0000 0253     {
+; 0000 0254         for(j=0; j<Graph_Step_N; j++)
 ;PCODE: $000010F3 VOL: 0
 ;PCODE: $000010F4 VOL: 0
-; 0000 025E 
-; 0000 025F             if(rx_counter0 < 2 || (TOUCH_IRQ < 1 && Touch_mSec > 70)) goto _return;
 ;PCODE: $000010F5 VOL: 0
 ;PCODE: $000010F6 VOL: 0
 ;PCODE: $000010F7 VOL: 0
@@ -7243,27 +7235,28 @@ _0x123:
 ;PCODE: $000010F9 VOL: 0
 ;PCODE: $000010FA VOL: 0
 ;PCODE: $000010FB VOL: 0
+; 0000 0255         {
+; 0000 0256             if(Graph_X > Graph_X_Max) break;
 ;PCODE: $000010FC VOL: 0
 ;PCODE: $000010FD VOL: 0
 ;PCODE: $000010FE VOL: 0
 ;PCODE: $000010FF VOL: 0
+; 0000 0257             Lenght = Graph_X + Graph_X_Step;
 ;PCODE: $00001100 VOL: 0
 ;PCODE: $00001101 VOL: 0
 ;PCODE: $00001102 VOL: 0
 ;PCODE: $00001103 VOL: 0
+; 0000 0258             if(Lenght > Graph_X_Max) Lenght = Graph_X_Max;
 ;PCODE: $00001104 VOL: 0
-; 0000 0260 
-; 0000 0261             Value[0] = getchar0();
 ;PCODE: $00001105 VOL: 0
 ;PCODE: $00001106 VOL: 0
 ;PCODE: $00001107 VOL: 0
 ;PCODE: $00001108 VOL: 0
-; 0000 0262             Value[1] = getchar0();
+; 0000 0259 
+; 0000 025A             if(rx_counter0 < 2 || (TOUCH_IRQ < 1 && Touch_mSec > 70)) goto _return;
 ;PCODE: $00001109 VOL: 0
 ;PCODE: $0000110A VOL: 0
 ;PCODE: $0000110B VOL: 0
-; 0000 0263 
-; 0000 0264             for(i=0; i<2; i++)
 ;PCODE: $0000110C VOL: 0
 ;PCODE: $0000110D VOL: 0
 ;PCODE: $0000110E VOL: 0
@@ -7273,29 +7266,33 @@ _0x123:
 ;PCODE: $00001112 VOL: 0
 ;PCODE: $00001113 VOL: 0
 ;PCODE: $00001114 VOL: 0
-; 0000 0265             {
-; 0000 0266                 Value[i] = 128 - Value[i];
 ;PCODE: $00001115 VOL: 0
 ;PCODE: $00001116 VOL: 0
 ;PCODE: $00001117 VOL: 0
 ;PCODE: $00001118 VOL: 0
+; 0000 025B 
+; 0000 025C             Value[0] = getchar0();
 ;PCODE: $00001119 VOL: 0
 ;PCODE: $0000111A VOL: 0
 ;PCODE: $0000111B VOL: 0
 ;PCODE: $0000111C VOL: 0
+; 0000 025D             Value[1] = getchar0();
 ;PCODE: $0000111D VOL: 0
 ;PCODE: $0000111E VOL: 0
 ;PCODE: $0000111F VOL: 0
+; 0000 025E 
+; 0000 025F             for(i=0; i<2; i++)
 ;PCODE: $00001120 VOL: 0
 ;PCODE: $00001121 VOL: 0
 ;PCODE: $00001122 VOL: 0
 ;PCODE: $00001123 VOL: 0
 ;PCODE: $00001124 VOL: 0
 ;PCODE: $00001125 VOL: 0
-; 0000 0267                 Value[i] *= ConfigValue[ParameterState];
 ;PCODE: $00001126 VOL: 0
 ;PCODE: $00001127 VOL: 0
 ;PCODE: $00001128 VOL: 0
+; 0000 0260             {
+; 0000 0261                 Value[i] = 128 - Value[i];
 ;PCODE: $00001129 VOL: 0
 ;PCODE: $0000112A VOL: 0
 ;PCODE: $0000112B VOL: 0
@@ -7310,17 +7307,16 @@ _0x123:
 ;PCODE: $00001134 VOL: 0
 ;PCODE: $00001135 VOL: 0
 ;PCODE: $00001136 VOL: 0
-; 0000 0268                 Value[i] >>= 7;
 ;PCODE: $00001137 VOL: 0
 ;PCODE: $00001138 VOL: 0
 ;PCODE: $00001139 VOL: 0
+; 0000 0262                 Value[i] *= ConfigValue[ParameterState];
 ;PCODE: $0000113A VOL: 0
 ;PCODE: $0000113B VOL: 0
 ;PCODE: $0000113C VOL: 0
 ;PCODE: $0000113D VOL: 0
 ;PCODE: $0000113E VOL: 0
 ;PCODE: $0000113F VOL: 0
-; 0000 0269                 if(Value[i]&0x0100) Value[i] |= 0xFF00;
 ;PCODE: $00001140 VOL: 0
 ;PCODE: $00001141 VOL: 0
 ;PCODE: $00001142 VOL: 0
@@ -7332,17 +7328,17 @@ _0x123:
 ;PCODE: $00001148 VOL: 0
 ;PCODE: $00001149 VOL: 0
 ;PCODE: $0000114A VOL: 0
+; 0000 0263                 Value[i] >>= 7;
 ;PCODE: $0000114B VOL: 0
 ;PCODE: $0000114C VOL: 0
 ;PCODE: $0000114D VOL: 0
 ;PCODE: $0000114E VOL: 0
 ;PCODE: $0000114F VOL: 0
-; 0000 026A 
-; 0000 026B                 Value[i] += mid + ((i==1)?(45):(-45));
 ;PCODE: $00001150 VOL: 0
 ;PCODE: $00001151 VOL: 0
 ;PCODE: $00001152 VOL: 0
 ;PCODE: $00001153 VOL: 0
+; 0000 0264                 if(Value[i]&0x0100) Value[i] |= 0xFF00;
 ;PCODE: $00001154 VOL: 0
 ;PCODE: $00001155 VOL: 0
 ;PCODE: $00001156 VOL: 0
@@ -7359,9 +7355,10 @@ _0x123:
 ;PCODE: $00001161 VOL: 0
 ;PCODE: $00001162 VOL: 0
 ;PCODE: $00001163 VOL: 0
+; 0000 0265 
+; 0000 0266                 Value[i] += mid + ((i==1)?(45):(-45));
 ;PCODE: $00001164 VOL: 0
 ;PCODE: $00001165 VOL: 0
-; 0000 026C                 if(Value[i] > Graph_Y_Max) Value[i] = Graph_Y_Max;
 ;PCODE: $00001166 VOL: 0
 ;PCODE: $00001167 VOL: 0
 ;PCODE: $00001168 VOL: 0
@@ -7377,12 +7374,12 @@ _0x123:
 ;PCODE: $00001172 VOL: 0
 ;PCODE: $00001173 VOL: 0
 ;PCODE: $00001174 VOL: 0
-; 0000 026D                 if(Value[i] < Graph_Y_Min) Value[i] = Graph_Y_Min;
 ;PCODE: $00001175 VOL: 0
 ;PCODE: $00001176 VOL: 0
 ;PCODE: $00001177 VOL: 0
 ;PCODE: $00001178 VOL: 0
 ;PCODE: $00001179 VOL: 0
+; 0000 0267                 if(Value[i] > Graph_Y_Max) Value[i] = Graph_Y_Max;
 ;PCODE: $0000117A VOL: 0
 ;PCODE: $0000117B VOL: 0
 ;PCODE: $0000117C VOL: 0
@@ -7394,14 +7391,11 @@ _0x123:
 ;PCODE: $00001182 VOL: 0
 ;PCODE: $00001183 VOL: 0
 ;PCODE: $00001184 VOL: 0
-; 0000 026E 
-; 0000 026F                 if(Graph_X >= Graph_X_Min)
 ;PCODE: $00001185 VOL: 0
 ;PCODE: $00001186 VOL: 0
 ;PCODE: $00001187 VOL: 0
 ;PCODE: $00001188 VOL: 0
-; 0000 0270                 {   // пишем точку в столбце
-; 0000 0271                     SSD1963_DrawLine(Graph_X, Lenght, ValueLast[i], Value[i], Color[i], 2);
+; 0000 0268                 if(Value[i] < Graph_Y_Min) Value[i] = Graph_Y_Min;
 ;PCODE: $00001189 VOL: 0
 ;PCODE: $0000118A VOL: 0
 ;PCODE: $0000118B VOL: 0
@@ -7418,10 +7412,14 @@ _0x123:
 ;PCODE: $00001196 VOL: 0
 ;PCODE: $00001197 VOL: 0
 ;PCODE: $00001198 VOL: 0
+; 0000 0269 
+; 0000 026A                 if(Graph_X >= Graph_X_Min)
 ;PCODE: $00001199 VOL: 0
 ;PCODE: $0000119A VOL: 0
 ;PCODE: $0000119B VOL: 0
 ;PCODE: $0000119C VOL: 0
+; 0000 026B                 {   // пишем точку в столбце
+; 0000 026C                     SSD1963_DrawLine(Graph_X, Lenght, ValueLast[i], Value[i], Color[i], 2);
 ;PCODE: $0000119D VOL: 0
 ;PCODE: $0000119E VOL: 0
 ;PCODE: $0000119F VOL: 0
@@ -7429,9 +7427,6 @@ _0x123:
 ;PCODE: $000011A1 VOL: 0
 ;PCODE: $000011A2 VOL: 0
 ;PCODE: $000011A3 VOL: 0
-; 0000 0272                 }
-; 0000 0273                     // определяем предыдущую точку диограммы
-; 0000 0274                     ValueLast[i] = Value[i];
 ;PCODE: $000011A4 VOL: 0
 ;PCODE: $000011A5 VOL: 0
 ;PCODE: $000011A6 VOL: 0
@@ -7447,181 +7442,179 @@ _0x123:
 ;PCODE: $000011B0 VOL: 0
 ;PCODE: $000011B1 VOL: 0
 ;PCODE: $000011B2 VOL: 0
-; 0000 0275             }
 ;PCODE: $000011B3 VOL: 0
 ;PCODE: $000011B4 VOL: 0
 ;PCODE: $000011B5 VOL: 0
 ;PCODE: $000011B6 VOL: 0
 ;PCODE: $000011B7 VOL: 0
-; 0000 0276             Graph_X += Graph_X_Step; // увеличеваем Х диограммы
+; 0000 026D                 }
+; 0000 026E                     // определяем предыдущую точку диограммы
+; 0000 026F                     ValueLast[i] = Value[i];
 ;PCODE: $000011B8 VOL: 0
 ;PCODE: $000011B9 VOL: 0
 ;PCODE: $000011BA VOL: 0
-; 0000 0277         }
 ;PCODE: $000011BB VOL: 0
 ;PCODE: $000011BC VOL: 0
 ;PCODE: $000011BD VOL: 0
 ;PCODE: $000011BE VOL: 0
 ;PCODE: $000011BF VOL: 0
-; 0000 0278     }
 ;PCODE: $000011C0 VOL: 0
-; 0000 0279     _return:;
 ;PCODE: $000011C1 VOL: 0
-; 0000 027A }
 ;PCODE: $000011C2 VOL: 0
 ;PCODE: $000011C3 VOL: 0
 ;PCODE: $000011C4 VOL: 0
 ;PCODE: $000011C5 VOL: 0
-;
-;//Функция посылающаа управление куда подальше
-;inline void TestParameterFun(char aa, char bb, char cc, char fHz)
-; 0000 027E {
 ;PCODE: $000011C6 VOL: 0
+; 0000 0270             }
 ;PCODE: $000011C7 VOL: 0
-; 0000 027F     if(aa>101 || aa<99 || bb>101 || bb<99 || cc>101 || cc<99)
-;	aa -> Y+3
-;	bb -> Y+2
-;	cc -> Y+1
-;	fHz -> Y+0
 ;PCODE: $000011C8 VOL: 0
 ;PCODE: $000011C9 VOL: 0
 ;PCODE: $000011CA VOL: 0
 ;PCODE: $000011CB VOL: 0
+; 0000 0271             Graph_X += Graph_X_Step; // увеличеваем Х диограммы
 ;PCODE: $000011CC VOL: 0
 ;PCODE: $000011CD VOL: 0
 ;PCODE: $000011CE VOL: 0
+; 0000 0272         }
 ;PCODE: $000011CF VOL: 0
 ;PCODE: $000011D0 VOL: 0
 ;PCODE: $000011D1 VOL: 0
 ;PCODE: $000011D2 VOL: 0
 ;PCODE: $000011D3 VOL: 0
+; 0000 0273     }
 ;PCODE: $000011D4 VOL: 0
+; 0000 0274     _return:;
 ;PCODE: $000011D5 VOL: 0
+; 0000 0275 }
 ;PCODE: $000011D6 VOL: 0
 ;PCODE: $000011D7 VOL: 0
 ;PCODE: $000011D8 VOL: 0
 ;PCODE: $000011D9 VOL: 0
+;
+;//Функция посылающаа управление куда подальше
+;inline void TestParameterFun(char a, char b, char c, char fHz)
+; 0000 0279 {
 ;PCODE: $000011DA VOL: 0
 ;PCODE: $000011DB VOL: 0
-; 0000 0280     {
-; 0000 0281         AddTxData(0x66);
+; 0000 027A     if(a>101 || a<99 || b>101 || b<99 || c>101 || c<99)
+;	a -> Y+3
+;	b -> Y+2
+;	c -> Y+1
+;	fHz -> Y+0
 ;PCODE: $000011DC VOL: 0
 ;PCODE: $000011DD VOL: 0
 ;PCODE: $000011DE VOL: 0
-; 0000 0282         AddTxData(0x06);
 ;PCODE: $000011DF VOL: 0
 ;PCODE: $000011E0 VOL: 0
 ;PCODE: $000011E1 VOL: 0
-; 0000 0283         AddTxData(0x60);
 ;PCODE: $000011E2 VOL: 0
 ;PCODE: $000011E3 VOL: 0
 ;PCODE: $000011E4 VOL: 0
-; 0000 0284         AddTxData(aa);
 ;PCODE: $000011E5 VOL: 0
 ;PCODE: $000011E6 VOL: 0
 ;PCODE: $000011E7 VOL: 0
-; 0000 0285         AddTxData(bb);
 ;PCODE: $000011E8 VOL: 0
 ;PCODE: $000011E9 VOL: 0
 ;PCODE: $000011EA VOL: 0
-; 0000 0286         AddTxData(cc);
 ;PCODE: $000011EB VOL: 0
 ;PCODE: $000011EC VOL: 0
 ;PCODE: $000011ED VOL: 0
-; 0000 0287         StartTransmit();
 ;PCODE: $000011EE VOL: 0
-; 0000 0288     }
-; 0000 0289 
-; 0000 028A     if(fHz < 49 || fHz > 50)
 ;PCODE: $000011EF VOL: 0
+; 0000 027B     {
+; 0000 027C         AddTxData(0x66);
 ;PCODE: $000011F0 VOL: 0
 ;PCODE: $000011F1 VOL: 0
 ;PCODE: $000011F2 VOL: 0
+; 0000 027D         AddTxData(0x06);
 ;PCODE: $000011F3 VOL: 0
 ;PCODE: $000011F4 VOL: 0
 ;PCODE: $000011F5 VOL: 0
+; 0000 027E         AddTxData(0x60);
 ;PCODE: $000011F6 VOL: 0
 ;PCODE: $000011F7 VOL: 0
-; 0000 028B     {
-; 0000 028C         AddTxData(0x01);
 ;PCODE: $000011F8 VOL: 0
+; 0000 027F         AddTxData(a);
 ;PCODE: $000011F9 VOL: 0
 ;PCODE: $000011FA VOL: 0
-; 0000 028D         AddTxData(0x06);
 ;PCODE: $000011FB VOL: 0
+; 0000 0280         AddTxData(b);
 ;PCODE: $000011FC VOL: 0
 ;PCODE: $000011FD VOL: 0
-; 0000 028E         AddTxData(0x20);
 ;PCODE: $000011FE VOL: 0
+; 0000 0281         AddTxData(c);
 ;PCODE: $000011FF VOL: 0
 ;PCODE: $00001200 VOL: 0
-; 0000 028F         AddTxData(0x01); // установка скорости
 ;PCODE: $00001201 VOL: 0
+; 0000 0282         StartTransmit();
 ;PCODE: $00001202 VOL: 0
+; 0000 0283     }
+; 0000 0284 
+; 0000 0285     if(fHz < 49 || fHz > 50)
 ;PCODE: $00001203 VOL: 0
-; 0000 0290         AddTxData(50);  //Скорость Lo
 ;PCODE: $00001204 VOL: 0
 ;PCODE: $00001205 VOL: 0
 ;PCODE: $00001206 VOL: 0
-; 0000 0291         AddTxData(0);   //Скорость Hi
 ;PCODE: $00001207 VOL: 0
 ;PCODE: $00001208 VOL: 0
 ;PCODE: $00001209 VOL: 0
-; 0000 0292         StartTransmit();
 ;PCODE: $0000120A VOL: 0
-; 0000 0293     }
-; 0000 0294 }
 ;PCODE: $0000120B VOL: 0
+; 0000 0286     {
+; 0000 0287         AddTxData(0x01);
 ;PCODE: $0000120C VOL: 0
 ;PCODE: $0000120D VOL: 0
 ;PCODE: $0000120E VOL: 0
-;
-;void Save_Eeprom(char Number)
-; 0000 0297 {
+; 0000 0288         AddTxData(0x06);
 ;PCODE: $0000120F VOL: 0
 ;PCODE: $00001210 VOL: 0
-; 0000 0298     if(Number > 2)
-;	Number -> Y+0
 ;PCODE: $00001211 VOL: 0
+; 0000 0289         AddTxData(0x20);
 ;PCODE: $00001212 VOL: 0
 ;PCODE: $00001213 VOL: 0
-; 0000 0299     {
-; 0000 029A         putchar0_i('K');
 ;PCODE: $00001214 VOL: 0
+; 0000 028A         AddTxData(0x01); // установка скорости
 ;PCODE: $00001215 VOL: 0
 ;PCODE: $00001216 VOL: 0
-; 0000 029B         putchar0_i(Number-3);
 ;PCODE: $00001217 VOL: 0
+; 0000 028B         AddTxData(50);  //Скорость Lo
 ;PCODE: $00001218 VOL: 0
 ;PCODE: $00001219 VOL: 0
 ;PCODE: $0000121A VOL: 0
+; 0000 028C         AddTxData(0);   //Скорость Hi
 ;PCODE: $0000121B VOL: 0
-; 0000 029C         putchar0_i(ConfigValue[Number] & 0xFF);
 ;PCODE: $0000121C VOL: 0
 ;PCODE: $0000121D VOL: 0
+; 0000 028D         StartTransmit();
 ;PCODE: $0000121E VOL: 0
+; 0000 028E     }
+; 0000 028F }
 ;PCODE: $0000121F VOL: 0
 ;PCODE: $00001220 VOL: 0
 ;PCODE: $00001221 VOL: 0
 ;PCODE: $00001222 VOL: 0
+;
+;void Save_Eeprom(char Number)
+; 0000 0292 {
 ;PCODE: $00001223 VOL: 0
 ;PCODE: $00001224 VOL: 0
-; 0000 029D         putchar0_i(ConfigValue[Number] >> 8);
+; 0000 0293     if(Number > 2)
+;	Number -> Y+0
 ;PCODE: $00001225 VOL: 0
 ;PCODE: $00001226 VOL: 0
 ;PCODE: $00001227 VOL: 0
+; 0000 0294     {
+; 0000 0295         putchar0_i('K');
 ;PCODE: $00001228 VOL: 0
 ;PCODE: $00001229 VOL: 0
 ;PCODE: $0000122A VOL: 0
+; 0000 0296         putchar0_i(Number-3);
 ;PCODE: $0000122B VOL: 0
 ;PCODE: $0000122C VOL: 0
 ;PCODE: $0000122D VOL: 0
-; 0000 029E     }
-; 0000 029F     else
 ;PCODE: $0000122E VOL: 0
 ;PCODE: $0000122F VOL: 0
-; 0000 02A0     {
-; 0000 02A1         ConfigValue_mem[Number] = ConfigValue[Number];
+; 0000 0297         putchar0_i(ConfigValue[Number] & 0xFF);
 ;PCODE: $00001230 VOL: 0
 ;PCODE: $00001231 VOL: 0
 ;PCODE: $00001232 VOL: 0
@@ -7631,74 +7624,73 @@ _0x123:
 ;PCODE: $00001236 VOL: 0
 ;PCODE: $00001237 VOL: 0
 ;PCODE: $00001238 VOL: 0
+; 0000 0298         putchar0_i(ConfigValue[Number] >> 8);
 ;PCODE: $00001239 VOL: 0
 ;PCODE: $0000123A VOL: 0
 ;PCODE: $0000123B VOL: 0
 ;PCODE: $0000123C VOL: 0
 ;PCODE: $0000123D VOL: 0
-; 0000 02A2     }
 ;PCODE: $0000123E VOL: 0
-; 0000 02A3 
-; 0000 02A4 }
 ;PCODE: $0000123F VOL: 0
 ;PCODE: $00001240 VOL: 0
 ;PCODE: $00001241 VOL: 0
-;
-;inline void main_loop()  // основной рабочий режим
-; 0000 02A7 {
+; 0000 0299     }
+; 0000 029A     else
 ;PCODE: $00001242 VOL: 0
 ;PCODE: $00001243 VOL: 0
-; 0000 02A8     char fHz, a, b, c;
-; 0000 02A9 
-; 0000 02AA             switch(ValueState)
+; 0000 029B     {
+; 0000 029C         ConfigValue_mem[Number] = ConfigValue[Number];
 ;PCODE: $00001244 VOL: 0
+;PCODE: $00001245 VOL: 0
+;PCODE: $00001246 VOL: 0
+;PCODE: $00001247 VOL: 0
+;PCODE: $00001248 VOL: 0
+;PCODE: $00001249 VOL: 0
+;PCODE: $0000124A VOL: 0
+;PCODE: $0000124B VOL: 0
+;PCODE: $0000124C VOL: 0
+;PCODE: $0000124D VOL: 0
+;PCODE: $0000124E VOL: 0
+;PCODE: $0000124F VOL: 0
+;PCODE: $00001250 VOL: 0
+;PCODE: $00001251 VOL: 0
+; 0000 029D     }
+;PCODE: $00001252 VOL: 0
+; 0000 029E 
+; 0000 029F }
+;PCODE: $00001253 VOL: 0
+;PCODE: $00001254 VOL: 0
+;PCODE: $00001255 VOL: 0
+;
+;inline void main_loop()  // основной рабочий режим
+; 0000 02A2 {
+;PCODE: $00001256 VOL: 0
+;PCODE: $00001257 VOL: 0
+; 0000 02A3     char fHz, a, b, c;
+; 0000 02A4 
+; 0000 02A5             switch(ValueState)
+;PCODE: $00001258 VOL: 0
 ;	fHz -> R17
 ;	a -> R16
 ;	b -> R19
 ;	c -> R18
-;PCODE: $00001245 VOL: 0
-;PCODE: $00001246 VOL: 0
-; 0000 02AB             {
-; 0000 02AC                 case 0:
-;PCODE: $00001247 VOL: 0
-;PCODE: $00001248 VOL: 0
-; 0000 02AD                   if(ValueUpd_mSec > 200) //Надо обновить значения, но как?
-;PCODE: $00001249 VOL: 0
-;PCODE: $0000124A VOL: 0
-;PCODE: $0000124B VOL: 0
-; 0000 02AE                   {
-; 0000 02AF                       if(ValueState < 2)
-;PCODE: $0000124C VOL: 0
-;PCODE: $0000124D VOL: 0
-;PCODE: $0000124E VOL: 0
-; 0000 02B0                       {
-; 0000 02B1                           while(rx_counter2) getchar2();
-;PCODE: $0000124F VOL: 0
-;PCODE: $00001250 VOL: 0
-;PCODE: $00001251 VOL: 0
-;PCODE: $00001252 VOL: 0
-;PCODE: $00001253 VOL: 0
-;PCODE: $00001254 VOL: 0
-;PCODE: $00001255 VOL: 0
-; 0000 02B2 putchar2('S');
-;PCODE: $00001256 VOL: 0
-;PCODE: $00001257 VOL: 0
-;PCODE: $00001258 VOL: 0
-; 0000 02B3                           ValueState = 1;
 ;PCODE: $00001259 VOL: 0
 ;PCODE: $0000125A VOL: 0
-; 0000 02B4                           ValueUpd_mSec = 0;
+; 0000 02A6             {
+; 0000 02A7                 case 0:
 ;PCODE: $0000125B VOL: 0
 ;PCODE: $0000125C VOL: 0
-; 0000 02B5                       }
-; 0000 02B6                   }
+; 0000 02A8                   if(ValueUpd_mSec > 200) //Надо обновить значения, но как?
 ;PCODE: $0000125D VOL: 0
-; 0000 02B7                   if(GraphState == 0 && State == 0 && ValueState == 0) //Надо обновить график
 ;PCODE: $0000125E VOL: 0
 ;PCODE: $0000125F VOL: 0
+; 0000 02A9                   {
+; 0000 02AA                       if(ValueState < 2)
 ;PCODE: $00001260 VOL: 0
 ;PCODE: $00001261 VOL: 0
 ;PCODE: $00001262 VOL: 0
+; 0000 02AB                       {
+; 0000 02AC                           while(rx_counter2) getchar2();
 ;PCODE: $00001263 VOL: 0
 ;PCODE: $00001264 VOL: 0
 ;PCODE: $00001265 VOL: 0
@@ -7706,184 +7698,185 @@ _0x123:
 ;PCODE: $00001267 VOL: 0
 ;PCODE: $00001268 VOL: 0
 ;PCODE: $00001269 VOL: 0
+; 0000 02AD putchar2('S');
 ;PCODE: $0000126A VOL: 0
 ;PCODE: $0000126B VOL: 0
-; 0000 02B8                   {
-; 0000 02B9                       while(rx_counter0) getchar0();
 ;PCODE: $0000126C VOL: 0
+; 0000 02AE                           ValueState = 1;
 ;PCODE: $0000126D VOL: 0
 ;PCODE: $0000126E VOL: 0
+; 0000 02AF                           ValueUpd_mSec = 0;
 ;PCODE: $0000126F VOL: 0
 ;PCODE: $00001270 VOL: 0
+; 0000 02B0                       }
+; 0000 02B1                   }
 ;PCODE: $00001271 VOL: 0
+; 0000 02B2                   if(GraphState == 0 && State == 0 && ValueState == 0) //Надо обновить график
 ;PCODE: $00001272 VOL: 0
-; 0000 02BA switch(ParameterState)
 ;PCODE: $00001273 VOL: 0
 ;PCODE: $00001274 VOL: 0
-; 0000 02BB                       {
-; 0000 02BC                           case 0: putchar0('U'); break;
 ;PCODE: $00001275 VOL: 0
 ;PCODE: $00001276 VOL: 0
 ;PCODE: $00001277 VOL: 0
 ;PCODE: $00001278 VOL: 0
 ;PCODE: $00001279 VOL: 0
 ;PCODE: $0000127A VOL: 0
-; 0000 02BD                           case 1: putchar0('I'); break;
 ;PCODE: $0000127B VOL: 0
 ;PCODE: $0000127C VOL: 0
 ;PCODE: $0000127D VOL: 0
 ;PCODE: $0000127E VOL: 0
 ;PCODE: $0000127F VOL: 0
+; 0000 02B3                   {
+; 0000 02B4                       while(rx_counter0) getchar0();
 ;PCODE: $00001280 VOL: 0
 ;PCODE: $00001281 VOL: 0
-; 0000 02BE                           case 2: putchar0('Z'); break;
 ;PCODE: $00001282 VOL: 0
 ;PCODE: $00001283 VOL: 0
 ;PCODE: $00001284 VOL: 0
 ;PCODE: $00001285 VOL: 0
 ;PCODE: $00001286 VOL: 0
+; 0000 02B5 switch(ParameterState)
 ;PCODE: $00001287 VOL: 0
 ;PCODE: $00001288 VOL: 0
-; 0000 02BF                       }
+; 0000 02B6                       {
+; 0000 02B7                           case 0: putchar0('U'); break;
 ;PCODE: $00001289 VOL: 0
-; 0000 02C0                       ValueState = 2;
 ;PCODE: $0000128A VOL: 0
 ;PCODE: $0000128B VOL: 0
-; 0000 02C1                       GraphState = 1;
 ;PCODE: $0000128C VOL: 0
 ;PCODE: $0000128D VOL: 0
-; 0000 02C2 
-; 0000 02C3                       StartPaint();
 ;PCODE: $0000128E VOL: 0
-; 0000 02C4                       GraphUpd_mSec = 0;
+; 0000 02B8                           case 1: putchar0('I'); break;
 ;PCODE: $0000128F VOL: 0
 ;PCODE: $00001290 VOL: 0
-; 0000 02C5                       rx_buffer_overflow0 = 0;
 ;PCODE: $00001291 VOL: 0
 ;PCODE: $00001292 VOL: 0
-; 0000 02C6                   }
-; 0000 02C7                 break;
 ;PCODE: $00001293 VOL: 0
 ;PCODE: $00001294 VOL: 0
-; 0000 02C8                 case 1:
 ;PCODE: $00001295 VOL: 0
+; 0000 02B9                           case 2: putchar0('Z'); break;
 ;PCODE: $00001296 VOL: 0
 ;PCODE: $00001297 VOL: 0
-; 0000 02C9                   if(rx_counter2 > 8)
 ;PCODE: $00001298 VOL: 0
 ;PCODE: $00001299 VOL: 0
 ;PCODE: $0000129A VOL: 0
-; 0000 02CA                   {
-; 0000 02CB                       fHz = getchar2();
 ;PCODE: $0000129B VOL: 0
 ;PCODE: $0000129C VOL: 0
-; 0000 02CC                       a = getchar2();
+; 0000 02BA                       }
 ;PCODE: $0000129D VOL: 0
+; 0000 02BB                       ValueState = 2;
 ;PCODE: $0000129E VOL: 0
-; 0000 02CD                       b = getchar2();
 ;PCODE: $0000129F VOL: 0
+; 0000 02BC                       GraphState = 1;
 ;PCODE: $000012A0 VOL: 0
-; 0000 02CE                       c = getchar2();
 ;PCODE: $000012A1 VOL: 0
+; 0000 02BD 
+; 0000 02BE                       StartPaint();
 ;PCODE: $000012A2 VOL: 0
-; 0000 02CF                       TestParameterFun(a, b, c, fHz);
+; 0000 02BF                       GraphUpd_mSec = 0;
 ;PCODE: $000012A3 VOL: 0
 ;PCODE: $000012A4 VOL: 0
+; 0000 02C0                       rx_buffer_overflow0 = 0;
 ;PCODE: $000012A5 VOL: 0
 ;PCODE: $000012A6 VOL: 0
+; 0000 02C1                   }
+; 0000 02C2                 break;
 ;PCODE: $000012A7 VOL: 0
-; 0000 02D0 
-; 0000 02D1                       if(State == 0) //Надо обновить значения на дисплее
 ;PCODE: $000012A8 VOL: 0
+; 0000 02C3                 case 1:
 ;PCODE: $000012A9 VOL: 0
 ;PCODE: $000012AA VOL: 0
-; 0000 02D2                       {
-; 0000 02D3                         switch(ParameterState)
 ;PCODE: $000012AB VOL: 0
+; 0000 02C4                   if(rx_counter2 > 8)
 ;PCODE: $000012AC VOL: 0
-; 0000 02D4                         {
-; 0000 02D5                           case 2:
 ;PCODE: $000012AD VOL: 0
 ;PCODE: $000012AE VOL: 0
-; 0000 02D6                               {
-; 0000 02D7                               getchar2();
+; 0000 02C5                   {
+; 0000 02C6                       fHz = getchar2();
 ;PCODE: $000012AF VOL: 0
-; 0000 02D8                               getchar2();
 ;PCODE: $000012B0 VOL: 0
-; 0000 02D9                               getchar2();
+; 0000 02C7                       a = getchar2();
 ;PCODE: $000012B1 VOL: 0
-; 0000 02DA                               }
-; 0000 02DB                               a = getchar2();
 ;PCODE: $000012B2 VOL: 0
+; 0000 02C8                       b = getchar2();
 ;PCODE: $000012B3 VOL: 0
-; 0000 02DC                               b = getchar2();
 ;PCODE: $000012B4 VOL: 0
+; 0000 02C9                       c = getchar2();
 ;PCODE: $000012B5 VOL: 0
-; 0000 02DD                               PutParameterValue(a, b, c, fHz);
 ;PCODE: $000012B6 VOL: 0
+; 0000 02CA                       TestParameterFun(a, b, c, fHz);
 ;PCODE: $000012B7 VOL: 0
 ;PCODE: $000012B8 VOL: 0
 ;PCODE: $000012B9 VOL: 0
 ;PCODE: $000012BA VOL: 0
-; 0000 02DE                           break;
 ;PCODE: $000012BB VOL: 0
-; 0000 02DF                           case 1:
+; 0000 02CB 
+; 0000 02CC                       if(State == 0) //Надо обновить значения на дисплее
 ;PCODE: $000012BC VOL: 0
 ;PCODE: $000012BD VOL: 0
 ;PCODE: $000012BE VOL: 0
-; 0000 02E0                               a = getchar2();
+; 0000 02CD                       {
+; 0000 02CE                         switch(ParameterState)
 ;PCODE: $000012BF VOL: 0
 ;PCODE: $000012C0 VOL: 0
-; 0000 02E1                               b = getchar2();
+; 0000 02CF                         {
+; 0000 02D0                           case 2:
 ;PCODE: $000012C1 VOL: 0
 ;PCODE: $000012C2 VOL: 0
-; 0000 02E2                               c = getchar2();
+; 0000 02D1                               {
+; 0000 02D2                               getchar2();
 ;PCODE: $000012C3 VOL: 0
+; 0000 02D3                               getchar2();
 ;PCODE: $000012C4 VOL: 0
-; 0000 02E3                           case 0:
+; 0000 02D4                               getchar2();
 ;PCODE: $000012C5 VOL: 0
+; 0000 02D5                               }
+; 0000 02D6                               a = getchar2();
 ;PCODE: $000012C6 VOL: 0
 ;PCODE: $000012C7 VOL: 0
+; 0000 02D7                               b = getchar2();
 ;PCODE: $000012C8 VOL: 0
 ;PCODE: $000012C9 VOL: 0
-; 0000 02E4                               PutParameterValue(a, b, c, fHz);
+; 0000 02D8                               PutParameterValue(a, b, c, fHz);
 ;PCODE: $000012CA VOL: 0
 ;PCODE: $000012CB VOL: 0
 ;PCODE: $000012CC VOL: 0
 ;PCODE: $000012CD VOL: 0
 ;PCODE: $000012CE VOL: 0
-; 0000 02E5                           break;
+; 0000 02D9                           break;
 ;PCODE: $000012CF VOL: 0
-; 0000 02E6                         }
+; 0000 02DA                           case 1:
 ;PCODE: $000012D0 VOL: 0
-; 0000 02E7                       }
-; 0000 02E8 
-; 0000 02E9                       while(rx_counter2) getchar2();
 ;PCODE: $000012D1 VOL: 0
 ;PCODE: $000012D2 VOL: 0
+; 0000 02DB                               a = getchar2();
 ;PCODE: $000012D3 VOL: 0
 ;PCODE: $000012D4 VOL: 0
+; 0000 02DC                               b = getchar2();
 ;PCODE: $000012D5 VOL: 0
 ;PCODE: $000012D6 VOL: 0
+; 0000 02DD                               c = getchar2();
 ;PCODE: $000012D7 VOL: 0
 ;PCODE: $000012D8 VOL: 0
-; 0000 02EA ValueState = 0;
+; 0000 02DE                           case 0:
 ;PCODE: $000012D9 VOL: 0
 ;PCODE: $000012DA VOL: 0
-; 0000 02EB                   }
-; 0000 02EC                 break;
 ;PCODE: $000012DB VOL: 0
 ;PCODE: $000012DC VOL: 0
-; 0000 02ED                 case 2:
 ;PCODE: $000012DD VOL: 0
+; 0000 02DF                               PutParameterValue(a, b, c, fHz);
 ;PCODE: $000012DE VOL: 0
 ;PCODE: $000012DF VOL: 0
-; 0000 02EE                     if(ParameterState == 2 && GraphUpd_mSec < 80 && GraphUpd_mSec > 30)
 ;PCODE: $000012E0 VOL: 0
 ;PCODE: $000012E1 VOL: 0
 ;PCODE: $000012E2 VOL: 0
+; 0000 02E0                           break;
 ;PCODE: $000012E3 VOL: 0
+; 0000 02E1                         }
 ;PCODE: $000012E4 VOL: 0
+; 0000 02E2                       }
+; 0000 02E3 
+; 0000 02E4                       while(rx_counter2) getchar2();
 ;PCODE: $000012E5 VOL: 0
 ;PCODE: $000012E6 VOL: 0
 ;PCODE: $000012E7 VOL: 0
@@ -7892,112 +7885,113 @@ _0x123:
 ;PCODE: $000012EA VOL: 0
 ;PCODE: $000012EB VOL: 0
 ;PCODE: $000012EC VOL: 0
-; 0000 02EF                     {
-; 0000 02F0                         if(tx_counter0 == 0 && rx_buffer_overflow0 == 0) putchar0('Z'); //Вытягиваем недостающие точки
+; 0000 02E5 ValueState = 0;
 ;PCODE: $000012ED VOL: 0
 ;PCODE: $000012EE VOL: 0
+; 0000 02E6                   }
+; 0000 02E7                 break;
 ;PCODE: $000012EF VOL: 0
 ;PCODE: $000012F0 VOL: 0
+; 0000 02E8                 case 2:
 ;PCODE: $000012F1 VOL: 0
 ;PCODE: $000012F2 VOL: 0
 ;PCODE: $000012F3 VOL: 0
+; 0000 02E9                     if(ParameterState == 2 && GraphUpd_mSec < 80 && GraphUpd_mSec > 30)
 ;PCODE: $000012F4 VOL: 0
 ;PCODE: $000012F5 VOL: 0
 ;PCODE: $000012F6 VOL: 0
 ;PCODE: $000012F7 VOL: 0
 ;PCODE: $000012F8 VOL: 0
 ;PCODE: $000012F9 VOL: 0
-; 0000 02F1                     }
 ;PCODE: $000012FA VOL: 0
-; 0000 02F2                     if(GraphUpd_mSec > 200)
 ;PCODE: $000012FB VOL: 0
 ;PCODE: $000012FC VOL: 0
 ;PCODE: $000012FD VOL: 0
 ;PCODE: $000012FE VOL: 0
-; 0000 02F3                     {
-; 0000 02F4                         ValueState = 0;
 ;PCODE: $000012FF VOL: 0
 ;PCODE: $00001300 VOL: 0
-; 0000 02F5                     }
-; 0000 02F6                 break;
+; 0000 02EA                     {
+; 0000 02EB                         if(tx_counter0 == 0 && rx_buffer_overflow0 == 0) putchar0('Z'); //Вытягиваем недостающие точки
 ;PCODE: $00001301 VOL: 0
 ;PCODE: $00001302 VOL: 0
-; 0000 02F7             }
 ;PCODE: $00001303 VOL: 0
-; 0000 02F8 
-; 0000 02F9             switch(State)
 ;PCODE: $00001304 VOL: 0
 ;PCODE: $00001305 VOL: 0
-; 0000 02FA             {
-; 0000 02FB                 case 1:
 ;PCODE: $00001306 VOL: 0
 ;PCODE: $00001307 VOL: 0
-; 0000 02FC                     State = 0;
 ;PCODE: $00001308 VOL: 0
 ;PCODE: $00001309 VOL: 0
-; 0000 02FD                     Repaint_Button("МЕНЮ", 4, BLACK, WHITE);
 ;PCODE: $0000130A VOL: 0
 ;PCODE: $0000130B VOL: 0
 ;PCODE: $0000130C VOL: 0
 ;PCODE: $0000130D VOL: 0
+; 0000 02EC                     }
 ;PCODE: $0000130E VOL: 0
+; 0000 02ED                     if(GraphUpd_mSec > 230)
 ;PCODE: $0000130F VOL: 0
 ;PCODE: $00001310 VOL: 0
 ;PCODE: $00001311 VOL: 0
 ;PCODE: $00001312 VOL: 0
+; 0000 02EE                     {
+; 0000 02EF                         ValueState = 0;
 ;PCODE: $00001313 VOL: 0
-; 0000 02FE                     PutParameterText(ParameterState, BLUE);
 ;PCODE: $00001314 VOL: 0
+; 0000 02F0                     }
+; 0000 02F1                 break;
 ;PCODE: $00001315 VOL: 0
 ;PCODE: $00001316 VOL: 0
+; 0000 02F2             }
 ;PCODE: $00001317 VOL: 0
+; 0000 02F3 
+; 0000 02F4             switch(State)
 ;PCODE: $00001318 VOL: 0
-; 0000 02FF 
-; 0000 0300                 case 0: // основной рабочий режим
 ;PCODE: $00001319 VOL: 0
+; 0000 02F5             {
+; 0000 02F6                 case 1:
 ;PCODE: $0000131A VOL: 0
 ;PCODE: $0000131B VOL: 0
+; 0000 02F7                     State = 0;
 ;PCODE: $0000131C VOL: 0
 ;PCODE: $0000131D VOL: 0
-; 0000 0301                 {
-; 0000 0302                       if(GraphState) Paint_Phase(); //Рисуем график
+; 0000 02F8                     Repaint_Button("МЕНЮ", 4, BLACK, WHITE);
 ;PCODE: $0000131E VOL: 0
 ;PCODE: $0000131F VOL: 0
 ;PCODE: $00001320 VOL: 0
 ;PCODE: $00001321 VOL: 0
-; 0000 0303 
-; 0000 0304                       switch (GetButton())
 ;PCODE: $00001322 VOL: 0
 ;PCODE: $00001323 VOL: 0
-; 0000 0305                       {
-; 0000 0306                           case 1:  //Переключение графиков
 ;PCODE: $00001324 VOL: 0
 ;PCODE: $00001325 VOL: 0
-; 0000 0307                               if(++ParameterState > 2) ParameterState = 0;
 ;PCODE: $00001326 VOL: 0
 ;PCODE: $00001327 VOL: 0
+; 0000 02F9                     PutParameterText(ParameterState, BLUE);
 ;PCODE: $00001328 VOL: 0
 ;PCODE: $00001329 VOL: 0
 ;PCODE: $0000132A VOL: 0
 ;PCODE: $0000132B VOL: 0
 ;PCODE: $0000132C VOL: 0
-; 0000 0308                               PutParameterText(ParameterState, BLUE);
+; 0000 02FA 
+; 0000 02FB                 case 0: // основной рабочий режим
 ;PCODE: $0000132D VOL: 0
 ;PCODE: $0000132E VOL: 0
 ;PCODE: $0000132F VOL: 0
 ;PCODE: $00001330 VOL: 0
 ;PCODE: $00001331 VOL: 0
+; 0000 02FC                 {
+; 0000 02FD                       if(GraphState) Paint_Phase(); //Рисуем график
 ;PCODE: $00001332 VOL: 0
-; 0000 0309                           break;
 ;PCODE: $00001333 VOL: 0
-; 0000 030A                           case 2:
 ;PCODE: $00001334 VOL: 0
 ;PCODE: $00001335 VOL: 0
+; 0000 02FE 
+; 0000 02FF                       switch (GetButton())
 ;PCODE: $00001336 VOL: 0
-; 0000 030B                               if(ConfigValue[ParameterState] < ConfigParam[2][ParameterState])
 ;PCODE: $00001337 VOL: 0
+; 0000 0300                       {
+; 0000 0301                           case 1:  //Переключение графиков
 ;PCODE: $00001338 VOL: 0
 ;PCODE: $00001339 VOL: 0
+; 0000 0302                               if(++ParameterState > 2) ParameterState = 0;
 ;PCODE: $0000133A VOL: 0
 ;PCODE: $0000133B VOL: 0
 ;PCODE: $0000133C VOL: 0
@@ -8005,18 +7999,20 @@ _0x123:
 ;PCODE: $0000133E VOL: 0
 ;PCODE: $0000133F VOL: 0
 ;PCODE: $00001340 VOL: 0
+; 0000 0303                               PutParameterText(ParameterState, BLUE);
 ;PCODE: $00001341 VOL: 0
 ;PCODE: $00001342 VOL: 0
 ;PCODE: $00001343 VOL: 0
 ;PCODE: $00001344 VOL: 0
 ;PCODE: $00001345 VOL: 0
 ;PCODE: $00001346 VOL: 0
-; 0000 030C                               {
-; 0000 030D                                   ConfigValue[ParameterState] += ConfigParam[0][ParameterState];
+; 0000 0304                           break;
 ;PCODE: $00001347 VOL: 0
+; 0000 0305                           case 2:
 ;PCODE: $00001348 VOL: 0
 ;PCODE: $00001349 VOL: 0
 ;PCODE: $0000134A VOL: 0
+; 0000 0306                               if(ConfigValue[ParameterState] < ConfigParam[2][ParameterState])
 ;PCODE: $0000134B VOL: 0
 ;PCODE: $0000134C VOL: 0
 ;PCODE: $0000134D VOL: 0
@@ -8029,15 +8025,13 @@ _0x123:
 ;PCODE: $00001354 VOL: 0
 ;PCODE: $00001355 VOL: 0
 ;PCODE: $00001356 VOL: 0
-; 0000 030E                               }
-; 0000 030F                           break;
 ;PCODE: $00001357 VOL: 0
 ;PCODE: $00001358 VOL: 0
-; 0000 0310                           case 3:
 ;PCODE: $00001359 VOL: 0
 ;PCODE: $0000135A VOL: 0
+; 0000 0307                               {
+; 0000 0308                                   ConfigValue[ParameterState] += ConfigParam[0][ParameterState];
 ;PCODE: $0000135B VOL: 0
-; 0000 0311                               if(ConfigValue[ParameterState] > ConfigParam[1][ParameterState])
 ;PCODE: $0000135C VOL: 0
 ;PCODE: $0000135D VOL: 0
 ;PCODE: $0000135E VOL: 0
@@ -8053,13 +8047,15 @@ _0x123:
 ;PCODE: $00001368 VOL: 0
 ;PCODE: $00001369 VOL: 0
 ;PCODE: $0000136A VOL: 0
+; 0000 0309                               }
+; 0000 030A                           break;
 ;PCODE: $0000136B VOL: 0
-; 0000 0312                               {
-; 0000 0313                                   ConfigValue[ParameterState] -= ConfigParam[0][ParameterState];
 ;PCODE: $0000136C VOL: 0
+; 0000 030B                           case 3:
 ;PCODE: $0000136D VOL: 0
 ;PCODE: $0000136E VOL: 0
 ;PCODE: $0000136F VOL: 0
+; 0000 030C                               if(ConfigValue[ParameterState] > ConfigParam[1][ParameterState])
 ;PCODE: $00001370 VOL: 0
 ;PCODE: $00001371 VOL: 0
 ;PCODE: $00001372 VOL: 0
@@ -8073,103 +8069,98 @@ _0x123:
 ;PCODE: $0000137A VOL: 0
 ;PCODE: $0000137B VOL: 0
 ;PCODE: $0000137C VOL: 0
-; 0000 0314                               }
-; 0000 0315                           break;
 ;PCODE: $0000137D VOL: 0
 ;PCODE: $0000137E VOL: 0
-; 0000 0316                           case 4:  //Уходим в настройки
 ;PCODE: $0000137F VOL: 0
+; 0000 030D                               {
+; 0000 030E                                   ConfigValue[ParameterState] -= ConfigParam[0][ParameterState];
 ;PCODE: $00001380 VOL: 0
 ;PCODE: $00001381 VOL: 0
-; 0000 0317                                State = 4;
 ;PCODE: $00001382 VOL: 0
 ;PCODE: $00001383 VOL: 0
-; 0000 0318                           break;
 ;PCODE: $00001384 VOL: 0
-; 0000 0319                       }
 ;PCODE: $00001385 VOL: 0
-; 0000 031A                 }
-; 0000 031B                 break;
 ;PCODE: $00001386 VOL: 0
-; 0000 031C                 case 4:
 ;PCODE: $00001387 VOL: 0
 ;PCODE: $00001388 VOL: 0
 ;PCODE: $00001389 VOL: 0
-; 0000 031D                     State = 5;
 ;PCODE: $0000138A VOL: 0
 ;PCODE: $0000138B VOL: 0
-; 0000 031E                     ConfigState = 0;
 ;PCODE: $0000138C VOL: 0
 ;PCODE: $0000138D VOL: 0
-; 0000 031F                     Repaint_Button("НАЗАД", 4, BLACK, WHITE);
 ;PCODE: $0000138E VOL: 0
 ;PCODE: $0000138F VOL: 0
 ;PCODE: $00001390 VOL: 0
+; 0000 030F                               }
+; 0000 0310                           break;
 ;PCODE: $00001391 VOL: 0
 ;PCODE: $00001392 VOL: 0
+; 0000 0311                           case 4:  //Уходим в настройки
 ;PCODE: $00001393 VOL: 0
 ;PCODE: $00001394 VOL: 0
 ;PCODE: $00001395 VOL: 0
+; 0000 0312                                State = 4;
 ;PCODE: $00001396 VOL: 0
 ;PCODE: $00001397 VOL: 0
-; 0000 0320                     PutParameterText(ConfigState + State, PURPLE);
+; 0000 0313                           break;
 ;PCODE: $00001398 VOL: 0
+; 0000 0314                       }
 ;PCODE: $00001399 VOL: 0
+; 0000 0315                 }
+; 0000 0316                 break;
 ;PCODE: $0000139A VOL: 0
+; 0000 0317                 case 4:
 ;PCODE: $0000139B VOL: 0
 ;PCODE: $0000139C VOL: 0
 ;PCODE: $0000139D VOL: 0
+; 0000 0318                     State = 5;
 ;PCODE: $0000139E VOL: 0
-; 0000 0321                     old_confVal = ConfigValue[ConfigState];
 ;PCODE: $0000139F VOL: 0
+; 0000 0319                     ConfigState = 0;
 ;PCODE: $000013A0 VOL: 0
 ;PCODE: $000013A1 VOL: 0
+; 0000 031A                     Repaint_Button("НАЗАД", 4, BLACK, WHITE);
 ;PCODE: $000013A2 VOL: 0
 ;PCODE: $000013A3 VOL: 0
 ;PCODE: $000013A4 VOL: 0
 ;PCODE: $000013A5 VOL: 0
-; 0000 0322 
-; 0000 0323                 case 5: // настройки
 ;PCODE: $000013A6 VOL: 0
 ;PCODE: $000013A7 VOL: 0
 ;PCODE: $000013A8 VOL: 0
 ;PCODE: $000013A9 VOL: 0
 ;PCODE: $000013AA VOL: 0
-; 0000 0324                 {
-; 0000 0325                     switch (GetButton())
 ;PCODE: $000013AB VOL: 0
-; 0000 0326                     {
-; 0000 0327                         case 1:
+; 0000 031B                     PutParameterText(ConfigState + State, PURPLE);
 ;PCODE: $000013AC VOL: 0
 ;PCODE: $000013AD VOL: 0
-; 0000 0328                             if(old_confVal != ConfigValue[ConfigState])
 ;PCODE: $000013AE VOL: 0
 ;PCODE: $000013AF VOL: 0
 ;PCODE: $000013B0 VOL: 0
 ;PCODE: $000013B1 VOL: 0
 ;PCODE: $000013B2 VOL: 0
+; 0000 031C                     old_confVal = ConfigValue[ConfigState];
 ;PCODE: $000013B3 VOL: 0
 ;PCODE: $000013B4 VOL: 0
 ;PCODE: $000013B5 VOL: 0
 ;PCODE: $000013B6 VOL: 0
-; 0000 0329                             {
-; 0000 032A                                 //Сохраняем значение
-; 0000 032B                                 Save_Eeprom(ConfigState);
 ;PCODE: $000013B7 VOL: 0
 ;PCODE: $000013B8 VOL: 0
 ;PCODE: $000013B9 VOL: 0
-; 0000 032C                             }
-; 0000 032D 
-; 0000 032E                             if(++ConfigState > 11) ConfigState = 0;
+; 0000 031D 
+; 0000 031E                 case 5: // настройки
 ;PCODE: $000013BA VOL: 0
 ;PCODE: $000013BB VOL: 0
 ;PCODE: $000013BC VOL: 0
 ;PCODE: $000013BD VOL: 0
 ;PCODE: $000013BE VOL: 0
+; 0000 031F                 {
+; 0000 0320                     switch (GetButton())
 ;PCODE: $000013BF VOL: 0
+; 0000 0321                     {
+; 0000 0322                         case 1:
 ;PCODE: $000013C0 VOL: 0
 ;PCODE: $000013C1 VOL: 0
-; 0000 032F                             PutParameterText(ConfigState + State, PURPLE);
+; 0000 0323                             if(old_confVal != ConfigValue[ConfigState])
 ;PCODE: $000013C2 VOL: 0
 ;PCODE: $000013C3 VOL: 0
 ;PCODE: $000013C4 VOL: 0
@@ -8178,23 +8169,25 @@ _0x123:
 ;PCODE: $000013C7 VOL: 0
 ;PCODE: $000013C8 VOL: 0
 ;PCODE: $000013C9 VOL: 0
-; 0000 0330 
-; 0000 0331                             old_confVal = ConfigValue[ConfigState];
 ;PCODE: $000013CA VOL: 0
+; 0000 0324                             {
+; 0000 0325                                 //Сохраняем значение
+; 0000 0326                                 Save_Eeprom(ConfigState);
 ;PCODE: $000013CB VOL: 0
 ;PCODE: $000013CC VOL: 0
 ;PCODE: $000013CD VOL: 0
+; 0000 0327                             }
+; 0000 0328 
+; 0000 0329                             if(++ConfigState > 11) ConfigState = 0;
 ;PCODE: $000013CE VOL: 0
 ;PCODE: $000013CF VOL: 0
 ;PCODE: $000013D0 VOL: 0
-; 0000 0332                         break;
 ;PCODE: $000013D1 VOL: 0
-; 0000 0333                         case 2:
 ;PCODE: $000013D2 VOL: 0
 ;PCODE: $000013D3 VOL: 0
 ;PCODE: $000013D4 VOL: 0
-; 0000 0334                               if(ConfigValue[ConfigState] < ConfigParam[2][ConfigState])
 ;PCODE: $000013D5 VOL: 0
+; 0000 032A                             PutParameterText(ConfigState + State, PURPLE);
 ;PCODE: $000013D6 VOL: 0
 ;PCODE: $000013D7 VOL: 0
 ;PCODE: $000013D8 VOL: 0
@@ -8203,6 +8196,8 @@ _0x123:
 ;PCODE: $000013DB VOL: 0
 ;PCODE: $000013DC VOL: 0
 ;PCODE: $000013DD VOL: 0
+; 0000 032B 
+; 0000 032C                             old_confVal = ConfigValue[ConfigState];
 ;PCODE: $000013DE VOL: 0
 ;PCODE: $000013DF VOL: 0
 ;PCODE: $000013E0 VOL: 0
@@ -8210,12 +8205,13 @@ _0x123:
 ;PCODE: $000013E2 VOL: 0
 ;PCODE: $000013E3 VOL: 0
 ;PCODE: $000013E4 VOL: 0
-; 0000 0335                               {
-; 0000 0336                                   ConfigValue[ConfigState] += ConfigParam[0][ConfigState];
+; 0000 032D                         break;
 ;PCODE: $000013E5 VOL: 0
+; 0000 032E                         case 2:
 ;PCODE: $000013E6 VOL: 0
 ;PCODE: $000013E7 VOL: 0
 ;PCODE: $000013E8 VOL: 0
+; 0000 032F                               if(ConfigValue[ConfigState] < ConfigParam[2][ConfigState])
 ;PCODE: $000013E9 VOL: 0
 ;PCODE: $000013EA VOL: 0
 ;PCODE: $000013EB VOL: 0
@@ -8228,23 +8224,20 @@ _0x123:
 ;PCODE: $000013F2 VOL: 0
 ;PCODE: $000013F3 VOL: 0
 ;PCODE: $000013F4 VOL: 0
-; 0000 0337                                   PutParameterText(ConfigState + State, PURPLE);
 ;PCODE: $000013F5 VOL: 0
 ;PCODE: $000013F6 VOL: 0
 ;PCODE: $000013F7 VOL: 0
 ;PCODE: $000013F8 VOL: 0
+; 0000 0330                               {
+; 0000 0331                                   ConfigValue[ConfigState] += ConfigParam[0][ConfigState];
 ;PCODE: $000013F9 VOL: 0
 ;PCODE: $000013FA VOL: 0
 ;PCODE: $000013FB VOL: 0
-; 0000 0338                               }
-; 0000 0339                         break;
 ;PCODE: $000013FC VOL: 0
 ;PCODE: $000013FD VOL: 0
-; 0000 033A                         case 3:
 ;PCODE: $000013FE VOL: 0
 ;PCODE: $000013FF VOL: 0
 ;PCODE: $00001400 VOL: 0
-; 0000 033B                               if(ConfigValue[ConfigState] > ConfigParam[1][ConfigState])
 ;PCODE: $00001401 VOL: 0
 ;PCODE: $00001402 VOL: 0
 ;PCODE: $00001403 VOL: 0
@@ -8253,6 +8246,7 @@ _0x123:
 ;PCODE: $00001406 VOL: 0
 ;PCODE: $00001407 VOL: 0
 ;PCODE: $00001408 VOL: 0
+; 0000 0332                                   PutParameterText(ConfigState + State, PURPLE);
 ;PCODE: $00001409 VOL: 0
 ;PCODE: $0000140A VOL: 0
 ;PCODE: $0000140B VOL: 0
@@ -8260,13 +8254,15 @@ _0x123:
 ;PCODE: $0000140D VOL: 0
 ;PCODE: $0000140E VOL: 0
 ;PCODE: $0000140F VOL: 0
+; 0000 0333                               }
+; 0000 0334                         break;
 ;PCODE: $00001410 VOL: 0
-; 0000 033C                               {
-; 0000 033D                                   ConfigValue[ConfigState] -= ConfigParam[0][ConfigState];
 ;PCODE: $00001411 VOL: 0
+; 0000 0335                         case 3:
 ;PCODE: $00001412 VOL: 0
 ;PCODE: $00001413 VOL: 0
 ;PCODE: $00001414 VOL: 0
+; 0000 0336                               if(ConfigValue[ConfigState] > ConfigParam[1][ConfigState])
 ;PCODE: $00001415 VOL: 0
 ;PCODE: $00001416 VOL: 0
 ;PCODE: $00001417 VOL: 0
@@ -8280,172 +8276,168 @@ _0x123:
 ;PCODE: $0000141F VOL: 0
 ;PCODE: $00001420 VOL: 0
 ;PCODE: $00001421 VOL: 0
-; 0000 033E                                   PutParameterText(ConfigState + State, PURPLE);
 ;PCODE: $00001422 VOL: 0
 ;PCODE: $00001423 VOL: 0
 ;PCODE: $00001424 VOL: 0
+; 0000 0337                               {
+; 0000 0338                                   ConfigValue[ConfigState] -= ConfigParam[0][ConfigState];
 ;PCODE: $00001425 VOL: 0
 ;PCODE: $00001426 VOL: 0
 ;PCODE: $00001427 VOL: 0
 ;PCODE: $00001428 VOL: 0
-; 0000 033F                               }
-; 0000 0340                         break;
 ;PCODE: $00001429 VOL: 0
 ;PCODE: $0000142A VOL: 0
-; 0000 0341                         case 4:
 ;PCODE: $0000142B VOL: 0
 ;PCODE: $0000142C VOL: 0
 ;PCODE: $0000142D VOL: 0
-; 0000 0342                             State = 1;
 ;PCODE: $0000142E VOL: 0
 ;PCODE: $0000142F VOL: 0
-; 0000 0343                         break;
 ;PCODE: $00001430 VOL: 0
-; 0000 0344                     }
 ;PCODE: $00001431 VOL: 0
-; 0000 0345                 }
-; 0000 0346                 break;
 ;PCODE: $00001432 VOL: 0
-; 0000 0347                 case 200 : // пауза
 ;PCODE: $00001433 VOL: 0
 ;PCODE: $00001434 VOL: 0
 ;PCODE: $00001435 VOL: 0
-; 0000 0348                 //Sleep_mSec = 0;
-; 0000 0349                     switch (GetButton())
+; 0000 0339                                   PutParameterText(ConfigState + State, PURPLE);
 ;PCODE: $00001436 VOL: 0
-; 0000 034A                     {
-; 0000 034B                         case 1:
 ;PCODE: $00001437 VOL: 0
 ;PCODE: $00001438 VOL: 0
-; 0000 034C                         break;
 ;PCODE: $00001439 VOL: 0
-; 0000 034D                         case 2:
 ;PCODE: $0000143A VOL: 0
 ;PCODE: $0000143B VOL: 0
 ;PCODE: $0000143C VOL: 0
-; 0000 034E                         break;
+; 0000 033A                               }
+; 0000 033B                         break;
 ;PCODE: $0000143D VOL: 0
-; 0000 034F                         case 3:
 ;PCODE: $0000143E VOL: 0
+; 0000 033C                         case 4:
 ;PCODE: $0000143F VOL: 0
 ;PCODE: $00001440 VOL: 0
-; 0000 0350                         break;
 ;PCODE: $00001441 VOL: 0
-; 0000 0351                         case 4:
+; 0000 033D                             State = 1;
 ;PCODE: $00001442 VOL: 0
 ;PCODE: $00001443 VOL: 0
+; 0000 033E                         break;
 ;PCODE: $00001444 VOL: 0
-; 0000 0352                             State = 0;
+; 0000 033F                     }
 ;PCODE: $00001445 VOL: 0
+; 0000 0340                 }
+; 0000 0341                 break;
 ;PCODE: $00001446 VOL: 0
-; 0000 0353                             Repaint_Button("ПАУЗА", 4, BLACK, WHITE);
+; 0000 0342                 case 200 : // пауза
 ;PCODE: $00001447 VOL: 0
 ;PCODE: $00001448 VOL: 0
 ;PCODE: $00001449 VOL: 0
+; 0000 0343                 //Sleep_mSec = 0;
+; 0000 0344                     switch (GetButton())
 ;PCODE: $0000144A VOL: 0
+; 0000 0345                     {
+; 0000 0346                         case 1:
 ;PCODE: $0000144B VOL: 0
 ;PCODE: $0000144C VOL: 0
+; 0000 0347                         break;
 ;PCODE: $0000144D VOL: 0
+; 0000 0348                         case 2:
 ;PCODE: $0000144E VOL: 0
 ;PCODE: $0000144F VOL: 0
 ;PCODE: $00001450 VOL: 0
-; 0000 0354                             delay_ms(250);
+; 0000 0349                         break;
 ;PCODE: $00001451 VOL: 0
+; 0000 034A                         case 3:
 ;PCODE: $00001452 VOL: 0
 ;PCODE: $00001453 VOL: 0
-; 0000 0355                         break;
 ;PCODE: $00001454 VOL: 0
-; 0000 0356                     }
+; 0000 034B                         break;
 ;PCODE: $00001455 VOL: 0
-; 0000 0357 
-; 0000 0358                 break;
+; 0000 034C                         case 4:
 ;PCODE: $00001456 VOL: 0
-; 0000 0359                 case 250 : // сп¤щий режим
 ;PCODE: $00001457 VOL: 0
 ;PCODE: $00001458 VOL: 0
+; 0000 034D                             State = 0;
 ;PCODE: $00001459 VOL: 0
-; 0000 035A                 {
-; 0000 035B                     if (TSC2046_GetCoordinates() > 0)
 ;PCODE: $0000145A VOL: 0
+; 0000 034E                             Repaint_Button("ПАУЗА", 4, BLACK, WHITE);
 ;PCODE: $0000145B VOL: 0
 ;PCODE: $0000145C VOL: 0
-; 0000 035C                     {
-; 0000 035D                         State = 0;
 ;PCODE: $0000145D VOL: 0
 ;PCODE: $0000145E VOL: 0
-; 0000 035E                         BACKLIGHT = 0; //On
 ;PCODE: $0000145F VOL: 0
 ;PCODE: $00001460 VOL: 0
-; 0000 035F                     }
-; 0000 0360                 }
 ;PCODE: $00001461 VOL: 0
-; 0000 0361                 break;
 ;PCODE: $00001462 VOL: 0
-; 0000 0362             }
 ;PCODE: $00001463 VOL: 0
-; 0000 0363 }
 ;PCODE: $00001464 VOL: 0
+; 0000 034F                             delay_ms(250);
 ;PCODE: $00001465 VOL: 0
 ;PCODE: $00001466 VOL: 0
 ;PCODE: $00001467 VOL: 0
-
-	.DSEG
-_0x1DA:
-	.BYTE 0x11
-;
-;
-;void Load_Config(void)
-; 0000 0367 {
-
-	.CSEG
+; 0000 0350                         break;
 ;PCODE: $00001468 VOL: 0
+; 0000 0351                     }
 ;PCODE: $00001469 VOL: 0
-; 0000 0368     char i;
-; 0000 0369     //Читаем настройки
-; 0000 036A     putchar2('G');
+; 0000 0352 
+; 0000 0353                 break;
 ;PCODE: $0000146A VOL: 0
-;	i -> R17
+; 0000 0354                 case 250 : // сп¤щий режим
 ;PCODE: $0000146B VOL: 0
 ;PCODE: $0000146C VOL: 0
 ;PCODE: $0000146D VOL: 0
-; 0000 036B     ValueUpd_mSec = 0;
+; 0000 0355                 {
+; 0000 0356                     if (TSC2046_GetCoordinates() > 0)
 ;PCODE: $0000146E VOL: 0
 ;PCODE: $0000146F VOL: 0
-; 0000 036C     ValueState = 5;
 ;PCODE: $00001470 VOL: 0
+; 0000 0357                     {
+; 0000 0358                         State = 0;
 ;PCODE: $00001471 VOL: 0
-; 0000 036D     while(rx_counter2 < (9*2) && ValueUpd_mSec < 100); //ждем
 ;PCODE: $00001472 VOL: 0
+; 0000 0359                         BACKLIGHT = 0; //On
 ;PCODE: $00001473 VOL: 0
 ;PCODE: $00001474 VOL: 0
+; 0000 035A                     }
+; 0000 035B                 }
 ;PCODE: $00001475 VOL: 0
+; 0000 035C                 break;
 ;PCODE: $00001476 VOL: 0
+; 0000 035D             }
 ;PCODE: $00001477 VOL: 0
+; 0000 035E }
 ;PCODE: $00001478 VOL: 0
 ;PCODE: $00001479 VOL: 0
 ;PCODE: $0000147A VOL: 0
 ;PCODE: $0000147B VOL: 0
+
+	.DSEG
+_0x1DE:
+	.BYTE 0x11
+;
+;
+;void Load_Config(void)
+; 0000 0362 {
+
+	.CSEG
 ;PCODE: $0000147C VOL: 0
 ;PCODE: $0000147D VOL: 0
+; 0000 0363     char i;
+; 0000 0364     //Читаем настройки
+; 0000 0365     putchar2('G');
 ;PCODE: $0000147E VOL: 0
-; 0000 036E 
-; 0000 036F     for(i=0; i<12; i++)
+;	i -> R17
 ;PCODE: $0000147F VOL: 0
 ;PCODE: $00001480 VOL: 0
 ;PCODE: $00001481 VOL: 0
+; 0000 0366     ValueUpd_mSec = 0;
 ;PCODE: $00001482 VOL: 0
 ;PCODE: $00001483 VOL: 0
+; 0000 0367     ValueState = 5;
 ;PCODE: $00001484 VOL: 0
 ;PCODE: $00001485 VOL: 0
+; 0000 0368     while(rx_counter2 < (9*2) && ValueUpd_mSec < 100); //ждем
 ;PCODE: $00001486 VOL: 0
 ;PCODE: $00001487 VOL: 0
-; 0000 0370     {
-; 0000 0371         if(i<3)
 ;PCODE: $00001488 VOL: 0
 ;PCODE: $00001489 VOL: 0
 ;PCODE: $0000148A VOL: 0
-; 0000 0372         {
-; 0000 0373             ConfigValue[i] = ConfigValue_mem[i];
 ;PCODE: $0000148B VOL: 0
 ;PCODE: $0000148C VOL: 0
 ;PCODE: $0000148D VOL: 0
@@ -8454,22 +8446,24 @@ _0x1DA:
 ;PCODE: $00001490 VOL: 0
 ;PCODE: $00001491 VOL: 0
 ;PCODE: $00001492 VOL: 0
+; 0000 0369 
+; 0000 036A     for(i=0; i<12; i++)
 ;PCODE: $00001493 VOL: 0
 ;PCODE: $00001494 VOL: 0
 ;PCODE: $00001495 VOL: 0
 ;PCODE: $00001496 VOL: 0
 ;PCODE: $00001497 VOL: 0
 ;PCODE: $00001498 VOL: 0
-; 0000 0374         }
-; 0000 0375         else if(rx_counter2 > 1)
 ;PCODE: $00001499 VOL: 0
 ;PCODE: $0000149A VOL: 0
 ;PCODE: $0000149B VOL: 0
+; 0000 036B     {
+; 0000 036C         if(i<3)
 ;PCODE: $0000149C VOL: 0
 ;PCODE: $0000149D VOL: 0
-; 0000 0376         {
-; 0000 0377             ConfigValue[i] = getchar2() & 0x00FF;
 ;PCODE: $0000149E VOL: 0
+; 0000 036D         {
+; 0000 036E             ConfigValue[i] = ConfigValue_mem[i];
 ;PCODE: $0000149F VOL: 0
 ;PCODE: $000014A0 VOL: 0
 ;PCODE: $000014A1 VOL: 0
@@ -8480,30 +8474,31 @@ _0x1DA:
 ;PCODE: $000014A6 VOL: 0
 ;PCODE: $000014A7 VOL: 0
 ;PCODE: $000014A8 VOL: 0
-; 0000 0378             ConfigValue[i] |= (unsigned int)getchar2() << 8;
 ;PCODE: $000014A9 VOL: 0
 ;PCODE: $000014AA VOL: 0
 ;PCODE: $000014AB VOL: 0
 ;PCODE: $000014AC VOL: 0
+; 0000 036F         }
+; 0000 0370         else if(rx_counter2 > 1)
 ;PCODE: $000014AD VOL: 0
 ;PCODE: $000014AE VOL: 0
 ;PCODE: $000014AF VOL: 0
 ;PCODE: $000014B0 VOL: 0
 ;PCODE: $000014B1 VOL: 0
+; 0000 0371         {
+; 0000 0372             ConfigValue[i] = getchar2() & 0x00FF;
 ;PCODE: $000014B2 VOL: 0
 ;PCODE: $000014B3 VOL: 0
 ;PCODE: $000014B4 VOL: 0
 ;PCODE: $000014B5 VOL: 0
 ;PCODE: $000014B6 VOL: 0
 ;PCODE: $000014B7 VOL: 0
-; 0000 0379         }
-; 0000 037A 
-; 0000 037B         if(ConfigValue[i] < ConfigParam[1][i] || ConfigValue[i] > ConfigParam[2][i])
 ;PCODE: $000014B8 VOL: 0
 ;PCODE: $000014B9 VOL: 0
 ;PCODE: $000014BA VOL: 0
 ;PCODE: $000014BB VOL: 0
 ;PCODE: $000014BC VOL: 0
+; 0000 0373             ConfigValue[i] |= (unsigned int)getchar2() << 8;
 ;PCODE: $000014BD VOL: 0
 ;PCODE: $000014BE VOL: 0
 ;PCODE: $000014BF VOL: 0
@@ -8519,6 +8514,9 @@ _0x1DA:
 ;PCODE: $000014C9 VOL: 0
 ;PCODE: $000014CA VOL: 0
 ;PCODE: $000014CB VOL: 0
+; 0000 0374         }
+; 0000 0375 
+; 0000 0376         if(ConfigValue[i] < ConfigParam[1][i] || ConfigValue[i] > ConfigParam[2][i])
 ;PCODE: $000014CC VOL: 0
 ;PCODE: $000014CD VOL: 0
 ;PCODE: $000014CE VOL: 0
@@ -8535,8 +8533,6 @@ _0x1DA:
 ;PCODE: $000014D9 VOL: 0
 ;PCODE: $000014DA VOL: 0
 ;PCODE: $000014DB VOL: 0
-; 0000 037C         {
-; 0000 037D             ConfigValue[i] = ConfigParam[3][i];
 ;PCODE: $000014DC VOL: 0
 ;PCODE: $000014DD VOL: 0
 ;PCODE: $000014DE VOL: 0
@@ -8553,383 +8549,382 @@ _0x1DA:
 ;PCODE: $000014E9 VOL: 0
 ;PCODE: $000014EA VOL: 0
 ;PCODE: $000014EB VOL: 0
-; 0000 037E         }
-; 0000 037F     }
 ;PCODE: $000014EC VOL: 0
 ;PCODE: $000014ED VOL: 0
 ;PCODE: $000014EE VOL: 0
 ;PCODE: $000014EF VOL: 0
+; 0000 0377         {
+; 0000 0378             ConfigValue[i] = ConfigParam[3][i];
 ;PCODE: $000014F0 VOL: 0
 ;PCODE: $000014F1 VOL: 0
-; 0000 0380 
-; 0000 0381     ValueState = 0;
 ;PCODE: $000014F2 VOL: 0
 ;PCODE: $000014F3 VOL: 0
-; 0000 0382 }
 ;PCODE: $000014F4 VOL: 0
 ;PCODE: $000014F5 VOL: 0
 ;PCODE: $000014F6 VOL: 0
+;PCODE: $000014F7 VOL: 0
+;PCODE: $000014F8 VOL: 0
+;PCODE: $000014F9 VOL: 0
+;PCODE: $000014FA VOL: 0
+;PCODE: $000014FB VOL: 0
+;PCODE: $000014FC VOL: 0
+;PCODE: $000014FD VOL: 0
+;PCODE: $000014FE VOL: 0
+;PCODE: $000014FF VOL: 0
+; 0000 0379         }
+; 0000 037A     }
+;PCODE: $00001500 VOL: 0
+;PCODE: $00001501 VOL: 0
+;PCODE: $00001502 VOL: 0
+;PCODE: $00001503 VOL: 0
+;PCODE: $00001504 VOL: 0
+;PCODE: $00001505 VOL: 0
+; 0000 037B 
+; 0000 037C     ValueState = 0;
+;PCODE: $00001506 VOL: 0
+;PCODE: $00001507 VOL: 0
+; 0000 037D }
+;PCODE: $00001508 VOL: 0
+;PCODE: $00001509 VOL: 0
+;PCODE: $0000150A VOL: 0
 ;
 ;// Declare your global variables here
 ;
 ;void main(void)
-; 0000 0387 {
-;PCODE: $000014F7 VOL: 0
-; 0000 0388 // Declare your local variables here
-; 0000 0389 {
-; 0000 038A // Input/Output Ports initialization
-; 0000 038B // Port A initialization
-; 0000 038C // Func7=In Func6=In Func5=In Func4=In Func3=In Func2=In Func1=In Func0=In
-; 0000 038D // State7=T State6=T State5=T State4=T State3=T State2=T State1=T State0=T
-; 0000 038E PORTA=0x00;
-;PCODE: $000014F8 VOL: 0
-;PCODE: $000014F9 VOL: 0
-; 0000 038F DDRA=0x00;
-;PCODE: $000014FA VOL: 0
-;PCODE: $000014FB VOL: 0
-; 0000 0390 
-; 0000 0391 // Port B initialization
-; 0000 0392 // Func7=Out Func6=In Func5=In Func4=In Func3=In Func2=Out Func1=Out Func0=Out
-; 0000 0393 // State7=1 State6=T State5=T State4=T State3=T State2=0 State1=0 State0=0
-; 0000 0394 PORTB=0x80;
-;PCODE: $000014FC VOL: 0
-;PCODE: $000014FD VOL: 0
-; 0000 0395 DDRB=0x87;
-;PCODE: $000014FE VOL: 0
-;PCODE: $000014FF VOL: 0
-; 0000 0396 
-; 0000 0397 // Port C initialization
-; 0000 0398 // Func7=In Func6=In Func5=In Func4=In Func3=In Func2=In Func1=In Func0=In
-; 0000 0399 // State7=T State6=T State5=T State4=T State3=T State2=T State1=T State0=T
-; 0000 039A PORTC=0x00;
-;PCODE: $00001500 VOL: 0
-;PCODE: $00001501 VOL: 0
-; 0000 039B DDRC=0x00;
-;PCODE: $00001502 VOL: 0
-;PCODE: $00001503 VOL: 0
-; 0000 039C 
-; 0000 039D // Port D initialization
-; 0000 039E // Func7=In Func6=In Func5=In Func4=Out Func3=In Func2=In Func1=In Func0=In
-; 0000 039F // State7=T State6=T State5=T State4=0 State3=T State2=T State1=T State0=T
-; 0000 03A0 PORTD=0x00;
-;PCODE: $00001504 VOL: 0
-;PCODE: $00001505 VOL: 0
-; 0000 03A1 DDRD=0x10;
-;PCODE: $00001506 VOL: 0
-;PCODE: $00001507 VOL: 0
-; 0000 03A2 
-; 0000 03A3 // Port E initialization
-; 0000 03A4 // Func7=In Func6=In Func5=In Func4=Out Func3=In Func2=In Func1=In Func0=In
-; 0000 03A5 // State7=T State6=T State5=T State4=1 State3=T State2=T State1=T State0=T
-; 0000 03A6 PORTE=0x10;
-;PCODE: $00001508 VOL: 0
-;PCODE: $00001509 VOL: 0
-; 0000 03A7 DDRE=0x10;  //PE4 - CD off
-;PCODE: $0000150A VOL: 0
+; 0000 0382 {
 ;PCODE: $0000150B VOL: 0
-; 0000 03A8 
-; 0000 03A9 // Port F initialization
-; 0000 03AA // Func7=In Func6=In Func5=In Func4=In Func3=In Func2=In Func1=In Func0=In
-; 0000 03AB // State7=T State6=T State5=T State4=T State3=T State2=T State1=T State0=T
-; 0000 03AC PORTF=0x00;
+; 0000 0383 // Declare your local variables here
+; 0000 0384 {
+; 0000 0385 // Input/Output Ports initialization
+; 0000 0386 // Port A initialization
+; 0000 0387 // Func7=In Func6=In Func5=In Func4=In Func3=In Func2=In Func1=In Func0=In
+; 0000 0388 // State7=T State6=T State5=T State4=T State3=T State2=T State1=T State0=T
+; 0000 0389 PORTA=0x00;
 ;PCODE: $0000150C VOL: 0
 ;PCODE: $0000150D VOL: 0
-; 0000 03AD DDRF=0x00;
+; 0000 038A DDRA=0x00;
 ;PCODE: $0000150E VOL: 0
 ;PCODE: $0000150F VOL: 0
-; 0000 03AE 
-; 0000 03AF // Port G initialization
-; 0000 03B0 // Func4=In Func3=In Func2=In Func1=In Func0=In
-; 0000 03B1 // State4=T State3=T State2=T State1=T State0=T
-; 0000 03B2 PORTG=0x00;
+; 0000 038B 
+; 0000 038C // Port B initialization
+; 0000 038D // Func7=Out Func6=In Func5=In Func4=In Func3=In Func2=Out Func1=Out Func0=Out
+; 0000 038E // State7=1 State6=T State5=T State4=T State3=T State2=0 State1=0 State0=0
+; 0000 038F PORTB=0x80;
 ;PCODE: $00001510 VOL: 0
 ;PCODE: $00001511 VOL: 0
-; 0000 03B3 DDRG=0x00;
+; 0000 0390 DDRB=0x87;
 ;PCODE: $00001512 VOL: 0
 ;PCODE: $00001513 VOL: 0
-; 0000 03B4 
-; 0000 03B5 // Timer/Counter 0 initialization
-; 0000 03B6 // Clock source: System Clock
-; 0000 03B7 // Clock value: 250,000 kHz
-; 0000 03B8 // Mode: Normal top=0xFF
-; 0000 03B9 // OC0 output: Disconnected
-; 0000 03BA ASSR=0x00;
+; 0000 0391 
+; 0000 0392 // Port C initialization
+; 0000 0393 // Func7=In Func6=In Func5=In Func4=In Func3=In Func2=In Func1=In Func0=In
+; 0000 0394 // State7=T State6=T State5=T State4=T State3=T State2=T State1=T State0=T
+; 0000 0395 PORTC=0x00;
 ;PCODE: $00001514 VOL: 0
 ;PCODE: $00001515 VOL: 0
-; 0000 03BB TCCR0=0x04;
+; 0000 0396 DDRC=0x00;
 ;PCODE: $00001516 VOL: 0
 ;PCODE: $00001517 VOL: 0
-; 0000 03BC TCNT0=0x06;
+; 0000 0397 
+; 0000 0398 // Port D initialization
+; 0000 0399 // Func7=In Func6=In Func5=In Func4=Out Func3=In Func2=In Func1=In Func0=In
+; 0000 039A // State7=T State6=T State5=T State4=0 State3=T State2=T State1=T State0=T
+; 0000 039B PORTD=0x00;
 ;PCODE: $00001518 VOL: 0
 ;PCODE: $00001519 VOL: 0
-; 0000 03BD OCR0=0x00;
+; 0000 039C DDRD=0x10;
 ;PCODE: $0000151A VOL: 0
 ;PCODE: $0000151B VOL: 0
-; 0000 03BE 
-; 0000 03BF // Timer/Counter 1 initialization
-; 0000 03C0 // Clock source: System Clock
-; 0000 03C1 // Clock value: Timer1 Stopped
-; 0000 03C2 // Mode: Normal top=0xFFFF
-; 0000 03C3 // OC1A output: Discon.
-; 0000 03C4 // OC1B output: Discon.
-; 0000 03C5 // OC1C output: Discon.
-; 0000 03C6 // Noise Canceler: Off
-; 0000 03C7 // Input Capture on Falling Edge
-; 0000 03C8 // Timer1 Overflow Interrupt: Off
-; 0000 03C9 // Input Capture Interrupt: Off
-; 0000 03CA // Compare A Match Interrupt: Off
-; 0000 03CB // Compare B Match Interrupt: Off
-; 0000 03CC // Compare C Match Interrupt: Off
-; 0000 03CD TCCR1A=0x00;
+; 0000 039D 
+; 0000 039E // Port E initialization
+; 0000 039F // Func7=In Func6=In Func5=In Func4=Out Func3=In Func2=In Func1=In Func0=In
+; 0000 03A0 // State7=T State6=T State5=T State4=1 State3=T State2=T State1=T State0=T
+; 0000 03A1 PORTE=0x10;
 ;PCODE: $0000151C VOL: 0
 ;PCODE: $0000151D VOL: 0
-; 0000 03CE TCCR1B=0x00;
+; 0000 03A2 DDRE=0x10;  //PE4 - CD off
 ;PCODE: $0000151E VOL: 0
 ;PCODE: $0000151F VOL: 0
-; 0000 03CF TCNT1H=0x00;
+; 0000 03A3 
+; 0000 03A4 // Port F initialization
+; 0000 03A5 // Func7=In Func6=In Func5=In Func4=In Func3=In Func2=In Func1=In Func0=In
+; 0000 03A6 // State7=T State6=T State5=T State4=T State3=T State2=T State1=T State0=T
+; 0000 03A7 PORTF=0x00;
 ;PCODE: $00001520 VOL: 0
 ;PCODE: $00001521 VOL: 0
-; 0000 03D0 TCNT1L=0x00;
+; 0000 03A8 DDRF=0x00;
 ;PCODE: $00001522 VOL: 0
 ;PCODE: $00001523 VOL: 0
-; 0000 03D1 ICR1H=0x00;
+; 0000 03A9 
+; 0000 03AA // Port G initialization
+; 0000 03AB // Func4=In Func3=In Func2=In Func1=In Func0=In
+; 0000 03AC // State4=T State3=T State2=T State1=T State0=T
+; 0000 03AD PORTG=0x00;
 ;PCODE: $00001524 VOL: 0
 ;PCODE: $00001525 VOL: 0
-; 0000 03D2 ICR1L=0x00;
+; 0000 03AE DDRG=0x00;
 ;PCODE: $00001526 VOL: 0
 ;PCODE: $00001527 VOL: 0
-; 0000 03D3 OCR1AH=0x00;
+; 0000 03AF 
+; 0000 03B0 // Timer/Counter 0 initialization
+; 0000 03B1 // Clock source: System Clock
+; 0000 03B2 // Clock value: 250,000 kHz
+; 0000 03B3 // Mode: Normal top=0xFF
+; 0000 03B4 // OC0 output: Disconnected
+; 0000 03B5 ASSR=0x00;
 ;PCODE: $00001528 VOL: 0
 ;PCODE: $00001529 VOL: 0
-; 0000 03D4 OCR1AL=0x00;
+; 0000 03B6 TCCR0=0x04;
 ;PCODE: $0000152A VOL: 0
 ;PCODE: $0000152B VOL: 0
-; 0000 03D5 OCR1BH=0x00;
+; 0000 03B7 TCNT0=0x06;
 ;PCODE: $0000152C VOL: 0
 ;PCODE: $0000152D VOL: 0
-; 0000 03D6 OCR1BL=0x00;
+; 0000 03B8 OCR0=0x00;
 ;PCODE: $0000152E VOL: 0
 ;PCODE: $0000152F VOL: 0
-; 0000 03D7 OCR1CH=0x00;
+; 0000 03B9 
+; 0000 03BA // Timer/Counter 1 initialization
+; 0000 03BB // Clock source: System Clock
+; 0000 03BC // Clock value: Timer1 Stopped
+; 0000 03BD // Mode: Normal top=0xFFFF
+; 0000 03BE // OC1A output: Discon.
+; 0000 03BF // OC1B output: Discon.
+; 0000 03C0 // OC1C output: Discon.
+; 0000 03C1 // Noise Canceler: Off
+; 0000 03C2 // Input Capture on Falling Edge
+; 0000 03C3 // Timer1 Overflow Interrupt: Off
+; 0000 03C4 // Input Capture Interrupt: Off
+; 0000 03C5 // Compare A Match Interrupt: Off
+; 0000 03C6 // Compare B Match Interrupt: Off
+; 0000 03C7 // Compare C Match Interrupt: Off
+; 0000 03C8 TCCR1A=0x00;
 ;PCODE: $00001530 VOL: 0
 ;PCODE: $00001531 VOL: 0
-; 0000 03D8 OCR1CL=0x00;
+; 0000 03C9 TCCR1B=0x00;
 ;PCODE: $00001532 VOL: 0
 ;PCODE: $00001533 VOL: 0
-; 0000 03D9 
-; 0000 03DA // Timer/Counter 2 initialization
-; 0000 03DB // Clock source: System Clock
-; 0000 03DC // Clock value: Timer2 Stopped
-; 0000 03DD // Mode: Normal top=0xFF
-; 0000 03DE // OC2 output: Disconnected
-; 0000 03DF TCCR2=0x00;
+; 0000 03CA TCNT1H=0x00;
 ;PCODE: $00001534 VOL: 0
 ;PCODE: $00001535 VOL: 0
-; 0000 03E0 TCNT2=0x00;
+; 0000 03CB TCNT1L=0x00;
 ;PCODE: $00001536 VOL: 0
 ;PCODE: $00001537 VOL: 0
-; 0000 03E1 OCR2=0x00;
+; 0000 03CC ICR1H=0x00;
 ;PCODE: $00001538 VOL: 0
 ;PCODE: $00001539 VOL: 0
-; 0000 03E2 
-; 0000 03E3 // Timer/Counter 3 initialization
-; 0000 03E4 // Clock source: System Clock
-; 0000 03E5 // Clock value: Timer3 Stopped
-; 0000 03E6 // Mode: Normal top=0xFFFF
-; 0000 03E7 // OC3A output: Discon.
-; 0000 03E8 // OC3B output: Discon.
-; 0000 03E9 // OC3C output: Discon.
-; 0000 03EA // Noise Canceler: Off
-; 0000 03EB // Input Capture on Falling Edge
-; 0000 03EC // Timer3 Overflow Interrupt: Off
-; 0000 03ED // Input Capture Interrupt: Off
-; 0000 03EE // Compare A Match Interrupt: Off
-; 0000 03EF // Compare B Match Interrupt: Off
-; 0000 03F0 // Compare C Match Interrupt: Off
-; 0000 03F1 TCCR3A=0x00;
+; 0000 03CD ICR1L=0x00;
 ;PCODE: $0000153A VOL: 0
 ;PCODE: $0000153B VOL: 0
-; 0000 03F2 TCCR3B=0x00;
+; 0000 03CE OCR1AH=0x00;
 ;PCODE: $0000153C VOL: 0
 ;PCODE: $0000153D VOL: 0
-; 0000 03F3 TCNT3H=0x00;
+; 0000 03CF OCR1AL=0x00;
 ;PCODE: $0000153E VOL: 0
 ;PCODE: $0000153F VOL: 0
-; 0000 03F4 TCNT3L=0x00;
+; 0000 03D0 OCR1BH=0x00;
 ;PCODE: $00001540 VOL: 0
 ;PCODE: $00001541 VOL: 0
-; 0000 03F5 ICR3H=0x00;
+; 0000 03D1 OCR1BL=0x00;
 ;PCODE: $00001542 VOL: 0
 ;PCODE: $00001543 VOL: 0
-; 0000 03F6 ICR3L=0x00;
+; 0000 03D2 OCR1CH=0x00;
 ;PCODE: $00001544 VOL: 0
 ;PCODE: $00001545 VOL: 0
-; 0000 03F7 OCR3AH=0x00;
+; 0000 03D3 OCR1CL=0x00;
 ;PCODE: $00001546 VOL: 0
 ;PCODE: $00001547 VOL: 0
-; 0000 03F8 OCR3AL=0x00;
+; 0000 03D4 
+; 0000 03D5 // Timer/Counter 2 initialization
+; 0000 03D6 // Clock source: System Clock
+; 0000 03D7 // Clock value: Timer2 Stopped
+; 0000 03D8 // Mode: Normal top=0xFF
+; 0000 03D9 // OC2 output: Disconnected
+; 0000 03DA TCCR2=0x00;
 ;PCODE: $00001548 VOL: 0
 ;PCODE: $00001549 VOL: 0
-; 0000 03F9 OCR3BH=0x00;
+; 0000 03DB TCNT2=0x00;
 ;PCODE: $0000154A VOL: 0
 ;PCODE: $0000154B VOL: 0
-; 0000 03FA OCR3BL=0x00;
+; 0000 03DC OCR2=0x00;
 ;PCODE: $0000154C VOL: 0
 ;PCODE: $0000154D VOL: 0
-; 0000 03FB OCR3CH=0x00;
+; 0000 03DD 
+; 0000 03DE // Timer/Counter 3 initialization
+; 0000 03DF // Clock source: System Clock
+; 0000 03E0 // Clock value: Timer3 Stopped
+; 0000 03E1 // Mode: Normal top=0xFFFF
+; 0000 03E2 // OC3A output: Discon.
+; 0000 03E3 // OC3B output: Discon.
+; 0000 03E4 // OC3C output: Discon.
+; 0000 03E5 // Noise Canceler: Off
+; 0000 03E6 // Input Capture on Falling Edge
+; 0000 03E7 // Timer3 Overflow Interrupt: Off
+; 0000 03E8 // Input Capture Interrupt: Off
+; 0000 03E9 // Compare A Match Interrupt: Off
+; 0000 03EA // Compare B Match Interrupt: Off
+; 0000 03EB // Compare C Match Interrupt: Off
+; 0000 03EC TCCR3A=0x00;
 ;PCODE: $0000154E VOL: 0
 ;PCODE: $0000154F VOL: 0
-; 0000 03FC OCR3CL=0x00;
+; 0000 03ED TCCR3B=0x00;
 ;PCODE: $00001550 VOL: 0
 ;PCODE: $00001551 VOL: 0
-; 0000 03FD 
-; 0000 03FE // External Interrupt(s) initialization
-; 0000 03FF // INT0: Off
-; 0000 0400 // INT1: Off
-; 0000 0401 // INT2: Off
-; 0000 0402 // INT3: Off
-; 0000 0403 // INT4: Off
-; 0000 0404 // INT5: Off
-; 0000 0405 // INT6: Off
-; 0000 0406 // INT7: Off
-; 0000 0407 EICRA=0x00;
+; 0000 03EE TCNT3H=0x00;
 ;PCODE: $00001552 VOL: 0
 ;PCODE: $00001553 VOL: 0
-; 0000 0408 EICRB=0x00;
+; 0000 03EF TCNT3L=0x00;
 ;PCODE: $00001554 VOL: 0
 ;PCODE: $00001555 VOL: 0
-; 0000 0409 EIMSK=0x00;
+; 0000 03F0 ICR3H=0x00;
 ;PCODE: $00001556 VOL: 0
 ;PCODE: $00001557 VOL: 0
-; 0000 040A 
-; 0000 040B // Timer(s)/Counter(s) Interrupt(s) initialization
-; 0000 040C TIMSK=0x01;
+; 0000 03F1 ICR3L=0x00;
 ;PCODE: $00001558 VOL: 0
 ;PCODE: $00001559 VOL: 0
-; 0000 040D 
-; 0000 040E ETIMSK=0x00;
+; 0000 03F2 OCR3AH=0x00;
 ;PCODE: $0000155A VOL: 0
 ;PCODE: $0000155B VOL: 0
-; 0000 040F 
-; 0000 0410 // USART0 initialization
-; 0000 0411 // Communication Parameters: 8 Data, 1 Stop, No Parity
-; 0000 0412 // USART0 Receiver: On
-; 0000 0413 // USART0 Transmitter: On
-; 0000 0414 // USART0 Mode: Asynchronous
-; 0000 0415 // USART0 Baud Rate: 115200
-; 0000 0416 UCSR0A=0x00;
+; 0000 03F3 OCR3AL=0x00;
 ;PCODE: $0000155C VOL: 0
 ;PCODE: $0000155D VOL: 0
-; 0000 0417 UCSR0B=0xD8;
+; 0000 03F4 OCR3BH=0x00;
 ;PCODE: $0000155E VOL: 0
 ;PCODE: $0000155F VOL: 0
-; 0000 0418 UCSR0C=0x06;
+; 0000 03F5 OCR3BL=0x00;
 ;PCODE: $00001560 VOL: 0
 ;PCODE: $00001561 VOL: 0
-; 0000 0419 UBRR0H=0x00;
+; 0000 03F6 OCR3CH=0x00;
 ;PCODE: $00001562 VOL: 0
 ;PCODE: $00001563 VOL: 0
-; 0000 041A UBRR0L=0x08;
+; 0000 03F7 OCR3CL=0x00;
 ;PCODE: $00001564 VOL: 0
 ;PCODE: $00001565 VOL: 0
-; 0000 041B 
-; 0000 041C // USART1 initialization
-; 0000 041D // Communication Parameters: 8 Data, 1 Stop, No Parity
-; 0000 041E // USART1 Receiver: On
-; 0000 041F // USART1 Transmitter: On
-; 0000 0420 // USART1 Mode: Asynchronous
-; 0000 0421 // USART1 Baud Rate: 9600
-; 0000 0422 UCSR1A=0x00;
+; 0000 03F8 
+; 0000 03F9 // External Interrupt(s) initialization
+; 0000 03FA // INT0: Off
+; 0000 03FB // INT1: Off
+; 0000 03FC // INT2: Off
+; 0000 03FD // INT3: Off
+; 0000 03FE // INT4: Off
+; 0000 03FF // INT5: Off
+; 0000 0400 // INT6: Off
+; 0000 0401 // INT7: Off
+; 0000 0402 EICRA=0x00;
 ;PCODE: $00001566 VOL: 0
 ;PCODE: $00001567 VOL: 0
-; 0000 0423 UCSR1B=0xD8;
+; 0000 0403 EICRB=0x00;
 ;PCODE: $00001568 VOL: 0
 ;PCODE: $00001569 VOL: 0
-; 0000 0424 UCSR1C=0x06;
+; 0000 0404 EIMSK=0x00;
 ;PCODE: $0000156A VOL: 0
 ;PCODE: $0000156B VOL: 0
-; 0000 0425 UBRR1H=0x00;
+; 0000 0405 
+; 0000 0406 // Timer(s)/Counter(s) Interrupt(s) initialization
+; 0000 0407 TIMSK=0x01;
 ;PCODE: $0000156C VOL: 0
 ;PCODE: $0000156D VOL: 0
-; 0000 0426 UBRR1L=0x67;
+; 0000 0408 
+; 0000 0409 ETIMSK=0x00;
 ;PCODE: $0000156E VOL: 0
 ;PCODE: $0000156F VOL: 0
-; 0000 0427 
-; 0000 0428 // Analog Comparator initialization
-; 0000 0429 // Analog Comparator: Off
-; 0000 042A // Analog Comparator Input Capture by Timer/Counter 1: Off
-; 0000 042B ACSR=0x80;
+; 0000 040A 
+; 0000 040B // USART0 initialization
+; 0000 040C // Communication Parameters: 8 Data, 1 Stop, No Parity
+; 0000 040D // USART0 Receiver: On
+; 0000 040E // USART0 Transmitter: On
+; 0000 040F // USART0 Mode: Asynchronous
+; 0000 0410 // USART0 Baud Rate: 115200
+; 0000 0411 UCSR0A=0x00;
 ;PCODE: $00001570 VOL: 0
 ;PCODE: $00001571 VOL: 0
-; 0000 042C SFIOR=0x00;
+; 0000 0412 UCSR0B=0xD8;
 ;PCODE: $00001572 VOL: 0
 ;PCODE: $00001573 VOL: 0
-; 0000 042D 
-; 0000 042E // ADC initialization
-; 0000 042F // ADC disabled
-; 0000 0430 ADCSRA=0x00;
+; 0000 0413 UCSR0C=0x06;
 ;PCODE: $00001574 VOL: 0
 ;PCODE: $00001575 VOL: 0
-; 0000 0431 
-; 0000 0432 // SPI initialization
-; 0000 0433 // SPI Type: Master
-; 0000 0434 // SPI Clock Rate: 2*250,000 kHz
-; 0000 0435 // SPI Clock Phase: Cycle Start
-; 0000 0436 // SPI Clock Polarity: Low
-; 0000 0437 // SPI Data Order: MSB First
-; 0000 0438 SPCR=0x52;
+; 0000 0414 UBRR0H=0x00;
 ;PCODE: $00001576 VOL: 0
 ;PCODE: $00001577 VOL: 0
-; 0000 0439 SPSR=0x00;
+; 0000 0415 UBRR0L=0x08;
 ;PCODE: $00001578 VOL: 0
 ;PCODE: $00001579 VOL: 0
-; 0000 043A 
-; 0000 043B // TWI initialization
-; 0000 043C // TWI disabled
-; 0000 043D TWCR=0x00;
+; 0000 0416 
+; 0000 0417 // USART1 initialization
+; 0000 0418 // Communication Parameters: 8 Data, 1 Stop, No Parity
+; 0000 0419 // USART1 Receiver: On
+; 0000 041A // USART1 Transmitter: On
+; 0000 041B // USART1 Mode: Asynchronous
+; 0000 041C // USART1 Baud Rate: 9600
+; 0000 041D UCSR1A=0x00;
 ;PCODE: $0000157A VOL: 0
 ;PCODE: $0000157B VOL: 0
-; 0000 043E }
-; 0000 043F {
-; 0000 0440 // Global enable interrupts
-; 0000 0441 #asm("sei")
+; 0000 041E UCSR1B=0xD8;
 ;PCODE: $0000157C VOL: 0
-	sei
 ;PCODE: $0000157D VOL: 0
-; 0000 0442 
-; 0000 0443 SSD1963_Init();
+; 0000 041F UCSR1C=0x06;
 ;PCODE: $0000157E VOL: 0
-; 0000 0444 TSC2046_Init();
 ;PCODE: $0000157F VOL: 0
-; 0000 0445 SSD1963_ClearScreen(BLACK);
+; 0000 0420 UBRR1H=0x00;
 ;PCODE: $00001580 VOL: 0
 ;PCODE: $00001581 VOL: 0
+; 0000 0421 UBRR1L=0x67;
 ;PCODE: $00001582 VOL: 0
-; 0000 0446 
-; 0000 0447   SSD1963_PutString16("ДЕСКОМ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2) - FONT_HEIGHT, BLUE, BLACK);
 ;PCODE: $00001583 VOL: 0
+; 0000 0422 
+; 0000 0423 // Analog Comparator initialization
+; 0000 0424 // Analog Comparator: Off
+; 0000 0425 // Analog Comparator Input Capture by Timer/Counter 1: Off
+; 0000 0426 ACSR=0x80;
 ;PCODE: $00001584 VOL: 0
 ;PCODE: $00001585 VOL: 0
+; 0000 0427 SFIOR=0x00;
 ;PCODE: $00001586 VOL: 0
 ;PCODE: $00001587 VOL: 0
+; 0000 0428 
+; 0000 0429 // ADC initialization
+; 0000 042A // ADC disabled
+; 0000 042B ADCSRA=0x00;
 ;PCODE: $00001588 VOL: 0
 ;PCODE: $00001589 VOL: 0
+; 0000 042C 
+; 0000 042D // SPI initialization
+; 0000 042E // SPI Type: Master
+; 0000 042F // SPI Clock Rate: 2*250,000 kHz
+; 0000 0430 // SPI Clock Phase: Cycle Start
+; 0000 0431 // SPI Clock Polarity: Low
+; 0000 0432 // SPI Data Order: MSB First
+; 0000 0433 SPCR=0x52;
 ;PCODE: $0000158A VOL: 0
 ;PCODE: $0000158B VOL: 0
+; 0000 0434 SPSR=0x00;
 ;PCODE: $0000158C VOL: 0
 ;PCODE: $0000158D VOL: 0
+; 0000 0435 
+; 0000 0436 // TWI initialization
+; 0000 0437 // TWI disabled
+; 0000 0438 TWCR=0x00;
 ;PCODE: $0000158E VOL: 0
-; 0000 0448   BACKLIGHT = 0; //On
 ;PCODE: $0000158F VOL: 0
+; 0000 0439 }
+; 0000 043A {
+; 0000 043B // Global enable interrupts
+; 0000 043C #asm("sei")
 ;PCODE: $00001590 VOL: 0
-; 0000 0449   delay_ms(200);
+	sei
 ;PCODE: $00001591 VOL: 0
+; 0000 043D 
+; 0000 043E SSD1963_Init();
 ;PCODE: $00001592 VOL: 0
+; 0000 043F TSC2046_Init();
 ;PCODE: $00001593 VOL: 0
-; 0000 044A   SSD1963_PutString16("ДЕСКОМ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2), RED, BLACK);
+; 0000 0440 SSD1963_ClearScreen(BLACK);
 ;PCODE: $00001594 VOL: 0
 ;PCODE: $00001595 VOL: 0
 ;PCODE: $00001596 VOL: 0
+; 0000 0441 
+; 0000 0442   SSD1963_PutString16("ДЕСКОМ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2) - FONT_HEIGHT, BLUE, BLACK);
 ;PCODE: $00001597 VOL: 0
 ;PCODE: $00001598 VOL: 0
 ;PCODE: $00001599 VOL: 0
@@ -8939,16 +8934,17 @@ _0x1DA:
 ;PCODE: $0000159D VOL: 0
 ;PCODE: $0000159E VOL: 0
 ;PCODE: $0000159F VOL: 0
-; 0000 044B   delay_ms(200);
 ;PCODE: $000015A0 VOL: 0
 ;PCODE: $000015A1 VOL: 0
 ;PCODE: $000015A2 VOL: 0
-; 0000 044C   SSD1963_PutString16("ДЕСКОМ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2) + FONT_HEIGHT, GREEN, BLACK);
+; 0000 0443   BACKLIGHT = 0; //On
 ;PCODE: $000015A3 VOL: 0
 ;PCODE: $000015A4 VOL: 0
+; 0000 0444   delay_ms(200);
 ;PCODE: $000015A5 VOL: 0
 ;PCODE: $000015A6 VOL: 0
 ;PCODE: $000015A7 VOL: 0
+; 0000 0445   SSD1963_PutString16("ДЕСКОМ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2), RED, BLACK);
 ;PCODE: $000015A8 VOL: 0
 ;PCODE: $000015A9 VOL: 0
 ;PCODE: $000015AA VOL: 0
@@ -8956,16 +8952,16 @@ _0x1DA:
 ;PCODE: $000015AC VOL: 0
 ;PCODE: $000015AD VOL: 0
 ;PCODE: $000015AE VOL: 0
-; 0000 044D   delay_ms(200);
 ;PCODE: $000015AF VOL: 0
 ;PCODE: $000015B0 VOL: 0
 ;PCODE: $000015B1 VOL: 0
-; 0000 044E   SSD1963_PutString16("      ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2) - FONT_HEIGHT, BLACK, BLACK);
 ;PCODE: $000015B2 VOL: 0
 ;PCODE: $000015B3 VOL: 0
+; 0000 0446   delay_ms(200);
 ;PCODE: $000015B4 VOL: 0
 ;PCODE: $000015B5 VOL: 0
 ;PCODE: $000015B6 VOL: 0
+; 0000 0447   SSD1963_PutString16("ДЕСКОМ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2) + FONT_HEIGHT, GREEN, BLACK);
 ;PCODE: $000015B7 VOL: 0
 ;PCODE: $000015B8 VOL: 0
 ;PCODE: $000015B9 VOL: 0
@@ -8973,16 +8969,16 @@ _0x1DA:
 ;PCODE: $000015BB VOL: 0
 ;PCODE: $000015BC VOL: 0
 ;PCODE: $000015BD VOL: 0
-; 0000 044F   delay_ms(200);
 ;PCODE: $000015BE VOL: 0
 ;PCODE: $000015BF VOL: 0
 ;PCODE: $000015C0 VOL: 0
-; 0000 0450   SSD1963_PutString16("      ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2), BLACK, BLACK);
 ;PCODE: $000015C1 VOL: 0
 ;PCODE: $000015C2 VOL: 0
+; 0000 0448   delay_ms(200);
 ;PCODE: $000015C3 VOL: 0
 ;PCODE: $000015C4 VOL: 0
 ;PCODE: $000015C5 VOL: 0
+; 0000 0449   SSD1963_PutString16("      ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2) - FONT_HEIGHT, BLACK, BLACK);
 ;PCODE: $000015C6 VOL: 0
 ;PCODE: $000015C7 VOL: 0
 ;PCODE: $000015C8 VOL: 0
@@ -8990,16 +8986,16 @@ _0x1DA:
 ;PCODE: $000015CA VOL: 0
 ;PCODE: $000015CB VOL: 0
 ;PCODE: $000015CC VOL: 0
-; 0000 0451   delay_ms(200);
 ;PCODE: $000015CD VOL: 0
 ;PCODE: $000015CE VOL: 0
 ;PCODE: $000015CF VOL: 0
-; 0000 0452   SSD1963_PutString16("      ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2) + FONT_HEIGHT, BLACK, BLACK);
 ;PCODE: $000015D0 VOL: 0
 ;PCODE: $000015D1 VOL: 0
+; 0000 044A   delay_ms(200);
 ;PCODE: $000015D2 VOL: 0
 ;PCODE: $000015D3 VOL: 0
 ;PCODE: $000015D4 VOL: 0
+; 0000 044B   SSD1963_PutString16("      ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2), BLACK, BLACK);
 ;PCODE: $000015D5 VOL: 0
 ;PCODE: $000015D6 VOL: 0
 ;PCODE: $000015D7 VOL: 0
@@ -9007,50 +9003,72 @@ _0x1DA:
 ;PCODE: $000015D9 VOL: 0
 ;PCODE: $000015DA VOL: 0
 ;PCODE: $000015DB VOL: 0
-; 0000 0453 
-; 0000 0454 Prepare_Screen();
 ;PCODE: $000015DC VOL: 0
-; 0000 0455 State = 1;
 ;PCODE: $000015DD VOL: 0
 ;PCODE: $000015DE VOL: 0
-; 0000 0456 Load_Config();
 ;PCODE: $000015DF VOL: 0
-; 0000 0457 
-; 0000 0458 // Watchdog Timer initialization
-; 0000 0459 // Watchdog Timer Prescaler: OSC/2048k
-; 0000 045A #pragma optsize-
-; 0000 045B #asm("wdr")
 ;PCODE: $000015E0 VOL: 0
-	wdr
+; 0000 044C   delay_ms(200);
 ;PCODE: $000015E1 VOL: 0
-; 0000 045C WDTCR=0x1F;
 ;PCODE: $000015E2 VOL: 0
 ;PCODE: $000015E3 VOL: 0
-; 0000 045D WDTCR=0x0F;
+; 0000 044D   SSD1963_PutString16("      ", 240 - 3 * FONT_WIDTH, (272 / 2) - (FONT_HEIGHT / 2) + FONT_HEIGHT, BLACK, BLACK);
 ;PCODE: $000015E4 VOL: 0
 ;PCODE: $000015E5 VOL: 0
-; 0000 045E #ifdef _OPTIMIZE_SIZE_
-; 0000 045F #pragma optsize+
-; 0000 0460 #endif
-; 0000 0461 }
-; 0000 0462 
-; 0000 0463 while (1)
 ;PCODE: $000015E6 VOL: 0
-; 0000 0464       {
-; 0000 0465       #asm("wdr")
 ;PCODE: $000015E7 VOL: 0
-	wdr
 ;PCODE: $000015E8 VOL: 0
-; 0000 0466       main_loop();
 ;PCODE: $000015E9 VOL: 0
-; 0000 0467       }
 ;PCODE: $000015EA VOL: 0
 ;PCODE: $000015EB VOL: 0
-; 0000 0468 }
 ;PCODE: $000015EC VOL: 0
 ;PCODE: $000015ED VOL: 0
 ;PCODE: $000015EE VOL: 0
+;PCODE: $000015EF VOL: 0
+; 0000 044E 
+; 0000 044F Prepare_Screen();
+;PCODE: $000015F0 VOL: 0
+; 0000 0450 State = 1;
+;PCODE: $000015F1 VOL: 0
+;PCODE: $000015F2 VOL: 0
+; 0000 0451 Load_Config();
+;PCODE: $000015F3 VOL: 0
+; 0000 0452 
+; 0000 0453 // Watchdog Timer initialization
+; 0000 0454 // Watchdog Timer Prescaler: OSC/2048k
+; 0000 0455 #pragma optsize-
+; 0000 0456 #asm("wdr")
+;PCODE: $000015F4 VOL: 0
+	wdr
+;PCODE: $000015F5 VOL: 0
+; 0000 0457 WDTCR=0x1F;
+;PCODE: $000015F6 VOL: 0
+;PCODE: $000015F7 VOL: 0
+; 0000 0458 WDTCR=0x0F;
+;PCODE: $000015F8 VOL: 0
+;PCODE: $000015F9 VOL: 0
+; 0000 0459 #ifdef _OPTIMIZE_SIZE_
+; 0000 045A #pragma optsize+
+; 0000 045B #endif
+; 0000 045C }
+; 0000 045D 
+; 0000 045E while (1)
+;PCODE: $000015FA VOL: 0
+; 0000 045F       {
+; 0000 0460       #asm("wdr")
+;PCODE: $000015FB VOL: 0
+	wdr
+;PCODE: $000015FC VOL: 0
+; 0000 0461       main_loop();
+;PCODE: $000015FD VOL: 0
+; 0000 0462       }
+;PCODE: $000015FE VOL: 0
+;PCODE: $000015FF VOL: 0
+; 0000 0463 }
+;PCODE: $00001600 VOL: 0
+;PCODE: $00001601 VOL: 0
+;PCODE: $00001602 VOL: 0
 
 	.DSEG
-_0x210:
+_0x214:
 	.BYTE 0x2A
