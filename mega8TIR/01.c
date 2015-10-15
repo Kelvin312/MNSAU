@@ -175,11 +175,11 @@ else
 //#define DR1 PORTD.5
 //#define DR2 PORTD.6
 //#define DR3 PORTD.7
-inline void DrOn(char n)
+inline void DrOff(char n)
 {
     PORTD |= 1<<(n+4);
 }
-inline void DrOff(char n)
+inline void DrOn(char n)
 {
     PORTD &= ~(1<<(n+4));
 }
@@ -453,9 +453,8 @@ LEDBLUE = 1;
 while (1)
       {
           if(rx_counter > 6 && uart_firstByte)
-          {
-          test = getchar();  
-              if(test == 0x66)
+          { 
+              if(getchar() == 0x66)
               if(getchar() == 0x06)
               if(getchar() == 0x60)
               {

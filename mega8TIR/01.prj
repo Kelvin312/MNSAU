@@ -22,7 +22,7 @@ Active0=0
 EditorPanel0=0
 PageIndex0=0
 EditorPanel1=0
-TimeStamp1=1196206544
+TimeStamp1=1196333432
 PageIndex1=1
 [Compiler]
 RebuildAll=0
@@ -115,7 +115,7 @@ WarningUnknownPragma=1
 LinkerWarnings=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-Build=14
+Build=16
 UseEEPROMLocation0=1
 [Assembler]
 OutputFormat=1
@@ -196,16 +196,16 @@ Row=0
 Column=0
 ScrollPosX=0
 ScrollPosY=0
-TimeStamp=1196206546
+TimeStamp=1196334621
 [BookmarksFoldedCode]
 Files=1
 F1=01.c
 [Bookmarks1]
-TimeStamp=1196206544
-Row=173
-Column=35
+TimeStamp=1196333432
+Row=212
+Column=39
 ScrollPosX=0
-ScrollPosY=162
+ScrollPosY=280
 BK0=-1
 BK1=-1
 BK2=-1
@@ -217,7 +217,8 @@ BK7=-1
 BK8=-1
 BK9=-1
 [FoldedCode1]
-Blocks=0
+Line1=332
+Blocks=1
 [HeadersList]
 Files=1
 F1=D:\Проекты от студии\mnsauV3 (07.07.15)\mega8TIR\01.c
