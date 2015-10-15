@@ -186,9 +186,9 @@ inline void DrOn(char n)
 
 char test;
 
-signed int regVal[4] = {0,20000,20000,20000}; //0 - 20000
-signed int stepVal[4] = {10,10,10,10}; //1 - 100
-char flipFlop[4] = {0,0,0,0}; //0-1
+signed int regVal[4] = {0,20000,20000,20000}; //0 - 20000 //Угол открытия
+signed int stepVal[4] = {10,10,10,10}; //1 - 100 //Шаг изменения на 1 вольт
+char flipFlop[4] = {0,0,0,0}; //0-1   //Направление отклонения напряжения
 signed int temp[4];
 char index=0;
 
@@ -202,7 +202,7 @@ char index=0;
 #define T_OFF3 0x03*/
 #define TIME_OFF 100
 
-char tValA = T_FREE, tValB = T_FREE;
+char tValA = T_FREE, tValB = T_FREE; //Флаги действий прерываний
 char uart_firstByte=0;
 
  
@@ -212,26 +212,21 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 // Reinitialize Timer 0 value
 TCNT0=0x06;
 
-if(++uart_timeout>15) //&& uart_timeout < 17)
+if(++uart_timeout>15)  //Если 15 мс нет данных, обнуляем буфер
 {
-   // RS485 = 1;
-   // delay_ms(5);
-    //putchar(0xEE);
-   // putchar(test);
-     
     while (rx_counter) getchar(); 
     uart_firstByte = 1;
 }   
 
 //if(uart_timeout > 50) RS485 = 0;
 
-if(uart_timeout>250) LEDBLUE = 1;
+if(uart_timeout>150) LEDBLUE = 1;  //Если 150 мс нет данных, выключить светодиод
 
 }
 
 
 
-inline void TimeAdd(char i)
+inline void TimeAdd(char i)  //Добавить включение тиристора в очередь на свободное прерывание или включить его сразу
 {
     if(regVal[i] < 8)
     {
@@ -284,7 +279,7 @@ interrupt [EXT_INT2] void ext_int2_isr(void)
 
 
 // Timer1 output compare A interrupt service routine
-interrupt [TIM1_COMPA] void timer1_compa_isr(void)
+interrupt [TIM1_COMPA] void timer1_compa_isr(void)  //Взять следующее событие из очереди
 {
     if(tValA & 0x10)
     {
@@ -301,7 +296,7 @@ interrupt [TIM1_COMPA] void timer1_compa_isr(void)
 }
 
 // Timer1 output compare B interrupt service routine
-interrupt [TIM1_COMPB] void timer1_compb_isr(void)
+interrupt [TIM1_COMPB] void timer1_compb_isr(void) //Взять следующее событие из очереди
 {
     if(tValB & 0x10)
     {
@@ -452,30 +447,30 @@ LEDBLUE = 1;
 
 while (1)
       {
-          if(rx_counter > 6 && uart_firstByte)
+          if(rx_counter > 6 && uart_firstByte) //Если с начала посылки прошло больше 6 байт и верный адрес
           { 
               if(getchar() == 0x66)
               if(getchar() == 0x06)
               if(getchar() == 0x60)
               {
-                LEDBLUE = 0;
+                LEDBLUE = 0;          //То включаем светодиод и 
                 for(index=0; index<3; index++)
                 {
                     temp[index] = getchar();
-                    temp[index] -= 100; 
+                    temp[index] -= 100;     //Настраеваем шаг регулирования
                     if(flipFlop[index] && temp[index] > 0 || !flipFlop[index] && temp[index] < 0) 
                     {
-                        stepVal[index]<<=1;
+                        stepVal[index]<<=1; //Если напряжение долго отклоняется в 1 сторону, то увеличиваем шаг
                         if(stepVal[index] > 100) stepVal[index] = 100; 
                     }
                     else if(temp[index] != 0)
                     {
-                        stepVal[index]>>=1;
+                        stepVal[index]>>=1; //Если напряжение колеблится около нужного, уменьшаем шаг
                         if(stepVal[index] < 1) stepVal[index] = 1;
                     }
                      
                     
-                    if(temp[index]<0)
+                    if(temp[index]<0)  //Регулируем угол открытия 
                     {
                         #asm("cli")
                         regVal[index+1] += stepVal[index]*temp[index];

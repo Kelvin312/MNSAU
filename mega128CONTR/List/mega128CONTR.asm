@@ -6143,7 +6143,7 @@ _0xE5:
 ;#define RX_COMPLETE (1<<RXC)
 ;*/
 ;// USART2 Receiver buffer
-;#define RX_BUFFER_SIZE2 20
+;#define RX_BUFFER_SIZE2 20      //Буфер напряжения, тока, частоты, настроек
 ;char rx_buffer2[RX_BUFFER_SIZE2];
 ;
 ;#if RX_BUFFER_SIZE2 <= 256
@@ -6156,7 +6156,7 @@ _0xE5:
 ;char uart_swap = 0;
 ;
 ;// USART0 Receiver buffer
-;#define RX_BUFFER_SIZE0 255
+;#define RX_BUFFER_SIZE0 255      //Буфер данных графиков
 ;char rx_buffer0[RX_BUFFER_SIZE0];
 ;
 ;#if RX_BUFFER_SIZE0 <= 256
@@ -6478,7 +6478,7 @@ _0xFF:
 	sei
 ; 0000 00C5 }
 	RJMP _0x2020007
-;
+;//Двухпоточный юарт :)
 ;inline void putchar0(char c)
 ; 0000 00C8 {
 _putchar0:
@@ -6518,24 +6518,24 @@ _0x2020007:
 ;//#define RS485 PORTD.4
 ;#define BACKLIGHT PORTB.7
 ;
-;#define Graph_X_Min 0
+;#define Graph_X_Min 0    //Координаты графиков
 ;#define Graph_X_Max 478
 ;#define Graph_Y_Min 42
 ;#define Graph_Y_Max 232
-;#define Graph_Step_N 2 //1..3
-;#define Graph_PointCount 80
+;#define Graph_Step_N 2 //1..3  //Количество точек за 1 проход
+;#define Graph_PointCount 80 //Количество точек по горизонтали
 ;
 ;flash unsigned int Graph_X_Step = (Graph_X_Max-Graph_X_Min+2)/Graph_PointCount;
 ;flash unsigned int Graph_Y_Mid = (Graph_Y_Max-Graph_Y_Min)/2 + Graph_Y_Min;
 ;
-;#define Text_StartX 16
+;#define Text_StartX 16  //Координаты текста
 ;#define Text_StartY 6
 ;
-;#define Value_StartX 290
+;#define Value_StartX 290 //Координаты значений
 ;#define Value_StartY 6
 ;#define Value_Lenght (16*4)
 ;
-;#define BTN_StartX 6
+;#define BTN_StartX 6    //Координаты кнопок
 ;#define BTN_StartY 240
 ;#define BTN_Width 100
 ;#define BTN_Height 30
@@ -7014,7 +7014,7 @@ _0x108:
 ;unsigned int GraphUpdTime = 0;
 ;signed int Graph_X = -Graph_X_Step;
 ;signed int ValueLast[3] = {0,0,0};
-;
+;//Настройки
 ;unsigned int ConfigValue[12], old_confVal;
 ;eeprom unsigned int ConfigValue_mem[3];
 ;flash unsigned int ConfigParam[4][12] = {
@@ -8535,7 +8535,7 @@ _0x16C:
 	STS  _GraphState,R30
 ; 0000 0211     }
 ; 0000 0212 
-; 0000 0213     if( rx_counter0 < 2 || (rx_counter0 < 3 && ParameterState != 2))
+; 0000 0213     if( rx_counter0 < 2 || (rx_counter0 < 3 && ParameterState != 2)) //Недостаточно данных
 _0x169:
 	LDS  R26,_rx_counter0
 	CPI  R26,LOW(0x2)
@@ -8751,7 +8751,7 @@ _0x17F:
 _0x180:
 	RJMP _0x17B
 ; 0000 022E 
-; 0000 022F     if(ParameterState != 2)
+; 0000 022F     if(ParameterState != 2) // 3 Графика
 _0x17E:
 	LDS  R26,_ParameterState
 	CPI  R26,LOW(0x2)
@@ -9080,7 +9080,7 @@ _0x18E:
 	RJMP _0x183
 _0x184:
 ; 0000 0251     }
-; 0000 0252     else
+; 0000 0252     else // 2 Графика
 	RJMP _0x193
 _0x181:
 ; 0000 0253     {
@@ -9428,7 +9428,7 @@ _0x17B:
 ;inline void TestParameterFun(char a, char b, char c, char fHz)
 ; 0000 0279 {
 _TestParameterFun:
-; 0000 027A     if(a>101 || a<99 || b>101 || b<99 || c>101 || c<99)
+; 0000 027A     if(a>101 || a<99 || b>101 || b<99 || c>101 || c<99) //Напряжение
 ;	a -> Y+3
 ;	b -> Y+2
 ;	c -> Y+1
@@ -9478,7 +9478,7 @@ _0x1A9:
 	CALL _StartTransmit
 ; 0000 0283     }
 ; 0000 0284 
-; 0000 0285     if(fHz < 49 || fHz > 50)
+; 0000 0285     if(fHz < 49 || fHz > 50) //Частота
 _0x1A8:
 	LD   R26,Y
 	CPI  R26,LOW(0x31)
@@ -9600,7 +9600,7 @@ _0x1AF:
 _main_loop:
 ; 0000 02A3     char fHz, a, b, c;
 ; 0000 02A4 
-; 0000 02A5             switch(ValueState)
+; 0000 02A5             switch(ValueState) //Считывание значений с АЦП другого контроллера
 	CALL __SAVELOCR4
 ;	fHz -> R17
 ;	a -> R16
@@ -9613,7 +9613,7 @@ _main_loop:
 	SBIW R30,0
 	BREQ PC+3
 	JMP _0x1B3
-; 0000 02A8                   if(ValueUpd_mSec > 200) //Надо обновить значения, но как?
+; 0000 02A8                   if(ValueUpd_mSec > 200) //Интервал обновления чисел
 	LDS  R26,_ValueUpd_mSec
 	LDS  R27,_ValueUpd_mSec+1
 	CPI  R26,LOW(0xC9)
@@ -9719,7 +9719,7 @@ _0x1C1:
 ; 0000 02C2                 break;
 _0x1B9:
 	RJMP _0x1B2
-; 0000 02C3                 case 1:
+; 0000 02C3                 case 1: //Обновляем числа
 _0x1B3:
 	CPI  R30,LOW(0x1)
 	LDI  R26,HIGH(0x1)
@@ -9831,7 +9831,7 @@ _0x1D1:
 ; 0000 02E7                 break;
 _0x1C6:
 	RJMP _0x1B2
-; 0000 02E8                 case 2:
+; 0000 02E8                 case 2: //Принимаем поток данных графиков
 _0x1C5:
 	CPI  R30,LOW(0x2)
 	LDI  R26,HIGH(0x2)
@@ -9868,7 +9868,7 @@ _0x1D8:
 	CALL _putchar0
 ; 0000 02EC                     }
 _0x1D6:
-; 0000 02ED                     if(GraphUpd_mSec > 230)
+; 0000 02ED                     if(GraphUpd_mSec > 230) //Время гарантированного считывания потока данных графиков
 _0x1D3:
 	LDS  R26,_GraphUpd_mSec
 	LDS  R27,_GraphUpd_mSec+1
@@ -9886,11 +9886,11 @@ _0x1D9:
 ; 0000 02F2             }
 _0x1B2:
 ; 0000 02F3 
-; 0000 02F4             switch(State)
+; 0000 02F4             switch(State) //Режим отображения
 	LDS  R30,_State
 	LDI  R31,0
 ; 0000 02F5             {
-; 0000 02F6                 case 1:
+; 0000 02F6                 case 1: //Переход в рабочий режим
 	CPI  R30,LOW(0x1)
 	LDI  R26,HIGH(0x1)
 	CPC  R31,R26
@@ -9922,7 +9922,7 @@ _0x1B2:
 	ST   -Y,R30
 	CALL _PutParameterText
 ; 0000 02FA 
-; 0000 02FB                 case 0: // основной рабочий режим
+; 0000 02FB                 case 0: //Основной рабочий режим
 	RJMP _0x1DF
 _0x1DD:
 	SBIW R30,0
@@ -9962,7 +9962,7 @@ _0x1E6:
 	CALL _PutParameterText
 ; 0000 0304                           break;
 	RJMP _0x1E4
-; 0000 0305                           case 2:
+; 0000 0305                           case 2:  //Масштаб графиков
 _0x1E5:
 	CPI  R30,LOW(0x2)
 	BREQ PC+3
@@ -10094,7 +10094,7 @@ _0x1E4:
 ; 0000 0315                 }
 ; 0000 0316                 break;
 	RJMP _0x1DC
-; 0000 0317                 case 4:
+; 0000 0317                 case 4: //Переход в настройки
 _0x1E0:
 	CPI  R30,LOW(0x4)
 	LDI  R26,HIGH(0x4)
@@ -10177,14 +10177,14 @@ _0x1ED:
 	CPC  R31,R27
 	BREQ _0x1F3
 ; 0000 0324                             {
-; 0000 0325                                 //Сохраняем значение
+; 0000 0325                                 //Сохраняем значение при нажатии "СЛЕД"
 ; 0000 0326                                 Save_Eeprom(ConfigState);
 	LDS  R30,_ConfigState
 	ST   -Y,R30
 	RCALL _Save_Eeprom
 ; 0000 0327                             }
 ; 0000 0328 
-; 0000 0329                             if(++ConfigState > 11) ConfigState = 0;
+; 0000 0329                             if(++ConfigState > 11) ConfigState = 0; //Переходим на следующее значение
 _0x1F3:
 	LDS  R26,_ConfigState
 	SUBI R26,-LOW(1)
@@ -10219,7 +10219,7 @@ _0x1F4:
 	STS  _old_confVal+1,R31
 ; 0000 032D                         break;
 	RJMP _0x1F1
-; 0000 032E                         case 2:
+; 0000 032E                         case 2:  //Меняем значение
 _0x1F2:
 	CPI  R30,LOW(0x2)
 	BREQ PC+3
@@ -10358,7 +10358,7 @@ _0x1F5:
 ; 0000 033B                         break;
 _0x1F8:
 	RJMP _0x1F1
-; 0000 033C                         case 4:
+; 0000 033C                         case 4: //Уходим из настроек, не сохраняя текущее значение
 _0x1F7:
 	CPI  R30,LOW(0x4)
 	BRNE _0x1F1
@@ -10466,7 +10466,7 @@ _0x1DE:
 	.CSEG
 _Load_Config:
 ; 0000 0363     char i;
-; 0000 0364     //Читаем настройки
+; 0000 0364     //Читаем настройки с другого контроллера
 ; 0000 0365     putchar2('G');
 	ST   -Y,R17
 ;	i -> R17

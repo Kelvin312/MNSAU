@@ -63,7 +63,7 @@ Data Stack size         : 1024
 #define RX_COMPLETE (1<<RXC)
 */
 // USART2 Receiver buffer
-#define RX_BUFFER_SIZE2 20
+#define RX_BUFFER_SIZE2 20      //Буфер напряжения, тока, частоты, настроек
 char rx_buffer2[RX_BUFFER_SIZE2];
 
 #if RX_BUFFER_SIZE2 <= 256
@@ -76,7 +76,7 @@ unsigned int rx_wr_index2,rx_rd_index2,rx_counter2;
 char uart_swap = 0;
 
 // USART0 Receiver buffer
-#define RX_BUFFER_SIZE0 255
+#define RX_BUFFER_SIZE0 255      //Буфер данных графиков
 char rx_buffer0[RX_BUFFER_SIZE0];
 
 #if RX_BUFFER_SIZE0 <= 256
@@ -195,7 +195,7 @@ else
    UDR0=c;
 #asm("sei")
 }
-
+//Двухпоточный юарт :)
 inline void putchar0(char c)
 {
     uart_swap = 0;
@@ -220,24 +220,24 @@ inline void putchar2(char c)
 //#define RS485 PORTD.4
 #define BACKLIGHT PORTB.7
 
-#define Graph_X_Min 0
+#define Graph_X_Min 0    //Координаты графиков
 #define Graph_X_Max 478
 #define Graph_Y_Min 42
 #define Graph_Y_Max 232
-#define Graph_Step_N 2 //1..3
-#define Graph_PointCount 80
+#define Graph_Step_N 2 //1..3  //Количество точек за 1 проход
+#define Graph_PointCount 80 //Количество точек по горизонтали
 
 flash unsigned int Graph_X_Step = (Graph_X_Max-Graph_X_Min+2)/Graph_PointCount;
 flash unsigned int Graph_Y_Mid = (Graph_Y_Max-Graph_Y_Min)/2 + Graph_Y_Min;
 
-#define Text_StartX 16 
+#define Text_StartX 16  //Координаты текста
 #define Text_StartY 6
 
-#define Value_StartX 290 
+#define Value_StartX 290 //Координаты значений
 #define Value_StartY 6
 #define Value_Lenght (16*4)
 
-#define BTN_StartX 6
+#define BTN_StartX 6    //Координаты кнопок
 #define BTN_StartY 240
 #define BTN_Width 100
 #define BTN_Height 30
@@ -313,7 +313,7 @@ unsigned int Touch_mSec = 0, ValueUpd_mSec = 0, GraphUpd_mSec = 0;
 unsigned int GraphUpdTime = 0;
 signed int Graph_X = -Graph_X_Step; 
 signed int ValueLast[3] = {0,0,0};
-
+//Настройки
 unsigned int ConfigValue[12], old_confVal; 
 eeprom unsigned int ConfigValue_mem[3];
 flash unsigned int ConfigParam[4][12] = {
@@ -334,7 +334,7 @@ TCNT0=0x06;
 // Place your code here
 
 if(Touch_mSec < 0xFF) Touch_mSec++;
-ValueUpd_mSec++;
+ValueUpd_mSec++;   
 GraphUpd_mSec++;
 if(transmitDelayMs<0xFF) transmitDelayMs++;
 
@@ -528,7 +528,7 @@ inline void Paint_Phase(void)
         GraphState = 0;
     }
     
-    if( rx_counter0 < 2 || (rx_counter0 < 3 && ParameterState != 2))
+    if( rx_counter0 < 2 || (rx_counter0 < 3 && ParameterState != 2)) //Недостаточно данных
     {
         if(GraphUpd_mSec > 100) 
         {  
@@ -556,7 +556,7 @@ inline void Paint_Phase(void)
     
     if(TOUCH_IRQ < 1 && Touch_mSec > 60) goto _return; //Отзывчивость
     
-    if(ParameterState != 2)
+    if(ParameterState != 2) // 3 Графика
     {
         for(j=0; j<Graph_Step_N; j++)
         {
@@ -591,7 +591,7 @@ inline void Paint_Phase(void)
             Graph_X += Graph_X_Step; // увеличеваем Х диограммы  
         } 
     }
-    else
+    else // 2 Графика
     {
         for(j=0; j<Graph_Step_N; j++)
         {
@@ -631,7 +631,7 @@ inline void Paint_Phase(void)
 //Функция посылающаа управление куда подальше
 inline void TestParameterFun(char a, char b, char c, char fHz)
 {
-    if(a>101 || a<99 || b>101 || b<99 || c>101 || c<99)
+    if(a>101 || a<99 || b>101 || b<99 || c>101 || c<99) //Напряжение
     {
         AddTxData(0x66);
         AddTxData(0x06);
@@ -642,7 +642,7 @@ inline void TestParameterFun(char a, char b, char c, char fHz)
         StartTransmit();
     }   
     
-    if(fHz < 49 || fHz > 50)
+    if(fHz < 49 || fHz > 50) //Частота
     {
         AddTxData(0x01);
         AddTxData(0x06);
@@ -674,10 +674,10 @@ inline void main_loop()  // основной рабочий режим
 {
     char fHz, a, b, c;
     
-            switch(ValueState)
+            switch(ValueState) //Считывание значений с АЦП другого контроллера
             {
                 case 0: 
-                  if(ValueUpd_mSec > 200) //Надо обновить значения, но как?
+                  if(ValueUpd_mSec > 200) //Интервал обновления чисел
                   {
                       if(ValueState < 2) 
                       {
@@ -704,8 +704,8 @@ inline void main_loop()  // основной рабочий режим
                       rx_buffer_overflow0 = 0;    
                   }
                 break;
-                case 1:
-                  if(rx_counter2 > 8)
+                case 1: //Обновляем числа
+                  if(rx_counter2 > 8)  
                   { 
                       fHz = getchar2();
                       a = getchar2();
@@ -741,26 +741,26 @@ inline void main_loop()  // основной рабочий режим
                       ValueState = 0;  
                   }
                 break;
-                case 2:
+                case 2: //Принимаем поток данных графиков
                     if(ParameterState == 2 && GraphUpd_mSec < 80 && GraphUpd_mSec > 30)
                     {
                         if(tx_counter0 == 0 && rx_buffer_overflow0 == 0) putchar0('Z'); //Вытягиваем недостающие точки    
                     } 
-                    if(GraphUpd_mSec > 230)
+                    if(GraphUpd_mSec > 230) //Время гарантированного считывания потока данных графиков
                     {
                         ValueState = 0;
                     }
                 break;
             } 
             
-            switch(State)
+            switch(State) //Режим отображения
             {
-                case 1:
+                case 1: //Переход в рабочий режим
                     State = 0;
                     Repaint_Button("МЕНЮ", 4, BLACK, WHITE);
                     PutParameterText(ParameterState, BLUE);
                     
-                case 0: // основной рабочий режим
+                case 0: //Основной рабочий режим
                 { 
                       if(GraphState) Paint_Phase(); //Рисуем график
                 
@@ -770,7 +770,7 @@ inline void main_loop()  // основной рабочий режим
                               if(++ParameterState > 2) ParameterState = 0;
                               PutParameterText(ParameterState, BLUE); 
                           break;
-                          case 2: 
+                          case 2:  //Масштаб графиков
                               if(ConfigValue[ParameterState] < ConfigParam[2][ParameterState])
                               {
                                   ConfigValue[ParameterState] += ConfigParam[0][ParameterState];   
@@ -788,7 +788,7 @@ inline void main_loop()  // основной рабочий режим
                       }
                 }
                 break;
-                case 4:
+                case 4: //Переход в настройки
                     State = 5;
                     ConfigState = 0;
                     Repaint_Button("НАЗАД", 4, BLACK, WHITE);
@@ -802,16 +802,16 @@ inline void main_loop()  // основной рабочий режим
                         case 1:
                             if(old_confVal != ConfigValue[ConfigState])
                             { 
-                                //Сохраняем значение
+                                //Сохраняем значение при нажатии "СЛЕД"
                                 Save_Eeprom(ConfigState);
                             }
                         
-                            if(++ConfigState > 11) ConfigState = 0;
+                            if(++ConfigState > 11) ConfigState = 0; //Переходим на следующее значение
                             PutParameterText(ConfigState + State, PURPLE);
                             
-                            old_confVal = ConfigValue[ConfigState];  
+                            old_confVal = ConfigValue[ConfigState];   
                         break;
-                        case 2: 
+                        case 2:  //Меняем значение
                               if(ConfigValue[ConfigState] < ConfigParam[2][ConfigState])
                               {
                                   ConfigValue[ConfigState] += ConfigParam[0][ConfigState];
@@ -825,7 +825,7 @@ inline void main_loop()  // основной рабочий режим
                                   PutParameterText(ConfigState + State, PURPLE);  
                               }
                         break;
-                        case 4:
+                        case 4: //Уходим из настроек, не сохраняя текущее значение
                             State = 1;
                         break;
                     }
@@ -865,7 +865,7 @@ inline void main_loop()  // основной рабочий режим
 void Load_Config(void)
 {
     char i;
-    //Читаем настройки  
+    //Читаем настройки с другого контроллера 
     putchar2('G');
     ValueUpd_mSec = 0;
     ValueState = 5;

@@ -119,55 +119,7 @@ return data;
 }
 #pragma used-
 #endif
-/*
-// USART Transmitter buffer
-#define TX_BUFFER_SIZE 128
-char tx_buffer[TX_BUFFER_SIZE];
 
-#if TX_BUFFER_SIZE <= 256
-unsigned char tx_wr_index,tx_rd_index,tx_counter;
-#else
-unsigned int tx_wr_index,tx_rd_index,tx_counter;
-#endif
-
-// USART Transmitter interrupt service routine
-interrupt [USART_TXC] void usart_tx_isr(void)
-{
-if (tx_counter)
-   {
-   --tx_counter;
-   UDR=tx_buffer[tx_rd_index++];
-#if TX_BUFFER_SIZE != 256
-   if (tx_rd_index == TX_BUFFER_SIZE) tx_rd_index=0;
-#endif
-   }
-}
- 
-#ifndef _DEBUG_TERMINAL_IO_
-// Write a character to the USART Transmitter buffer
-#define _ALTERNATE_PUTCHAR_
-#pragma used+
-void putchar(char c)
-{
-while (tx_counter == TX_BUFFER_SIZE);
-#asm("cli")
-if (tx_counter || ((UCSRA & DATA_REGISTER_EMPTY)==0))
-   {
-   tx_buffer[tx_wr_index++]=c;
-#if TX_BUFFER_SIZE != 256
-   if (tx_wr_index == TX_BUFFER_SIZE) tx_wr_index=0;
-#endif
-   ++tx_counter;
-   }
-else
-   UDR=c;
-#asm("sei")
-}
-#pragma used-
-#endif
-*/
-// Standard Input/Output functions
-//#include <stdio.h>  
 
 #define _ALTERNATE_PUTCHAR_
 void putchar(char c) 
@@ -263,7 +215,7 @@ if(adc_temp & 0x80) //Положительная полуволна
 {
   if(!isRising[adc_wr_input]) //Нарастающий   
   {
-    if(adc_wr_input == FREQUENCY_ADC_INPUT) 
+    if(adc_wr_input == FREQUENCY_ADC_INPUT) //Замеряем частоту
     {
       if(++freg_count > 9) //10 периодов
       {
@@ -361,7 +313,7 @@ inline void main_loop()
     {
         switch(getchar())
         {
-            case 'U':   
+            case 'U':  //Отдать графики напряжений 
                 while(adc_rd_index != adc_wr_index)
                 {
                         for(i=FIRST_U_ADC_INPUT+2; i >= FIRST_U_ADC_INPUT; i--)
@@ -372,7 +324,7 @@ inline void main_loop()
                     if(++adc_rd_index >= ADC_BUF_SIZE) adc_rd_index = 0;
                 }
             break;
-            case 'I':
+            case 'I':  //Отдать графики токов
                 while(adc_rd_index != adc_wr_index)
                 {
                         for(i=FIRST_I_ADC_INPUT+2; i >= FIRST_I_ADC_INPUT; i--)
@@ -383,7 +335,7 @@ inline void main_loop()
                     if(++adc_rd_index >= ADC_BUF_SIZE) adc_rd_index = 0;
                 }
             break;
-            case 'Z':
+            case 'Z':  //Отдать графики обмотки возбуждения
                 while(adc_rd_index != adc_wr_index)
                 {   
                     putchar(adc_data[ZU_ADC_INPUT][adc_rd_index]); 

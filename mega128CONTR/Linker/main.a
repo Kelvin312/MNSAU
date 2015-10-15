@@ -4862,7 +4862,7 @@
 ;#define RX_COMPLETE (1<<RXC)
 ;*/
 ;// USART2 Receiver buffer
-;#define RX_BUFFER_SIZE2 20
+;#define RX_BUFFER_SIZE2 20      //Буфер напряжения, тока, частоты, настроек
 ;char rx_buffer2[RX_BUFFER_SIZE2];
 ;
 ;#if RX_BUFFER_SIZE2 <= 256
@@ -4875,7 +4875,7 @@
 ;char uart_swap = 0;
 ;
 ;// USART0 Receiver buffer
-;#define RX_BUFFER_SIZE0 255
+;#define RX_BUFFER_SIZE0 255      //Буфер данных графиков
 ;char rx_buffer0[RX_BUFFER_SIZE0];
 ;
 ;#if RX_BUFFER_SIZE0 <= 256
@@ -5208,7 +5208,7 @@
 ;PCODE: $00000AC7 VOL: 0
 ;PCODE: $00000AC8 VOL: 0
 ;PCODE: $00000AC9 VOL: 0
-;
+;//Двухпоточный юарт :)
 ;inline void putchar0(char c)
 ; 0000 00C8 {
 ;PCODE: $00000ACA VOL: 0
@@ -5255,24 +5255,24 @@
 ;//#define RS485 PORTD.4
 ;#define BACKLIGHT PORTB.7
 ;
-;#define Graph_X_Min 0
+;#define Graph_X_Min 0    //Координаты графиков
 ;#define Graph_X_Max 478
 ;#define Graph_Y_Min 42
 ;#define Graph_Y_Max 232
-;#define Graph_Step_N 2 //1..3
-;#define Graph_PointCount 80
+;#define Graph_Step_N 2 //1..3  //Количество точек за 1 проход
+;#define Graph_PointCount 80 //Количество точек по горизонтали
 ;
 ;flash unsigned int Graph_X_Step = (Graph_X_Max-Graph_X_Min+2)/Graph_PointCount;
 ;flash unsigned int Graph_Y_Mid = (Graph_Y_Max-Graph_Y_Min)/2 + Graph_Y_Min;
 ;
-;#define Text_StartX 16
+;#define Text_StartX 16  //Координаты текста
 ;#define Text_StartY 6
 ;
-;#define Value_StartX 290
+;#define Value_StartX 290 //Координаты значений
 ;#define Value_StartY 6
 ;#define Value_Lenght (16*4)
 ;
-;#define BTN_StartX 6
+;#define BTN_StartX 6    //Координаты кнопок
 ;#define BTN_StartY 240
 ;#define BTN_Width 100
 ;#define BTN_Height 30
@@ -5617,7 +5617,7 @@ _0x108:
 ;unsigned int GraphUpdTime = 0;
 ;signed int Graph_X = -Graph_X_Step;
 ;signed int ValueLast[3] = {0,0,0};
-;
+;//Настройки
 ;unsigned int ConfigValue[12], old_confVal;
 ;eeprom unsigned int ConfigValue_mem[3];
 ;flash unsigned int ConfigParam[4][12] = {
@@ -6803,7 +6803,7 @@ _0x127:
 ;PCODE: $00000F8D VOL: 0
 ; 0000 0211     }
 ; 0000 0212 
-; 0000 0213     if( rx_counter0 < 2 || (rx_counter0 < 3 && ParameterState != 2))
+; 0000 0213     if( rx_counter0 < 2 || (rx_counter0 < 3 && ParameterState != 2)) //Недостаточно данных
 ;PCODE: $00000F8E VOL: 0
 ;PCODE: $00000F8F VOL: 0
 ;PCODE: $00000F90 VOL: 0
@@ -6967,7 +6967,7 @@ _0x127:
 ;PCODE: $00001014 VOL: 0
 ;PCODE: $00001015 VOL: 0
 ; 0000 022E 
-; 0000 022F     if(ParameterState != 2)
+; 0000 022F     if(ParameterState != 2) // 3 Графика
 ;PCODE: $00001016 VOL: 0
 ;PCODE: $00001017 VOL: 0
 ;PCODE: $00001018 VOL: 0
@@ -7221,7 +7221,7 @@ _0x127:
 ;PCODE: $000010EF VOL: 0
 ;PCODE: $000010F0 VOL: 0
 ; 0000 0251     }
-; 0000 0252     else
+; 0000 0252     else // 2 Графика
 ;PCODE: $000010F1 VOL: 0
 ;PCODE: $000010F2 VOL: 0
 ; 0000 0253     {
@@ -7496,7 +7496,7 @@ _0x127:
 ; 0000 0279 {
 ;PCODE: $000011DA VOL: 0
 ;PCODE: $000011DB VOL: 0
-; 0000 027A     if(a>101 || a<99 || b>101 || b<99 || c>101 || c<99)
+; 0000 027A     if(a>101 || a<99 || b>101 || b<99 || c>101 || c<99) //Напряжение
 ;	a -> Y+3
 ;	b -> Y+2
 ;	c -> Y+1
@@ -7550,7 +7550,7 @@ _0x127:
 ;PCODE: $00001202 VOL: 0
 ; 0000 0283     }
 ; 0000 0284 
-; 0000 0285     if(fHz < 49 || fHz > 50)
+; 0000 0285     if(fHz < 49 || fHz > 50) //Частота
 ;PCODE: $00001203 VOL: 0
 ;PCODE: $00001204 VOL: 0
 ;PCODE: $00001205 VOL: 0
@@ -7668,7 +7668,7 @@ _0x127:
 ;PCODE: $00001257 VOL: 0
 ; 0000 02A3     char fHz, a, b, c;
 ; 0000 02A4 
-; 0000 02A5             switch(ValueState)
+; 0000 02A5             switch(ValueState) //Считывание значений с АЦП другого контроллера
 ;PCODE: $00001258 VOL: 0
 ;	fHz -> R17
 ;	a -> R16
@@ -7680,7 +7680,7 @@ _0x127:
 ; 0000 02A7                 case 0:
 ;PCODE: $0000125B VOL: 0
 ;PCODE: $0000125C VOL: 0
-; 0000 02A8                   if(ValueUpd_mSec > 200) //Надо обновить значения, но как?
+; 0000 02A8                   if(ValueUpd_mSec > 200) //Интервал обновления чисел
 ;PCODE: $0000125D VOL: 0
 ;PCODE: $0000125E VOL: 0
 ;PCODE: $0000125F VOL: 0
@@ -7783,7 +7783,7 @@ _0x127:
 ; 0000 02C2                 break;
 ;PCODE: $000012A7 VOL: 0
 ;PCODE: $000012A8 VOL: 0
-; 0000 02C3                 case 1:
+; 0000 02C3                 case 1: //Обновляем числа
 ;PCODE: $000012A9 VOL: 0
 ;PCODE: $000012AA VOL: 0
 ;PCODE: $000012AB VOL: 0
@@ -7892,7 +7892,7 @@ _0x127:
 ; 0000 02E7                 break;
 ;PCODE: $000012EF VOL: 0
 ;PCODE: $000012F0 VOL: 0
-; 0000 02E8                 case 2:
+; 0000 02E8                 case 2: //Принимаем поток данных графиков
 ;PCODE: $000012F1 VOL: 0
 ;PCODE: $000012F2 VOL: 0
 ;PCODE: $000012F3 VOL: 0
@@ -7927,7 +7927,7 @@ _0x127:
 ;PCODE: $0000130D VOL: 0
 ; 0000 02EC                     }
 ;PCODE: $0000130E VOL: 0
-; 0000 02ED                     if(GraphUpd_mSec > 230)
+; 0000 02ED                     if(GraphUpd_mSec > 230) //Время гарантированного считывания потока данных графиков
 ;PCODE: $0000130F VOL: 0
 ;PCODE: $00001310 VOL: 0
 ;PCODE: $00001311 VOL: 0
@@ -7943,11 +7943,11 @@ _0x127:
 ; 0000 02F2             }
 ;PCODE: $00001317 VOL: 0
 ; 0000 02F3 
-; 0000 02F4             switch(State)
+; 0000 02F4             switch(State) //Режим отображения
 ;PCODE: $00001318 VOL: 0
 ;PCODE: $00001319 VOL: 0
 ; 0000 02F5             {
-; 0000 02F6                 case 1:
+; 0000 02F6                 case 1: //Переход в рабочий режим
 ;PCODE: $0000131A VOL: 0
 ;PCODE: $0000131B VOL: 0
 ; 0000 02F7                     State = 0;
@@ -7971,7 +7971,7 @@ _0x127:
 ;PCODE: $0000132B VOL: 0
 ;PCODE: $0000132C VOL: 0
 ; 0000 02FA 
-; 0000 02FB                 case 0: // основной рабочий режим
+; 0000 02FB                 case 0: //Основной рабочий режим
 ;PCODE: $0000132D VOL: 0
 ;PCODE: $0000132E VOL: 0
 ;PCODE: $0000132F VOL: 0
@@ -8008,7 +8008,7 @@ _0x127:
 ;PCODE: $00001346 VOL: 0
 ; 0000 0304                           break;
 ;PCODE: $00001347 VOL: 0
-; 0000 0305                           case 2:
+; 0000 0305                           case 2:  //Масштаб графиков
 ;PCODE: $00001348 VOL: 0
 ;PCODE: $00001349 VOL: 0
 ;PCODE: $0000134A VOL: 0
@@ -8109,7 +8109,7 @@ _0x127:
 ; 0000 0315                 }
 ; 0000 0316                 break;
 ;PCODE: $0000139A VOL: 0
-; 0000 0317                 case 4:
+; 0000 0317                 case 4: //Переход в настройки
 ;PCODE: $0000139B VOL: 0
 ;PCODE: $0000139C VOL: 0
 ;PCODE: $0000139D VOL: 0
@@ -8171,14 +8171,14 @@ _0x127:
 ;PCODE: $000013C9 VOL: 0
 ;PCODE: $000013CA VOL: 0
 ; 0000 0324                             {
-; 0000 0325                                 //Сохраняем значение
+; 0000 0325                                 //Сохраняем значение при нажатии "СЛЕД"
 ; 0000 0326                                 Save_Eeprom(ConfigState);
 ;PCODE: $000013CB VOL: 0
 ;PCODE: $000013CC VOL: 0
 ;PCODE: $000013CD VOL: 0
 ; 0000 0327                             }
 ; 0000 0328 
-; 0000 0329                             if(++ConfigState > 11) ConfigState = 0;
+; 0000 0329                             if(++ConfigState > 11) ConfigState = 0; //Переходим на следующее значение
 ;PCODE: $000013CE VOL: 0
 ;PCODE: $000013CF VOL: 0
 ;PCODE: $000013D0 VOL: 0
@@ -8207,7 +8207,7 @@ _0x127:
 ;PCODE: $000013E4 VOL: 0
 ; 0000 032D                         break;
 ;PCODE: $000013E5 VOL: 0
-; 0000 032E                         case 2:
+; 0000 032E                         case 2:  //Меняем значение
 ;PCODE: $000013E6 VOL: 0
 ;PCODE: $000013E7 VOL: 0
 ;PCODE: $000013E8 VOL: 0
@@ -8310,7 +8310,7 @@ _0x127:
 ; 0000 033B                         break;
 ;PCODE: $0000143D VOL: 0
 ;PCODE: $0000143E VOL: 0
-; 0000 033C                         case 4:
+; 0000 033C                         case 4: //Уходим из настроек, не сохраняя текущее значение
 ;PCODE: $0000143F VOL: 0
 ;PCODE: $00001440 VOL: 0
 ;PCODE: $00001441 VOL: 0
@@ -8419,7 +8419,7 @@ _0x1DE:
 ;PCODE: $0000147C VOL: 0
 ;PCODE: $0000147D VOL: 0
 ; 0000 0363     char i;
-; 0000 0364     //Читаем настройки
+; 0000 0364     //Читаем настройки с другого контроллера
 ; 0000 0365     putchar2('G');
 ;PCODE: $0000147E VOL: 0
 ;	i -> R17
