@@ -1,4 +1,4 @@
-VERSION:3 SOURCE_TIMESTAMP:474F7BA2
+VERSION:3 SOURCE_TIMESTAMP:475DAA38
 NODE:I LEVEL:0 LINE:24 "C:\cvavreval\inc\mega128.h"
 NODE:I LEVEL:0 LINE:25 "C:\cvavreval\inc\delay.h"
 NODE:I LEVEL:0 LINE:26 "D:\Проекты от студии\mnsauV3 (07.07.15)\mega128CONTR\Font16x16.c"
@@ -93,5 +93,5 @@ NODE:F LEVEL:0 LINE:516 "Paint_Phase(void)"
 NODE:F LEVEL:0 LINE:632 "TestParameterFun(unsigned char a,unsigned char b,unsigned char c,unsigned char fHz)"
 NODE:F LEVEL:0 LINE:657 "Save_Eeprom(unsigned char Number)"
 NODE:F LEVEL:0 LINE:673 "main_loop(void)"
-NODE:F LEVEL:0 LINE:865 "Load_Config(void)"
-NODE:F LEVEL:0 LINE:897 "main(void)"
+NODE:F LEVEL:0 LINE:866 "Load_Config(void)"
+NODE:F LEVEL:0 LINE:898 "main(void)"

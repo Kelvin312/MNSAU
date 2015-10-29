@@ -2394,11 +2394,11 @@ _0x6C:
 	MOVW R26,R0
 	ST   X+,R30
 	ST   X,R31
-; 0000 01AB     if(adc_coef[i] > 600 || adc_coef[i] == 0)
+; 0000 01AB     if(adc_coef[i] > 2000 || adc_coef[i] == 0)
 	RCALL SUBOPT_0x8
 	CALL __GETW1P
-	CPI  R30,LOW(0x259)
-	LDI  R26,HIGH(0x259)
+	CPI  R30,LOW(0x7D1)
+	LDI  R26,HIGH(0x7D1)
 	CPC  R31,R26
 	BRSH _0x6F
 	SBIW R30,0

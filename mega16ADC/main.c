@@ -424,7 +424,7 @@ char i; //Загружаем настройки
 for(i=0; i<9; i++)
 {
     adc_coef[i] =  adc_coef_mem[i];
-    if(adc_coef[i] > 600 || adc_coef[i] == 0) 
+    if(adc_coef[i] > 2000 || adc_coef[i] == 0) 
         adc_coef[i] = adc_coef_def[i];
 }
 adc_coef[8] &= 1;

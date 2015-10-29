@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.30  D:\Проекты от студии\mnsauV3 (07.07.15)\mega16ADC\List\mega16ADC.asm Thu Oct 15 15:33:47 2015
+AVRASM ver. 2.1.30  D:\Проекты от студии\mnsauV3 (07.07.15)\mega16ADC\List\mega16ADC.asm Thu Oct 29 20:45:41 2015
 
 D:\Проекты от студии\mnsauV3 (07.07.15)\mega16ADC\List\mega16ADC.asm(1059): warning: Register r5 already defined by the .DEF directive
 D:\Проекты от студии\mnsauV3 (07.07.15)\mega16ADC\List\mega16ADC.asm(1060): warning: Register r4 already defined by the .DEF directive
@@ -2485,11 +2485,11 @@ D:\Проекты от студии\mnsauV3 (07.07.15)\mega16ADC\List\mega16ADC.asm(1067): warn
 00034e 01d0      	MOVW R26,R0
 00034f 93ed      	ST   X+,R30
 000350 93fc      	ST   X,R31
-                 ; 0000 01AB     if(adc_coef[i] > 600 || adc_coef[i] == 0)
+                 ; 0000 01AB     if(adc_coef[i] > 2000 || adc_coef[i] == 0)
 000351 d09e      	RCALL SUBOPT_0x8
 000352 940e 04b3 	CALL __GETW1P
-000354 35e9      	CPI  R30,LOW(0x259)
-000355 e0a2      	LDI  R26,HIGH(0x259)
+000354 3de1      	CPI  R30,LOW(0x7D1)
+000355 e0a7      	LDI  R26,HIGH(0x7D1)
 000356 07fa      	CPC  R31,R26
 000357 f410      	BRSH _0x6F
 000358 9730      	SBIW R30,0

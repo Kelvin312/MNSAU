@@ -1389,7 +1389,7 @@
 ;PCODE: $000003A4 VOL: 0
 ;PCODE: $000003A5 VOL: 0
 ;PCODE: $000003A6 VOL: 0
-; 0000 01AB     if(adc_coef[i] > 600 || adc_coef[i] == 0)
+; 0000 01AB     if(adc_coef[i] > 2000 || adc_coef[i] == 0)
 ;PCODE: $000003A7 VOL: 0
 ;PCODE: $000003A8 VOL: 0
 ;PCODE: $000003A9 VOL: 0

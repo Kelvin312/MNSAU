@@ -1,0 +1,30 @@
+RAM Allocation
+Variable                                                          Address   Size
+--------------------------------------------------------------------------------
+rx_buffer                                                         0x0160      32
+tx_buffer                                                         0x0180      32
+regVal                                                            0x01A0       8
+stepVal                                                           0x01A8       8
+flipFlop                                                          0x01B0       4
+temp                                                              0x01B4       8
+tValB                                                             0x01BC       1
+uart_firstByte                                                    0x01BD       1
+
+EEPROM Allocation
+Variable                                                          Address   Size
+--------------------------------------------------------------------------------
+
+Register Allocation
+Variable                                                          Register  Size
+--------------------------------------------------------------------------------
+uart_timeout                                                      R5           1
+rx_wr_index                                                       R4           1
+rx_rd_index                                                       R7           1
+rx_counter                                                        R6           1
+rx_buffer_overflow                                                R2.0      1bit
+tx_wr_index                                                       R9           1
+tx_rd_index                                                       R8           1
+tx_counter                                                        R11          1
+test                                                              R10          1
+index                                                             R13          1
+tValA                                                             R12          1
